@@ -1,0 +1,129 @@
+/* UploadFile.css */
+
+.upload-file-page {
+    padding: 20px;
+    background-color: #f0f2f5;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: flex-start; /* Align content to the top */
+    min-height: calc(100vh - 40px); /* Adjust for padding, ensure it takes full height */
+}
+
+.income-statement-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; /* Limit width for better readability */
+    text-align: center;
+}
+
+.income-statement-section h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 28px;
+}
+
+.upload-button {
+    background-color: #007bff; /* Blue button */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.upload-button:hover {
+    background-color: #0056b3;
+}
+
+.upload-button i {
+    font-size: 20px;
+}
+
+.year-section {
+    margin-bottom: 25px;
+    text-align: left; /* Align text within section */
+}
+
+.year-section h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 20px;
+}
+
+.upload-slots {
+    display: flex;
+    gap: 20px;
+    justify-content: center; /* Center the slots within the section */
+}
+
+.upload-slot {
+    width: 150px; /* Fixed width for each slot */
+    height: 100px; /* Fixed height for each slot */
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+    color: #bbb;
+    /* This creates the 'X' effect, you could use an SVG or a more robust solution */
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-slot::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 2px;
+    background-color: #bbb;
+    transform: rotate(45deg);
+}
+
+.upload-slot::after {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 2px;
+    background-color: #bbb;
+    transform: rotate(-45deg);
+}
+
+
+.create-report-button {
+    background-color: #28a745; /* Green button */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.create-report-button:hover {
+    background-color: #218838;
+}
+
+.create-report-button i {
+    font-size: 20px;
+}

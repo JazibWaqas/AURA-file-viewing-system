@@ -1,0 +1,90 @@
+/* CreateFile.css */
+
+.create-file-page {
+    padding: 20px;
+    background-color: #f0f2f5;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px); /* Adjust for padding, assuming no fixed header/sidebar */
+}
+
+.viewing-system-header {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.viewing-system-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.create-file-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-grow: 1; /* Allows it to take up remaining space */
+    display: flex;
+    flex-direction: column;
+}
+
+.create-file-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 20px;
+    display: inline-block; /* To align with done button */
+}
+
+.done-button {
+    background-color: #28a745; /* Green button */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    float: right; /* Align to the right */
+    margin-top: -35px; /* Adjust position relative to h3 */
+}
+
+.done-button:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+.data-grid {
+    display: grid;
+    /* Define columns dynamically, e.g., repeat(5, 1fr) for 5 columns */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px; /* Small gap to create borders */
+    border: 1px solid #ddd;
+    background-color: #ddd; /* Grid lines color */
+    flex-grow: 1; /* Allow grid to fill available space */
+    overflow: auto; /* Enable scrolling if content exceeds height */
+}
+
+.grid-row {
+    display: contents; /* Allows cells to directly be children of the grid */
+}
+
+.grid-cell {
+    border: 1px solid #eee;
+    padding: 8px;
+    background-color: #fff;
+    box-sizing: border-box; /* Include padding in cell width/height */
+    width: 100%; /* Ensure input takes full cell width */
+    font-size: 14px;
+    outline: none; /* Remove default input outline */
+}
+
+.grid-cell:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 0 1px #007bff;
+}

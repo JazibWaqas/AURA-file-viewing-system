@@ -1,13 +1,29 @@
-import Sidebar from "../components/Sidebar.jsx";
-import CreateFile from "../components/CreateFile.jsx";
+import React from 'react';
+import '../styles/CreateFile.css'; // Assuming you'll create a CSS file for styling
 
-export default function CreateFilePage() {
+const CreateFile = () => {
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 bg-gray-50 min-h-screen">
-        <CreateFile />
+    <div className="create-file-page">
+      <div className="viewing-system-header">
+        <h2>VIEWING SYSTEM</h2>
+      </div>
+
+      <div className="create-file-section">
+        <h3>CREATE A FILE</h3>
+        <button className="done-button">DONE</button>
+        <div className="data-grid">
+          {/* Simple grid for data entry */}
+          {[...Array(10)].map((_, rowIndex) => (
+            <div key={rowIndex} className="grid-row">
+              {[...Array(5)].map((_, colIndex) => (
+                <input key={colIndex} type="text" className="grid-cell" />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default CreateFile;
