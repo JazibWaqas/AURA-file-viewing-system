@@ -1,0 +1,11 @@
+/* Example: Add a subtle shadow utility */
+.shadow-subtle {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  
+  /* Example: Card hover effect */
+  .card-hover:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.08);
+    transition: all 0.2s;
+  }

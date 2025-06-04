@@ -1,0 +1,23 @@
+.fileviewer-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 2rem;
+  }
+  
+  .toc-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .toc-list li {
+    padding: 0.5rem 0;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s;
+  }
+  
+  .toc-list li.active, .toc-list li:hover {
+    border-left: 3px solid #6366f1;
+    background: #f3f4f6;
+    color: #3730a3;
+  }

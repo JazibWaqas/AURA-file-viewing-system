@@ -1,0 +1,21 @@
+.sidebar {
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    min-width: 240px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.02);
+  }
+  
+  .sidebar .active {
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 600;
+  }
+  
+  .sidebar ul li {
+    transition: background 0.2s;
+  }
+  
+  .sidebar ul li:hover {
+    background: #f3f4f6;
+    cursor: pointer;
+  }
