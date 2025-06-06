@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus, FaTimes } from "react-icons/fa";
-import "../styles/sidebar.css";
+import "../styles/globals.css";
 
 const navLinks = [
   { to: "/", label: "Dashboard", icon: <FaHome /> },

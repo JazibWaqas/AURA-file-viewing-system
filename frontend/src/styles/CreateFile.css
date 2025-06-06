@@ -2,11 +2,9 @@
 
 .create-file-page {
     padding: 20px;
-    background-color: #f0f2f5;
-    font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px); /* Adjust for padding, assuming no fixed header/sidebar */
+    height: calc(100vh - 40px);
 }
 
 .viewing-system-header {
@@ -29,7 +27,7 @@
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    flex-grow: 1; /* Allows it to take up remaining space */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
@@ -39,11 +37,11 @@
     margin-bottom: 15px;
     color: #333;
     font-size: 20px;
-    display: inline-block; /* To align with done button */
+    display: inline-block;
 }
 
 .done-button {
-    background-color: #28a745; /* Green button */
+    background-color: #28a745;
     color: white;
     border: none;
     padding: 8px 15px;
@@ -51,40 +49,39 @@
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s;
-    float: right; /* Align to the right */
-    margin-top: -35px; /* Adjust position relative to h3 */
+    float: right;
+    margin-top: -35px;
 }
 
 .done-button:hover {
-    background-color: #218838; /* Darker green on hover */
+    background-color: #218838;
 }
 
 .data-grid {
     display: grid;
-    /* Define columns dynamically, e.g., repeat(5, 1fr) for 5 columns */
     grid-template-columns: repeat(5, 1fr);
-    gap: 1px; /* Small gap to create borders */
+    gap: 1px;
     border: 1px solid #ddd;
-    background-color: #ddd; /* Grid lines color */
-    flex-grow: 1; /* Allow grid to fill available space */
-    overflow: auto; /* Enable scrolling if content exceeds height */
+    background-color: #ddd;
+    flex-grow: 1;
+    overflow: auto;
 }
 
 .grid-row {
-    display: contents; /* Allows cells to directly be children of the grid */
+    display: contents;
 }
 
 .grid-cell {
     border: 1px solid #eee;
     padding: 8px;
     background-color: #fff;
-    box-sizing: border-box; /* Include padding in cell width/height */
-    width: 100%; /* Ensure input takes full cell width */
+    box-sizing: border-box;
+    width: 100%;
     font-size: 14px;
-    outline: none; /* Remove default input outline */
+    outline: none;
 }
 
 .grid-cell:focus {
-    border-color: #007bff; /* Highlight on focus */
+    border-color: #007bff;
     box-shadow: 0 0 0 1px #007bff;
 }

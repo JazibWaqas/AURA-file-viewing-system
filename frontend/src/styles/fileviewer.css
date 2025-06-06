@@ -2,8 +2,6 @@
 
 .file-viewer-page {
   padding: 20px;
-  background-color: #f0f2f5;
-  font-family: Arial, sans-serif;
   display: flex;
 }
 
@@ -13,11 +11,11 @@
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Ensures borders/shadows are contained */
+  overflow: hidden;
 }
 
 .table-of-contents {
-  width: 250px; /* Fixed width for TOC */
+  width: 250px;
   padding: 20px;
   border-right: 1px solid #eee;
   background-color: #fcfcfc;
@@ -45,13 +43,13 @@
 }
 
 .table-of-contents li:hover {
-  color: #007bff; /* Highlight on hover */
+  color: #007bff;
 }
 
 .report-content {
   flex-grow: 1;
   padding: 20px 30px;
-  overflow-y: auto; /* Enable scrolling for report content */
+  overflow-y: auto;
 }
 
 .report-header {
@@ -59,16 +57,16 @@
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping for elements */
+  flex-wrap: wrap;
   align-items: center;
-  gap: 15px; /* Spacing between header elements */
+  gap: 15px;
 }
 
 .report-header h2 {
   margin: 0;
   color: #333;
   font-size: 28px;
-  flex-basis: 100%; /* Take full width */
+  flex-basis: 100%;
 }
 
 .report-header p {
@@ -80,7 +78,7 @@
 .report-actions {
   display: flex;
   gap: 15px;
-  margin-left: auto; /* Pushes actions to the right */
+  margin-left: auto;
 }
 
 .report-actions span {
@@ -99,7 +97,7 @@
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 15px;
-  flex-grow: 1; /* Allow it to take available space */
+  flex-grow: 1;
 }
 
 .zoom-select {

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/Header.css';
+import '../styles/globals.css';
 
 const Header = ({ onMenuClick }) => (
   <header className="header">

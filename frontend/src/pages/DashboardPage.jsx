@@ -58,7 +58,7 @@ const Dashboard = () => {
             <Link className="action-button" to="/file-index">File Index</Link>
             <Link className="action-button" to="/upload-file">Upload File</Link>
             <Link className="action-button" to="/create-file">Create File</Link>
-            <Link className="action-button" to="/reports">View Reports</Link>
+            <Link className="action-button" to="/file-viewer">View Reports</Link>
           </div>
         </div>
       </div>

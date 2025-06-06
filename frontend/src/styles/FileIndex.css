@@ -2,8 +2,6 @@
 
 .file-index-page {
     padding: 20px;
-    background-color: #f0f2f5;
-    font-family: Arial, sans-serif;
 }
 
 .search-filter-bar {
@@ -31,7 +29,7 @@
 }
 
 .filter-button {
-    background-color: #e9ecef; /* Light gray button */
+    background-color: #e9ecef;
     color: #333;
     border: 1px solid #ccc;
     padding: 10px 15px;
@@ -65,7 +63,7 @@
 
 .file-cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
 }
 
@@ -88,7 +86,7 @@
     width: 100%;
     height: 150px;
     object-fit: cover;
-    background-color: #f8f9fa; /* Placeholder background */
+    background-color: #f8f9fa;
     border-bottom: 1px solid #eee;
 }
 
@@ -114,7 +112,7 @@
 }
 
 .view-file-button {
-    background-color: #6c757d; /* Gray button */
+    background-color: #6c757d;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -129,7 +127,6 @@
 .view-file-button:hover {
     background-color: #5a6268;
 }
-
 
 .category-cards-container {
     display: grid;
