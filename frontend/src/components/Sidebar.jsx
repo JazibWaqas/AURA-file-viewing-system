@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus, FaTimes } from "react-icons/fa";
+import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus, FaTimes, FaUser } from "react-icons/fa";
 import "../styles/globals.css";
 
 const navLinks = [
@@ -12,6 +12,7 @@ const navLinks = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
+
   return (
     <aside className={`sidebar${isOpen ? " open" : ""}`}>
       <button className="close-btn" onClick={onClose} aria-label="Close sidebar">
@@ -34,10 +35,12 @@ export default function Sidebar({ isOpen, onClose }) {
         </ul>
       </nav>
       <div className="sidebar-user-profile">
-        <div className="sidebar-user-avatar">O</div>
+        <div className="sidebar-user-avatar">
+          <FaUser />
+        </div>
         <div className="sidebar-user-info">
-          <div className="sidebar-user-name">Olivia Rhye</div>
-          <div className="sidebar-user-email">olivia@example.com</div>
+          <div className="sidebar-user-name">User Profile</div>
+          <div className="sidebar-user-email"></div>
         </div>
       </div>
     </aside>
