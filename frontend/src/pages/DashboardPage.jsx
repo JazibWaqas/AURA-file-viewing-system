@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
-import '../styles/dashboard.css'; // Assuming you'll create a CSS file for styling
+import Header from '../components/Header.jsx';
 
 const Dashboard = () => {
   return (
@@ -26,14 +27,12 @@ const Dashboard = () => {
       <div className="charts-section">
         <div className="chart-card">
           <h4>Income, Expenses & Profit Trends</h4>
-          {/* Placeholder for chart */}
           <div className="chart-placeholder">
             <img src="/placeholder-line-chart.png" alt="Income, Expenses & Profit Trends" />
           </div>
         </div>
         <div className="chart-card">
           <h4>Monthly Expenses by Category</h4>
-          {/* Placeholder for chart */}
           <div className="chart-placeholder">
             <img src="/placeholder-bar-chart.png" alt="Monthly Expenses by Category" />
           </div>
@@ -56,10 +55,10 @@ const Dashboard = () => {
         <div className="quick-actions">
           <h4>Quick Actions</h4>
           <div className="action-buttons">
-            <button className="action-button">File Index</button>
-            <button className="action-button">Upload File</button>
-            <button className="action-button">Create File</button>
-            <button className="action-button">View Reports</button>
+            <Link className="action-button" to="/file-index">File Index</Link>
+            <Link className="action-button" to="/upload-file">Upload File</Link>
+            <Link className="action-button" to="/create-file">Create File</Link>
+            <Link className="action-button" to="/reports">View Reports</Link>
           </div>
         </div>
       </div>
@@ -86,11 +85,25 @@ const Dashboard = () => {
 };
 
 export default function DashboardPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 900);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar />
-      <div style={{ flex: 1 }}>
-        <Dashboard />
+    <div className="app-root">
+      <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
+      <div className="app-content-row">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main className="main-content">
+          <Dashboard />
+        </main>
       </div>
     </div>
   );

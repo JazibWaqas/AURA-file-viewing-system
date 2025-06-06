@@ -1,0 +1,57 @@
+.header {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  z-index: 1100;
+  padding: 0 2rem 0 1rem;
+}
+
+.header-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.header-title {
+  color: #000;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  text-align: left;
+}
+
+.hamburger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 1rem;
+  padding: 0;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: #222;
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+@media (min-width: 900px) {
+  .hamburger {
+    display: none;
+  }
+}
