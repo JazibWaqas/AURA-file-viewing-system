@@ -33,6 +33,13 @@ export default function Sidebar({ isOpen, onClose }) {
           ))}
         </ul>
       </nav>
+      <div className="sidebar-user-profile">
+        <div className="sidebar-user-avatar">O</div>
+        <div className="sidebar-user-info">
+          <div className="sidebar-user-name">Olivia Rhye</div>
+          <div className="sidebar-user-email">olivia@example.com</div>
+        </div>
+      </div>
     </aside>
   );
 }

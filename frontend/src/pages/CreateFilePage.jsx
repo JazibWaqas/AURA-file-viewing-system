@@ -28,7 +28,7 @@ const CreateFile = () => {
 
             <div className="create-file-section">
               <h3>CREATE A FILE</h3>
-              <button className="done-button">DONE</button>
+          
               <div className="data-grid">
                 {/* Simple grid for data entry */}
                 {[...Array(10)].map((_, rowIndex) => (
@@ -36,9 +36,11 @@ const CreateFile = () => {
                     {[...Array(5)].map((_, colIndex) => (
                       <input key={colIndex} type="text" className="grid-cell" />
                     ))}
-                  </div>
+                    
+                  </div> 
+                  
                 ))}
-              </div>
+              </div> <button className="done-button">DONE</button>
             </div>
           </div>
         </main>

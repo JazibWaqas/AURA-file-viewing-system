@@ -1,125 +1,277 @@
-/* UploadFile.css */
+/* UploadFile.css - Modern, wireframe-matching styles */
 
-.upload-file-page {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 40px);
+.app-root {
+  min-height: 100vh;
+  background: #f8f9fb;
+  display: flex;
+  flex-direction: column;
 }
 
-.income-statement-section {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
+.app-content-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
-.income-statement-section h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #333;
-    font-size: 28px;
+.main-content {
+  max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  padding: 32px 40px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px);
+  overflow: auto;
+  box-sizing: border-box;
 }
 
-.upload-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    transition: background-color 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 30px;
+.upload-content-row {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  width: 100%;
+  align-items: flex-start;
 }
 
-.upload-button:hover {
-    background-color: #0056b3;
+.upload-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 32px 32px 32px;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.upload-button i {
-    font-size: 20px;
+.upload-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
 }
 
-.year-section {
-    margin-bottom: 25px;
-    text-align: left;
+.upload-subtitle {
+  color: #888;
+  font-size: 1rem;
+  margin-bottom: 24px;
 }
 
-.year-section h4 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #555;
-    font-size: 20px;
+.drop-zone {
+  border: 2px dashed #b3b3b3;
+  border-radius: 12px;
+  background: #f4f6fa;
+  padding: 32px 0;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: border-color 0.2s;
+}
+.drop-zone:hover {
+  border-color: #6c63ff;
+}
+.upload-icon {
+  font-size: 3.0rem;
+  color: #6c63ff;
+  margin-bottom: 30px;
+  margin-left: 15px;
+}
+.supported-formats {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin-top: 4px;
 }
 
-.upload-slots {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
+.file-details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.file-details-form label {
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 2px;
+}
+.file-details-form input,
+.file-details-form textarea,
+.file-details-form select {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  background: #fafbfc;
+  margin-bottom: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.file-details-form input:focus,
+.file-details-form textarea:focus,
+.file-details-form select:focus {
+  border-color: #6c63ff;
+}
+.file-details-form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+.dropdown-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.dropdown-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+.cancel-button {
+  background: #f3f3f3;
+  color: #888;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cancel-button:hover {
+  background: #e0e0e0;
+}
+.upload-file-button {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.upload-file-button:hover {
+  background: #554ee2;
 }
 
-.upload-slot {
-    width: 150px;
-    height: 100px;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    background-color: #f8f8f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 50px;
-    color: #bbb;
-    position: relative;
-    overflow: hidden;
+.recent-uploads-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 28px 24px 20px 24px;
+  min-width: 320px;
+  max-width: 380px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: fit-content;
+}
+.recent-uploads-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #222;
+}
+.recent-uploads-subtitle {
+  color: #888;
+  font-size: 0.97rem;
+  margin-bottom: 18px;
+}
+.recent-uploads-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.recent-upload-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f7f8fa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.file-icon-background {
+  background: #e7e9fc;
+  border-radius: 6px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.file-icon {
+  font-size: 1.3rem;
+  color: #6c63ff;
+}
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.file-type-date {
+  color: #888;
+  font-size: 0.97rem;
+}
+.dot-separator {
+  margin: 0 6px;
+  font-weight: bold;
+  color: #bbb;
+}
+.file-actions {
+  display: flex;
+  gap: 10px;
+}
+.action-icon {
+  font-size: 1.1rem;
+  color: #6c63ff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.action-icon:hover {
+  color: #554ee2;
 }
 
-.upload-slot::before {
-    content: '';
-    position: absolute;
-    width: 80%;
-    height: 2px;
-    background-color: #bbb;
-    transform: rotate(45deg);
+/* Sidebar user profile (add to Sidebar component CSS if needed) */
+.sidebar-user-profile {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #f4f6fa;
+  border-top: 1px solid #ececec;
 }
-
-.upload-slot::after {
-    content: '';
-    position: absolute;
-    width: 80%;
-    height: 2px;
-    background-color: #bbb;
-    transform: rotate(-45deg);
+.sidebar-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 700;
 }
-
-.create-report-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    transition: background-color 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
 }
-
-.create-report-button:hover {
-    background-color: #218838;
+.sidebar-user-name {
+  font-weight: 600;
+  color: #222;
+  font-size: 1rem;
 }
-
-.create-report-button i {
-    font-size: 20px;
+.sidebar-user-email {
+  color: #888;
+  font-size: 0.95rem;
 }
