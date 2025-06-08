@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const path = require('path');
 const categoryController = require('./controllers/categoryController');
 const { handleMulterError } = require('./middleware/upload');
+const mongoose = require('mongoose');
 
 // Load environment variables
 dotenv.config();
@@ -56,7 +57,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
         timestamp: new Date(),
-        uptime: process.uptime()
+        uptime: process.uptime(),
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     });
 });
 

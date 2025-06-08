@@ -2,6 +2,43 @@ const File = require('../models/File');
 const fs = require('fs').promises;
 const path = require('path');
 
+
+
+//upload lots of files 
+// Upload multiple files (bulk upload)
+exports.uploadBulkFiles = async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files uploaded' });
+        }
+
+        const filesToSave = req.files.map(file => ({
+            filename: file.filename,
+            originalName: file.originalname,
+            fileType: file.mimetype.includes('excel') ? 'excel' : 'pdf',
+            category: req.body.category,
+            year: parseInt(req.body.year),
+            month: parseInt(req.body.month),
+            path: file.path,
+            size: file.size,
+            description: req.body.description || '',
+            uploadedBy: req.body.uploadedBy || 'anonymous'
+        }));
+
+        const savedFiles = await File.insertMany(filesToSave);
+
+        res.status(201).json({
+            message: 'Files uploaded successfully',
+            files: savedFiles
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error uploading files',
+            error: error.message
+        });
+    }
+};
+
 // Upload a file
 exports.uploadFile = async (req, res) => {
     try {
@@ -9,6 +46,7 @@ exports.uploadFile = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
+        // Create a new file document
         const file = new File({
             filename: req.file.filename,
             originalName: req.file.originalname,
@@ -18,13 +56,31 @@ exports.uploadFile = async (req, res) => {
             month: parseInt(req.body.month),
             path: req.file.path,
             size: req.file.size,
+            description: req.body.description || '',
             uploadedBy: req.body.uploadedBy || 'anonymous'
         });
 
-        await file.save();
-        res.status(201).json(file);
+        // Save to database
+        const savedFile = await file.save();
+        
+        // Return success response
+        res.status(201).json({
+            message: 'File uploaded successfully',
+            file: savedFile
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        // If there's an error, try to delete the uploaded file
+        if (req.file) {
+            try {
+                await fs.unlink(req.file.path);
+            } catch (unlinkError) {
+                console.error('Error deleting file after failed upload:', unlinkError);
+            }
+        }
+        res.status(500).json({ 
+            message: 'Error uploading file',
+            error: error.message 
+        });
     }
 };
 
