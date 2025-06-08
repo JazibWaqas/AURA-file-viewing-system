@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/aura-files';
+        console.log('Connecting to MongoDB...');
+        
+        const conn = await mongoose.connect(MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

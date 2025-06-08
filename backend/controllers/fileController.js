@@ -42,7 +42,17 @@ exports.uploadBulkFiles = async (req, res) => {
 // Upload a file
 exports.uploadFile = async (req, res) => {
     try {
+        console.log('Upload request received:', {
+            file: req.file ? {
+                filename: req.file.filename,
+                size: req.file.size,
+                mimetype: req.file.mimetype
+            } : 'No file',
+            body: req.body
+        });
+
         if (!req.file) {
+            console.log('No file in request');
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
@@ -57,11 +67,27 @@ exports.uploadFile = async (req, res) => {
             path: req.file.path,
             size: req.file.size,
             description: req.body.description || '',
-            uploadedBy: req.body.uploadedBy || 'anonymous'
+            uploadedBy: req.body.uploadedBy || 'anonymous',
+            status: 'Draft'
+        });
+
+        console.log('Attempting to save file to database:', {
+            filename: file.filename,
+            originalName: file.originalName,
+            category: file.category,
+            year: file.year,
+            month: file.month,
+            size: file.size
         });
 
         // Save to database
         const savedFile = await file.save();
+        
+        console.log('File saved successfully to database:', {
+            id: savedFile._id,
+            filename: savedFile.filename,
+            path: savedFile.path
+        });
         
         // Return success response
         res.status(201).json({
@@ -69,10 +95,12 @@ exports.uploadFile = async (req, res) => {
             file: savedFile
         });
     } catch (error) {
+        console.error('Error in uploadFile:', error);
         // If there's an error, try to delete the uploaded file
         if (req.file) {
             try {
                 await fs.unlink(req.file.path);
+                console.log('Deleted uploaded file after error');
             } catch (unlinkError) {
                 console.error('Error deleting file after failed upload:', unlinkError);
             }
@@ -87,9 +115,26 @@ exports.uploadFile = async (req, res) => {
 // Get all files
 exports.getAllFiles = async (req, res) => {
     try {
+        console.log('Fetching all files from database...');
         const files = await File.find().sort({ createdAt: -1 });
+        console.log(`Found ${files.length} files in database`);
+        
+        // Log each file's details
+        files.forEach(file => {
+            console.log('File in database:', {
+                id: file._id,
+                filename: file.filename,
+                originalName: file.originalName,
+                category: file.category,
+                year: file.year,
+                month: file.month,
+                uploadedAt: file.createdAt
+            });
+        });
+
         res.json(files);
     } catch (error) {
+        console.error('Error fetching files:', error);
         res.status(500).json({ message: error.message });
     }
 };

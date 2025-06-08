@@ -16,7 +16,12 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -86,7 +91,7 @@ process.on('uncaughtException', (err) => {
     }, 1000);
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5173;
 
 const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

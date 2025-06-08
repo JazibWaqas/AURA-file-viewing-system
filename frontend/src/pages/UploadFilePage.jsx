@@ -16,10 +16,19 @@ export default function UploadFilePage() {
 
   // Fetch recent uploads on mount
   React.useEffect(() => {
-    fetch('/api/files?limit=5&sort=desc')
-      .then(res => res.json())
-      .then(data => setRecentUploads(data))
-      .catch(() => setRecentUploads([]));
+    const fetchFiles = async () => {
+      try {
+        console.log('Fetching files from database...');
+        const res = await fetch('http://localhost:5173/api/files');
+        const data = await res.json();
+        console.log('Files from database:', data);
+        setRecentUploads(data);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+        setRecentUploads([]);
+      }
+    };
+    fetchFiles();
   }, []);
 
   const handleFileChange = (e) => {
@@ -64,15 +73,45 @@ export default function UploadFilePage() {
     formData.append('description', description);
     formData.append('category', category);
     formData.append('year', year);
+    formData.append('month', new Date().getMonth() + 1); // Add current month
+    formData.append('uploadedBy', 'anonymous'); // Add uploadedBy field
 
     try {
-      const res = await fetch('/api/files', {
+      console.log('Sending request to backend...');
+      const res = await fetch('http://localhost:5173/api/files/upload', {
         method: 'POST',
         body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
       });
-      if (!res.ok) throw new Error('Upload failed');
-      const newFile = await res.json();
-      setRecentUploads([newFile, ...recentUploads.slice(0, 4)]);
+      
+      console.log('Response status:', res.status);
+      console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+      
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Error response text:', text);
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.message || 'Upload failed');
+        } catch (parseError) {
+          throw new Error(`Upload failed: ${text}`);
+        }
+      }
+      
+      const text = await res.text();
+      console.log('Response text:', text);
+      
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        throw new Error('Invalid server response');
+      }
+      
+      setRecentUploads([data.file, ...recentUploads.slice(0, 4)]);
       setFile(null);
       setFileName('');
       setDescription('');
@@ -80,7 +119,8 @@ export default function UploadFilePage() {
       setYear('');
       alert('File uploaded successfully!');
     } catch (err) {
-      alert('Error uploading file.');
+      console.error('Upload error:', err);
+      alert(err.message || 'Error uploading file.');
     }
     setUploading(false);
   };
@@ -193,20 +233,23 @@ export default function UploadFilePage() {
             </div>
             <div className="recent-uploads-card narrow">
               <h3>Recent Uploads</h3>
-              <p className="recent-uploads-subtitle">Quick access to your latest accounting files.</p>
+              <p className="recent-uploads-subtitle">Files in database:</p>
               <div className="recent-uploads-list">
                 {recentUploads.length === 0 ? (
-                  <p className="recent-uploads-empty">No recent uploads.</p>
+                  <p className="recent-uploads-empty">No files in database.</p>
                 ) : (
-                  recentUploads.map((item, index) => (
-                    <div className="recent-upload-item" key={item._id || index}>
+                  recentUploads.map((item) => (
+                    <div className="recent-upload-item" key={item._id}>
                       <div className="file-icon-background">
                         <FiFile className="file-icon" />
                       </div>
                       <div className="file-info">
-                        <strong>{item.title}</strong>
+                        <strong>{item.originalName}</strong>
                         <p className="file-type-date">
                           {item.category} <span className="dot-separator">•</span> {item.year}
+                        </p>
+                        <p className="file-upload-date">
+                          Uploaded: {new Date(item.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="file-actions">
