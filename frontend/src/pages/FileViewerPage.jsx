@@ -151,7 +151,7 @@ const FileViewer = () => {
                     <p>{file.category} | {new Date(file.createdAt).toLocaleDateString()}</p>
                     <div className="report-actions">
                       <a href={file.url} download={file.originalName} className="action-button" title="Download File">
-                        <i className="fa fa-download"></i>
+                        <FiDownload />
                       </a>
                     </div>
                   </div>
@@ -162,6 +162,7 @@ const FileViewer = () => {
                     <div className="file-type-message">
                       <p>This is an {file.fileType} file. Please click the download button to view it.</p>
                       <a href={file.url} download={file.originalName} className="download-button">
+                        <FiDownload />
                         Download {file.originalName}
                       </a>
                     </div>
@@ -169,6 +170,7 @@ const FileViewer = () => {
                     <div className="file-type-message">
                       <p>Unsupported file type: {file.fileType}. Please click the download button to view it.</p>
                       <a href={file.url} download={file.originalName} className="download-button">
+                        <FiDownload />
                         Download {file.originalName}
                       </a>
                     </div>
