@@ -5,7 +5,7 @@ This project is a centralized web-based dashboard for AURA, an NGO. It helps man
 ## 🏗️ Structure
 
 - **frontend/** – React + Tailwind CSS
-- **backend/** – Node.js + Express + MongoDB (Multer + SheetJS)
+- **backend/** – Node.js + Express + MongoDB 
 - **.gitignore** – Separate for frontend/backend
 - **README.md** – Setup guide
 
