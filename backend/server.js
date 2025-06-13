@@ -91,7 +91,7 @@ process.on('uncaughtException', (err) => {
     }, 1000);
 });
 
-const PORT = process.env.PORT || 5173;
+const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

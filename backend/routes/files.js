@@ -12,6 +12,7 @@ router.get('/filter', fileController.getFilesByCategoryAndDate);
 
 // File operations
 router.get('/:id', fileController.getFile);
+router.get('/:id/details', fileController.getFileDetails);
 router.put('/:id', upload.single('file'), fileController.updateFile);
 router.delete('/:id', fileController.deleteFile);
 

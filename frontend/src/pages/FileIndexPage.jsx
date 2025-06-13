@@ -1,17 +1,22 @@
 // ... existing imports ...
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import { useNavigate } from 'react-router-dom';
+import { FiFile, FiEye, FiDownload, FiLoader } from 'react-icons/fi';
 
 const FileIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [recentFiles, setRecentFiles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [allFiles, setAllFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  const debounceTimeout = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setSidebarOpen(window.innerWidth >= 900);
@@ -20,32 +25,64 @@ const FileIndex = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchFiles = async () => {
+      setIsLoadingFiles(true);
       try {
-        const [recentRes, categoriesRes, allFilesRes] = await Promise.all([
-          fetch('/api/files/recent'),
-          fetch('/api/categories'),
-          fetch('/api/files'),
-        ]);
-        setRecentFiles(await recentRes.json());
-        setCategories(await categoriesRes.json());
-        setAllFiles(await allFilesRes.json());
+        const searchQuery = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
+        const filesRes = await fetch(`/api/files${searchQuery}`);
+        const files = await filesRes.json();
+        
+        const sortedFiles = files.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        setRecentFiles(sortedFiles.slice(0, 5));
+        setAllFiles(sortedFiles);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error('Error fetching files:', err);
+      } finally {
+        setIsLoadingFiles(false);
       }
-      setLoading(false);
     };
-    fetchData();
+
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      fetchFiles();
+    }, 300);
+
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      try {
+        const categoriesRes = await fetch('/api/categories');
+        setCategories(await categoriesRes.json());
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+    fetchCategories();
   }, []);
 
   const handleViewFile = async (fileId) => {
-    // Log the view in backend, then navigate to viewer
-    await fetch(`/api/files/${fileId}/view`, { method: 'POST' });
-    navigate(`/file-viewer/${fileId}`);
+    try {
+      navigate(`/file-viewer/${fileId}`);
+    } catch (error) {
+      console.error('Error navigating to file viewer:', error);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   return (
     <div className="app-root">
@@ -55,70 +92,105 @@ const FileIndex = () => {
         <main className="main-content">
           <div className="file-index-page">
             <div className="search-filter-bar">
-              <input type="text" placeholder="Search files..." className="search-input" />
+              <input 
+                type="text" 
+                placeholder="Search files..." 
+                className="search-input"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
               <button className="filter-button">Filter by Type</button>
               <button className="filter-button">Filter by Year</button>
             </div>
 
-            {/* Recent Files Scrollbox */}
-            <div className="recent-files-grid">
+            {/* Recent Files Section */}
+            <div className="recent-files-section">
               <h2>Recent Files</h2>
-              <div className="file-cards-container" style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-                {recentFiles.length === 0 ? (
-                  <p>No recent files.</p>
+              <div className="recent-files-grid">
+                {isLoadingFiles ? (
+                  <div className="loading-indicator">
+                    <FiLoader className="spinner-icon" />
+                    <p>Loading recent files...</p>
+                  </div>
+                ) : recentFiles.length === 0 ? (
+                  <p className="no-files">No recent files found.</p>
                 ) : (
                   recentFiles.map((file) => (
-                    <div key={file._id} className="file-card" style={{ display: 'inline-block', minWidth: 250 }}>
-                      <img src={file.image} alt={file.title} className="file-thumbnail" />
-                      <div className="file-info">
-                        <h4>{file.title}</h4>
-                        <p>{file.type}</p>
-                        <p>{file.date}</p>
+                    <div key={file._id} className="file-card">
+                      <div className="file-icon">
+                        <FiFile />
                       </div>
-                      <button className="view-file-button" onClick={() => handleViewFile(file._id)}>
-                        View File
-                      </button>
+                      <div className="file-info">
+                        <h4>{file.originalName}</h4>
+                        <p>Category: {file.category}</p>
+                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="file-actions">
+                        <button className="action-button" onClick={() => handleViewFile(file._id)} title="View">
+                          <FiEye />
+                        </button>
+                        <button className="action-button" title="Download">
+                          <FiDownload />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            {/* Categories Overview Scrollbox */}
-            <div className="categories-overview-section">
+            {/* Categories Overview */}
+            <div className="categories-section">
               <h2>Categories Overview</h2>
-              <div className="category-cards-container" style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-                {categories.length === 0 ? (
-                  <p>No categories found.</p>
+              <div className="categories-grid">
+                {isLoadingCategories ? (
+                  <div className="loading-indicator">
+                    <FiLoader className="spinner-icon" />
+                    <p>Loading categories...</p>
+                  </div>
+                ) : categories.length === 0 ? (
+                  <p className="no-categories">No categories found.</p>
                 ) : (
                   categories.map((cat) => (
-                    <div key={cat.name} className="category-card" style={{ display: 'inline-block', minWidth: 200 }}>
+                    <div key={cat._id} className="category-card">
                       <h4>{cat.name}</h4>
-                      <p>{cat.count} files in category</p>
+                      <p>{cat.count || 0} files</p>
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            {/* All Files Scrollbox */}
-            <div className="recent-files-grid">
-              <h2>All Accounting Files</h2>
-              <div className="file-cards-container" style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-                {allFiles.length === 0 ? (
-                  <p>No files found.</p>
+            {/* All Files Section */}
+            <div className="all-files-section">
+              <h2>All Files</h2>
+              <div className="files-grid">
+                {isLoadingFiles ? (
+                  <div className="loading-indicator">
+                    <FiLoader className="spinner-icon" />
+                    <p>Loading all files...</p>
+                  </div>
+                ) : allFiles.length === 0 ? (
+                  <p className="no-files">No files found.</p>
                 ) : (
                   allFiles.map((file) => (
-                    <div key={file._id} className="file-card" style={{ display: 'inline-block', minWidth: 250 }}>
-                      <img src={file.image} alt={file.title} className="file-thumbnail" />
-                      <div className="file-info">
-                        <h4>{file.title}</h4>
-                        <p>{file.type}</p>
-                        <p>{file.date}</p>
+                    <div key={file._id} className="file-card">
+                      <div className="file-icon">
+                        <FiFile />
                       </div>
-                      <button className="view-file-button" onClick={() => handleViewFile(file._id)}>
-                        View File
-                      </button>
+                      <div className="file-info">
+                        <h4>{file.originalName}</h4>
+                        <p>Category: {file.category}</p>
+                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="file-actions">
+                        <button className="action-button" onClick={() => handleViewFile(file._id)} title="View">
+                          <FiEye />
+                        </button>
+                        <button className="action-button" title="Download">
+                          <FiDownload />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

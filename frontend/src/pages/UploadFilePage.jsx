@@ -19,10 +19,15 @@ export default function UploadFilePage() {
     const fetchFiles = async () => {
       try {
         console.log('Fetching files from database...');
-        const res = await fetch('http://localhost:5173/api/files');
+        const res = await fetch('/api/files');
+        if (!res.ok) {
+          throw new Error('Failed to fetch files');
+        }
         const data = await res.json();
         console.log('Files from database:', data);
-        setRecentUploads(data);
+        // Sort files by creation date and take the most recent 5
+        const recentFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+        setRecentUploads(recentFiles);
       } catch (error) {
         console.error('Error fetching files:', error);
         setRecentUploads([]);
@@ -68,17 +73,17 @@ export default function UploadFilePage() {
     }
     setUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
     formData.append('title', fileName);
     formData.append('description', description);
     formData.append('category', category);
     formData.append('year', year);
-    formData.append('month', new Date().getMonth() + 1); // Add current month
-    formData.append('uploadedBy', 'anonymous'); // Add uploadedBy field
+    formData.append('month', new Date().getMonth() + 1);
+    formData.append('uploadedBy', 'anonymous');
+    formData.append('file', file);
 
     try {
       console.log('Sending request to backend...');
-      const res = await fetch('http://localhost:5173/api/files/upload', {
+      const res = await fetch('http://localhost:3000/api/files/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -231,35 +236,34 @@ export default function UploadFilePage() {
                 </div>
               </form>
             </div>
-            <div className="recent-uploads-card narrow">
-              <h3>Recent Uploads</h3>
-              <p className="recent-uploads-subtitle">Files in database:</p>
-              <div className="recent-uploads-list">
-                {recentUploads.length === 0 ? (
-                  <p className="recent-uploads-empty">No files in database.</p>
-                ) : (
-                  recentUploads.map((item) => (
-                    <div className="recent-upload-item" key={item._id}>
-                      <div className="file-icon-background">
-                        <FiFile className="file-icon" />
-                      </div>
+            
+            {/* Recent Uploads Section */}
+            <div className="upload-card">
+              <h2 className="upload-title">Recent Uploads</h2>
+              {recentUploads.length > 0 ? (
+                <div className="recent-files-list">
+                  {recentUploads.map((file) => (
+                    <div key={file._id} className="recent-file-item">
+                      <FiFile className="file-icon" />
                       <div className="file-info">
-                        <strong>{item.originalName}</strong>
-                        <p className="file-type-date">
-                          {item.category} <span className="dot-separator">•</span> {item.year}
-                        </p>
-                        <p className="file-upload-date">
-                          Uploaded: {new Date(item.createdAt).toLocaleDateString()}
-                        </p>
+                        <h3>{file.originalName}</h3>
+                        <p>Category: {file.category}</p>
+                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
-                        <FiEye className="action-icon" />
-                        <FiDownload className="action-icon" />
+                        <button className="action-button" title="View">
+                          <FiEye />
+                        </button>
+                        <button className="action-button" title="Download">
+                          <FiDownload />
+                        </button>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-files">No recent files uploaded yet.</p>
+              )}
             </div>
           </div>
         </main>

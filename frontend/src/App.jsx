@@ -12,6 +12,7 @@ function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/file-index" element={<FileIndexPage />} />
         <Route path="/file-viewer" element={<FileViewerPage />} />
+        <Route path="/file-viewer/:id" element={<FileViewerPage />} />
         <Route path="/upload-file" element={<UploadFilePage />} />
         <Route path="/create-file" element={<CreateFilePage />} />
       </Routes>

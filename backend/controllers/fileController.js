@@ -116,7 +116,21 @@ exports.uploadFile = async (req, res) => {
 exports.getAllFiles = async (req, res) => {
     try {
         console.log('Fetching all files from database...');
-        const files = await File.find().sort({ createdAt: -1 });
+        const { search } = req.query; // Get search term from query parameters
+        let query = {};
+
+        if (search) {
+            const searchRegex = new RegExp(search, 'i'); // Case-insensitive regex
+            query = {
+                $or: [
+                    { originalName: { $regex: searchRegex } },
+                    { description: { $regex: searchRegex } },
+                    { category: { $regex: searchRegex } } // Search by category as well
+                ]
+            };
+        }
+
+        const files = await File.find(query).sort({ createdAt: -1 });
         console.log(`Found ${files.length} files in database`);
         
         // Log each file's details
@@ -164,12 +178,44 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        res.download(file.path, file.originalName);
+        // Serve the file directly for in-browser viewing
+        res.sendFile(file.path, { root: '.' }); // Use root to resolve absolute path
     } catch (error) {
+        console.error('Error fetching file for viewing:', error);
         res.status(500).json({ message: error.message });
     }
 };
 
+// Get file details (metadata)
+exports.getFileDetails = async (req, res) => {
+    try {
+        const fileId = req.params.id;
+        const file = await File.findById(fileId);
+
+        if (!file) {
+            return res.status(404).json({ message: 'File details not found' });
+        }
+
+        // Return only the necessary metadata
+        res.json({
+            _id: file._id,
+            filename: file.filename,
+            originalName: file.originalName,
+            fileType: file.fileType,
+            category: file.category,
+            year: file.year,
+            month: file.month,
+            size: file.size,
+            uploadedBy: file.uploadedBy,
+            description: file.description,
+            createdAt: file.createdAt,
+            updatedAt: file.updatedAt
+        });
+    } catch (error) {
+        console.error('Error fetching file details:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
 
 // Update file details
 exports.updateFile = async (req, res) => {
