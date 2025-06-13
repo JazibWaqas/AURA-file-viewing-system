@@ -17,3 +17,13 @@ This project is a centralized web-based dashboard for AURA, an NGO. It helps man
 cd frontend
 npm install
 npm run dev
+```
+
+### Backend
+
+
+```bash
+cd backend
+npm install
+npm start
+```
