@@ -3,13 +3,13 @@ import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder } from 'react-icons/fi';
 
 const FileViewer = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
-  const { id } = useParams(); // Get file ID from URL
+  const { id } = useParams();
   const [file, setFile] = useState(null);
-  const [allFiles, setAllFiles] = useState([]); // New state for all files
+  const [allFiles, setAllFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -30,21 +30,19 @@ const FileViewer = () => {
       try {
         if (id) {
           // Fetch specific file details and content
-          const res = await fetch(`/api/files/${id}`);
-          if (!res.ok) {
-            if (res.status === 404) {
-              throw new Error('File not found.');
-            } else {
-              throw new Error(`Error fetching file: ${res.statusText}`);
-            }
-          }
-          const fileBlob = await res.blob();
+          const [fileRes, detailsRes] = await Promise.all([
+            fetch(`/api/files/${id}`),
+            fetch(`/api/files/${id}/details`)
+          ]);
 
-          const detailsRes = await fetch(`/api/files/${id}/details`);
-          if (!detailsRes.ok) {
-            throw new Error(`Error fetching file details: ${detailsRes.statusText}`);
+          if (!fileRes.ok || !detailsRes.ok) {
+            throw new Error(fileRes.status === 404 ? 'File not found' : 'Error fetching file');
           }
-          const fileDetails = await detailsRes.json();
+
+          const [fileBlob, fileDetails] = await Promise.all([
+            fileRes.blob(),
+            detailsRes.json()
+          ]);
 
           setFile({
             blob: fileBlob,
@@ -55,13 +53,10 @@ const FileViewer = () => {
           // Fetch all files for browsing
           const res = await fetch('/api/files');
           if (!res.ok) {
-            throw new Error('Failed to fetch files from database.');
+            throw new Error('Failed to fetch files');
           }
           const data = await res.json();
-          // Sort files by creation date (most recent first)
-          const sortedFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          setAllFiles(sortedFiles);
-          console.log('Files fetched for FileViewer (no ID):', sortedFiles);
+          setAllFiles(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -73,13 +68,12 @@ const FileViewer = () => {
 
     fetchData();
 
-    // Cleanup for single file URL object
     return () => {
-      if (file && file.url) {
+      if (file?.url) {
         URL.revokeObjectURL(file.url);
       }
     };
-  }, [id]); // Depend on 'id' to re-run fetch when navigating between specific file and general view
+  }, [id]);
 
   const handleFileClick = (fileId) => {
     navigate(`/file-viewer/${fileId}`);
@@ -106,7 +100,6 @@ const FileViewer = () => {
     }
   };
 
-  // Render loading/error states for both scenarios
   if (loading) {
     return (
       <div className="app-root">
@@ -114,7 +107,8 @@ const FileViewer = () => {
         <div className="app-content-row">
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           <main className="main-content">
-            <div className="file-viewer-page">
+            <div className="loading-container">
+              <FiLoader className="spinner-icon" />
               <p>Loading content...</p>
             </div>
           </main>
@@ -130,8 +124,12 @@ const FileViewer = () => {
         <div className="app-content-row">
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           <main className="main-content">
-            <div className="file-viewer-page">
-              <p>Error: {error}</p>
+            <div className="error-container">
+              <h2>Error Loading File</h2>
+              <p>{error}</p>
+              <button onClick={() => window.location.reload()} className="retry-button">
+                Retry
+              </button>
             </div>
           </main>
         </div>
@@ -139,7 +137,6 @@ const FileViewer = () => {
     );
   }
 
-  // Render single file view if ID is present and file is loaded
   if (id && file) {
     return (
       <div className="app-root">
@@ -148,52 +145,91 @@ const FileViewer = () => {
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           <main className="main-content">
             <div className="file-viewer-page">
+              <div className="file-viewer-header">
+                <button className="back-button" onClick={() => navigate('/file-index')}>
+                  <FiArrowLeft /> Back to Files
+                </button>
+                <h1>{file.originalName}</h1>
+              </div>
+
               <div className="file-viewer-content">
-                <div className="table-of-contents">
-                  <h3>File Details</h3>
-                  <ul>
-                    <li><strong>File Name:</strong> {file.originalName}</li>
-                    <li><strong>Category:</strong> {file.category}</li>
-                    <li><strong>Year:</strong> {file.year}</li>
-                    <li><strong>Uploaded By:</strong> {file.uploadedBy}</li>
-                    <li><strong>Size:</strong> {(file.size / 1024).toFixed(2)} KB</li>
-                    <li><strong>Uploaded At:</strong> {new Date(file.createdAt).toLocaleDateString()}</li>
-                  </ul>
+                <div className="file-details-sidebar">
+                  <div className="details-section">
+                    <h3>File Information</h3>
+                    <ul>
+                      <li>
+                        <FiFolder />
+                        <span>Category:</span>
+                        <strong>{file.category}</strong>
+                      </li>
+                      <li>
+                        <FiCalendar />
+                        <span>Year:</span>
+                        <strong>{file.year}</strong>
+                      </li>
+                      <li>
+                        <FiUser />
+                        <span>Uploaded By:</span>
+                        <strong>{file.uploadedBy}</strong>
+                      </li>
+                      <li>
+                        <FiInfo />
+                        <span>Size:</span>
+                        <strong>{(file.size / 1024).toFixed(2)} KB</strong>
+                      </li>
+                      <li>
+                        <FiCalendar />
+                        <span>Uploaded:</span>
+                        <strong>{new Date(file.createdAt).toLocaleDateString()}</strong>
+                      </li>
+                    </ul>
+                  </div>
+
                   {file.description && (
-                    <div>
-                      <h4>Description:</h4>
+                    <div className="description-section">
+                      <h3>Description</h3>
                       <p>{file.description}</p>
                     </div>
                   )}
-                </div>
-                <div className="report-content">
-                  <div className="report-header">
-                    <h2>{file.originalName}</h2>
-                    <p>{file.category} | {new Date(file.createdAt).toLocaleDateString()}</p>
-                    <div className="report-actions">
-                      <a href={file.url} download={file.originalName} className="action-button" title="Download File">
-                        <FiDownload />
-                      </a>
-                    </div>
-                  </div>
 
+                  <div className="actions-section">
+                    <button 
+                      className="download-button"
+                      onClick={() => handleDownload(file._id, file.originalName)}
+                    >
+                      <FiDownload /> Download File
+                    </button>
+                  </div>
+                </div>
+
+                <div className="file-preview">
                   {file.fileType === 'pdf' ? (
-                    <iframe src={file.url} title={file.originalName} className="pdf-viewer"></iframe>
+                    <iframe 
+                      src={file.url} 
+                      title={file.originalName} 
+                      className="pdf-viewer"
+                    />
                   ) : (file.fileType === 'excel' || file.fileType === 'csv') ? (
                     <div className="file-type-message">
-                      <p>This is an {file.fileType} file. Please click the download button to view it.</p>
-                      <a href={file.url} download={file.originalName} className="download-button">
-                        <FiDownload />
-                        Download {file.originalName}
-                      </a>
+                      <FiFile className="file-type-icon" />
+                      <p>This is an {file.fileType} file. Please download it to view the contents.</p>
+                      <button 
+                        className="download-button"
+                        onClick={() => handleDownload(file._id, file.originalName)}
+                      >
+                        <FiDownload /> Download {file.originalName}
+                      </button>
                     </div>
                   ) : (
                     <div className="file-type-message">
-                      <p>Unsupported file type: {file.fileType}. Please click the download button to view it.</p>
-                      <a href={file.url} download={file.originalName} className="download-button">
-                        <FiDownload />
-                        Download {file.originalName}
-                      </a>
+                      <FiFile className="file-type-icon" />
+                      <p>This file type cannot be previewed. Please download it to view the contents.</p>
+                      <button 
+                        className="download-button"
+                        onClick={() => handleDownload(file._id, file.originalName)}
+                      >
+                        <FiDownload /> Download {file.originalName}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -205,7 +241,6 @@ const FileViewer = () => {
     );
   }
 
-  // Render file list if no ID is present and allFiles are loaded
   return (
     <div className="app-root">
       <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
@@ -224,11 +259,15 @@ const FileViewer = () => {
                       </div>
                       <div className="file-info">
                         <h3>{f.originalName}</h3>
-                        <p>Category: {f.category}</p>
-                        <p>Uploaded: {new Date(f.createdAt).toLocaleDateString()}</p>
+                        <p><FiFolder /> {f.category}</p>
+                        <p><FiCalendar /> {new Date(f.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
-                        <button className="action-button" title="View" onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}>
+                        <button 
+                          className="action-button" 
+                          title="View" 
+                          onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
+                        >
                           <FiEye />
                         </button>
                         <button 
@@ -242,7 +281,10 @@ const FileViewer = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="no-files">No files found in the database.</p>
+                  <div className="empty-state">
+                    <FiFile className="empty-icon" />
+                    <p>No files found in the database.</p>
+                  </div>
                 )}
               </div>
             </div>
