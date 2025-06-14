@@ -136,6 +136,27 @@ export default function UploadFilePage() {
     navigate(`/file-viewer/${fileId}`);
   };
 
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      const response = await fetch(`/api/files/${fileId}`);
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file. Please try again.');
+    }
+  };
+
   return (
     <div className="app-root">
       <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
@@ -264,7 +285,11 @@ export default function UploadFilePage() {
                         >
                           <FiEye />
                         </button>
-                        <button className="action-button" title="Download">
+                        <button 
+                          className="action-button" 
+                          title="Download"
+                          onClick={() => handleDownload(file._id, file.originalName)}
+                        >
                           <FiDownload />
                         </button>
                       </div>

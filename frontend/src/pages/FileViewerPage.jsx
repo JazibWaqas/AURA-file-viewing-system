@@ -85,6 +85,27 @@ const FileViewer = () => {
     navigate(`/file-viewer/${fileId}`);
   };
 
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      const response = await fetch(`/api/files/${fileId}`);
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file. Please try again.');
+    }
+  };
+
   // Render loading/error states for both scenarios
   if (loading) {
     return (
@@ -210,9 +231,13 @@ const FileViewer = () => {
                         <button className="action-button" title="View" onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}>
                           <FiEye />
                         </button>
-                        <a href={`/api/files/${f._id}`} download={f.originalName} className="action-button" title="Download" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className="action-button" 
+                          title="Download" 
+                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName); }}
+                        >
                           <FiDownload />
-                        </a>
+                        </button>
                       </div>
                     </div>
                   ))
