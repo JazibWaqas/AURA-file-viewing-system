@@ -4,7 +4,7 @@ import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import { useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX } from 'react-icons/fi';
 
 const FileIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -14,6 +14,10 @@ const FileIndex = () => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showYearFilter, setShowYearFilter] = useState(false);
   const navigate = useNavigate();
 
   const debounceTimeout = useRef(null);
@@ -28,11 +32,26 @@ const FileIndex = () => {
     const fetchFiles = async () => {
       setIsLoadingFiles(true);
       try {
-        const searchQuery = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
-        const filesRes = await fetch(`/api/files${searchQuery}`);
+        const queryParams = new URLSearchParams();
+        if (searchTerm) queryParams.append('search', searchTerm);
+        if (selectedCategory) queryParams.append('category', selectedCategory);
+        if (selectedYear) queryParams.append('year', selectedYear);
+        
+        const queryString = queryParams.toString();
+        const filesRes = await fetch(`/api/files${queryString ? `?${queryString}` : ''}`);
         const files = await filesRes.json();
         
-        const sortedFiles = files.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Filter files based on selected category and year
+        let filteredFiles = files;
+        if (selectedCategory) {
+          filteredFiles = filteredFiles.filter(file => file.category === selectedCategory);
+        }
+        if (selectedYear) {
+          filteredFiles = filteredFiles.filter(file => file.year === selectedYear);
+        }
+        
+        // Sort files by creation date
+        const sortedFiles = filteredFiles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         
         setRecentFiles(sortedFiles.slice(0, 5));
         setAllFiles(sortedFiles);
@@ -55,7 +74,7 @@ const FileIndex = () => {
         clearTimeout(debounceTimeout.current);
       }
     };
-  }, [searchTerm]);
+  }, [searchTerm, selectedCategory, selectedYear]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -84,6 +103,26 @@ const FileIndex = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleCategoryFilter = (category) => {
+    setSelectedCategory(category === selectedCategory ? '' : category);
+    setShowCategoryFilter(false);
+  };
+
+  const handleYearFilter = (year) => {
+    setSelectedYear(year === selectedYear ? '' : year);
+    setShowYearFilter(false);
+  };
+
+  const getUniqueCategories = () => {
+    const categories = new Set(allFiles.map(file => file.category));
+    return Array.from(categories).filter(Boolean);
+  };
+
+  const getUniqueYears = () => {
+    const years = new Set(allFiles.map(file => file.year));
+    return Array.from(years).filter(Boolean).sort((a, b) => b - a);
+  };
+
   return (
     <div className="app-root">
       <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
@@ -99,8 +138,59 @@ const FileIndex = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <button className="filter-button">Filter by Type</button>
-              <button className="filter-button">Filter by Year</button>
+              <div className="filter-container">
+                <button 
+                  className={`filter-button ${selectedCategory ? 'active' : ''}`}
+                  onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                >
+                  Filter by Category {selectedCategory && `(${selectedCategory})`}
+                </button>
+                {showCategoryFilter && (
+                  <div className="filter-dropdown">
+                    {getUniqueCategories().map(category => (
+                      <button
+                        key={category}
+                        className={`filter-option ${selectedCategory === category ? 'selected' : ''}`}
+                        onClick={() => handleCategoryFilter(category)}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="filter-container">
+                <button 
+                  className={`filter-button ${selectedYear ? 'active' : ''}`}
+                  onClick={() => setShowYearFilter(!showYearFilter)}
+                >
+                  Filter by Year {selectedYear && `(${selectedYear})`}
+                </button>
+                {showYearFilter && (
+                  <div className="filter-dropdown">
+                    {getUniqueYears().map(year => (
+                      <button
+                        key={year}
+                        className={`filter-option ${selectedYear === year ? 'selected' : ''}`}
+                        onClick={() => handleYearFilter(year)}
+                      >
+                        {year}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {(selectedCategory || selectedYear) && (
+                <button 
+                  className="clear-filters-button"
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSelectedYear('');
+                  }}
+                >
+                  <FiX /> Clear Filters
+                </button>
+              )}
             </div>
 
             {/* Recent Files Section */}
@@ -123,7 +213,7 @@ const FileIndex = () => {
                       <div className="file-info">
                         <h4>{file.originalName}</h4>
                         <p>Category: {file.category}</p>
-                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
+                        <p>Year: {file.year}</p>
                       </div>
                       <div className="file-actions">
                         <button className="action-button" onClick={() => handleViewFile(file._id)} title="View">
@@ -181,7 +271,7 @@ const FileIndex = () => {
                       <div className="file-info">
                         <h4>{file.originalName}</h4>
                         <p>Category: {file.category}</p>
-                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
+                        <p>Year: {file.year}</p>
                       </div>
                       <div className="file-actions">
                         <button className="action-button" onClick={() => handleViewFile(file._id)} title="View">
