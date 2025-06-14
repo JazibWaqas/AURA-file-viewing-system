@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import '../styles/UploadFile.css';
-import { FiUploadCloud, FiFile, FiEye, FiDownload, FiFolderPlus } from 'react-icons/fi';
+import { FiUploadCloud, FiFile, FiEye, FiDownload } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { initializeGoogleDrive, showGoogleDrivePicker, downloadFile } from '../services/googleDriveService';
 
 export default function UploadFilePage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -14,28 +15,29 @@ export default function UploadFilePage() {
   const [year, setYear] = useState('');
   const [recentUploads, setRecentUploads] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isGoogleDriveInitialized, setIsGoogleDriveInitialized] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch recent uploads on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchFiles = async () => {
       try {
-        console.log('Fetching files from database...');
         const res = await fetch('/api/files');
-        if (!res.ok) {
-          throw new Error('Failed to fetch files');
-        }
+        if (!res.ok) throw new Error('Failed to fetch files');
         const data = await res.json();
-        console.log('Files from database:', data);
-        // Sort files by creation date and take the most recent 5
         const recentFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
         setRecentUploads(recentFiles);
       } catch (error) {
-        console.error('Error fetching files:', error);
         setRecentUploads([]);
       }
     };
     fetchFiles();
+  }, []);
+
+  useEffect(() => {
+    initializeGoogleDrive().then(success => {
+      setIsGoogleDriveInitialized(!!success);
+    });
   }, []);
 
   const handleFileChange = (e) => {
@@ -46,10 +48,7 @@ export default function UploadFilePage() {
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
+  const handleDragOver = (e) => e.preventDefault();
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
@@ -59,77 +58,74 @@ export default function UploadFilePage() {
     }
   };
 
-  // Google Drive Picker integration (placeholder)
-  const handleGoogleDriveUpload = async () => {
-    alert('Google Drive integration coming soon!\n\nYou would trigger the Google Picker here.');
-    // Example: After picking a file, setFile and setFileName accordingly
-    // setFile(googleDriveFileBlob);
-    // setFileName(googleDriveFileName);
+  const handleGoogleDriveFileSelect = async () => {
+    try {
+      await showGoogleDrivePicker(async (data) => {
+        if (data.action === window.google.picker.Action.PICKED) {
+          const pickedFile = data.docs[0];
+          if (pickedFile && pickedFile.id && pickedFile.name) {
+            try {
+              const blob = await downloadFile(pickedFile.id);
+              let mimeType = pickedFile.mimeType || blob.type;
+              if (!mimeType || mimeType === 'application/octet-stream') {
+                if (pickedFile.name.endsWith('.pdf')) mimeType = 'application/pdf';
+                else if (pickedFile.name.endsWith('.xlsx')) mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                else if (pickedFile.name.endsWith('.xls')) mimeType = 'application/vnd.ms-excel';
+              }
+              const fileObj = new File([blob], pickedFile.name, { type: mimeType });
+              setFile(fileObj);
+              setFileName(pickedFile.name);
+            } catch (err) {
+              setError('Failed to download file from Google Drive.');
+            }
+          }
+        }
+      });
+    } catch (error) {
+      setError('Failed to access Google Drive files.');
+    }
   };
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file || !fileName || !category || !year) {
-      alert('Please fill all required fields and select a file.');
+    if (!file) {
+      setError('Please select a file first');
       return;
     }
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('title', fileName);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('year', year);
-    formData.append('month', new Date().getMonth() + 1);
-    formData.append('uploadedBy', 'anonymous');
-    formData.append('file', file);
-
+    if (!fileName || !category || !year) {
+      setError('Please fill in all required fields');
+      return;
+    }
     try {
-      console.log('Sending request to backend...');
-      const res = await fetch('http://localhost:3000/api/files/upload', {
+      setUploading(true);
+      setError(null);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileName', fileName);
+      formData.append('description', description);
+      formData.append('category', category);
+      formData.append('year', year);
+      formData.append('month', new Date().getMonth() + 1);
+      const response = await fetch('/api/files/upload', {
         method: 'POST',
         body: formData,
-        headers: {
-          'Accept': 'application/json',
-        },
       });
-      
-      console.log('Response status:', res.status);
-      console.log('Response headers:', Object.fromEntries(res.headers.entries()));
-      
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('Error response text:', text);
-        try {
-          const errorData = JSON.parse(text);
-          throw new Error(errorData.message || 'Upload failed');
-        } catch (parseError) {
-          throw new Error(`Upload failed: ${text}`);
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
       }
-      
-      const text = await res.text();
-      console.log('Response text:', text);
-      
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseError) {
-        console.error('Failed to parse response as JSON:', parseError);
-        throw new Error('Invalid server response');
-      }
-      
-      setRecentUploads([data.file, ...recentUploads.slice(0, 4)]);
+      const data = await response.json();
       setFile(null);
       setFileName('');
       setDescription('');
       setCategory('');
       setYear('');
-      alert('File uploaded successfully!');
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert(err.message || 'Error uploading file.');
+      navigate('/file-index');
+    } catch (error) {
+      setError(error.message || 'Failed to upload file');
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleViewFile = (fileId) => {
@@ -152,7 +148,6 @@ export default function UploadFilePage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error downloading file:', error);
       alert('Failed to download file. Please try again.');
     }
   };
@@ -190,10 +185,20 @@ export default function UploadFilePage() {
                 </p>
                 {fileName && <div className="selected-file-name">{fileName}</div>}
               </div>
-              <button className="google-drive-button" type="button" onClick={handleGoogleDriveUpload}>
-                <FiFolderPlus className="google-drive-icon" />
-                Upload from Google Drive
-              </button>
+              <div className="upload-options-row">
+                <button
+                  className="google-drive-button"
+                  onClick={handleGoogleDriveFileSelect}
+                  disabled={!isGoogleDriveInitialized}
+                >
+                  <img
+                    src="https://www.google.com/drive/static/images/drive/logo-drive.png"
+                    alt="Google Drive"
+                    className="google-drive-icon"
+                  />
+                  <span>Import from Google Drive</span>
+                </button>
+              </div>
               <form className="file-details-form" onSubmit={handleUpload}>
                 <label htmlFor="fileName">File Name</label>
                 <input
@@ -262,31 +267,32 @@ export default function UploadFilePage() {
                   </button>
                 </div>
               </form>
+              {error && <div className="error-message">{error}</div>}
             </div>
-            
-            {/* Recent Uploads Section */}
-            <div className="upload-card">
-              <h2 className="upload-title">Recent Uploads</h2>
-              {recentUploads.length > 0 ? (
-                <div className="recent-files-list">
-                  {recentUploads.map((file) => (
-                    <div key={file._id} className="recent-file-item">
-                      <FiFile className="file-icon" />
+            <div className="recent-uploads-card large">
+              <h3>Recent Uploads</h3>
+              <div className="recent-uploads-list">
+                {recentUploads.length > 0 ? (
+                  recentUploads.map((file) => (
+                    <div key={file._id} className="recent-upload-item">
+                      <div className="file-icon-background">
+                        <FiFile className="file-icon" />
+                      </div>
                       <div className="file-info">
                         <h3>{file.originalName}</h3>
                         <p>Category: {file.category}</p>
                         <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
-                        <button 
-                          className="action-button" 
+                        <button
+                          className="action-button"
                           title="View"
                           onClick={() => handleViewFile(file._id)}
                         >
                           <FiEye />
                         </button>
-                        <button 
-                          className="action-button" 
+                        <button
+                          className="action-button"
                           title="Download"
                           onClick={() => handleDownload(file._id, file.originalName)}
                         >
@@ -294,11 +300,11 @@ export default function UploadFilePage() {
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="no-files">No recent files uploaded yet.</p>
-              )}
+                  ))
+                ) : (
+                  <p className="no-files">No recent files uploaded yet.</p>
+                )}
+              </div>
             </div>
           </div>
         </main>
