@@ -3,6 +3,7 @@ import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import '../styles/UploadFile.css';
 import { FiUploadCloud, FiFile, FiEye, FiDownload, FiFolderPlus } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 export default function UploadFilePage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -13,6 +14,7 @@ export default function UploadFilePage() {
   const [year, setYear] = useState('');
   const [recentUploads, setRecentUploads] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch recent uploads on mount
   React.useEffect(() => {
@@ -128,6 +130,10 @@ export default function UploadFilePage() {
       alert(err.message || 'Error uploading file.');
     }
     setUploading(false);
+  };
+
+  const handleViewFile = (fileId) => {
+    navigate(`/file-viewer/${fileId}`);
   };
 
   return (
@@ -251,7 +257,11 @@ export default function UploadFilePage() {
                         <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
-                        <button className="action-button" title="View">
+                        <button 
+                          className="action-button" 
+                          title="View"
+                          onClick={() => handleViewFile(file._id)}
+                        >
                           <FiEye />
                         </button>
                         <button className="action-button" title="Download">
