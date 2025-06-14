@@ -116,18 +116,27 @@ exports.uploadFile = async (req, res) => {
 exports.getAllFiles = async (req, res) => {
     try {
         console.log('Fetching all files from database...');
-        const { search } = req.query; // Get search term from query parameters
+        const { search, category, year } = req.query; // Get search term and filters from query parameters
         let query = {};
 
+        // Handle search
         if (search) {
             const searchRegex = new RegExp(search, 'i'); // Case-insensitive regex
-            query = {
-                $or: [
-                    { originalName: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } },
-                    { category: { $regex: searchRegex } } // Search by category as well
-                ]
-            };
+            query.$or = [
+                { originalName: { $regex: searchRegex } },
+                { description: { $regex: searchRegex } },
+                { category: { $regex: searchRegex } }
+            ];
+        }
+
+        // Handle category filter
+        if (category) {
+            query.category = category;
+        }
+
+        // Handle year filter
+        if (year) {
+            query.year = parseInt(year);
         }
 
         const files = await File.find(query).sort({ createdAt: -1 });
