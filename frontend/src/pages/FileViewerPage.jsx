@@ -12,6 +12,7 @@ const FileViewer = () => {
   const [allFiles, setAllFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [previewData, setPreviewData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +50,15 @@ const FileViewer = () => {
             url: URL.createObjectURL(fileBlob),
             ...fileDetails
           });
+
+          // If it's a CSV or Excel file, fetch the preview
+          if (fileDetails.fileType === 'csv' || fileDetails.fileType === 'excel') {
+            const previewResponse = await fetch(`/api/files/${id}/preview`);
+            if (previewResponse.ok) {
+              const previewData = await previewResponse.json();
+              setPreviewData(previewData);
+            }
+          }
         } else {
           // Fetch all files for browsing
           const res = await fetch('/api/files');
@@ -210,16 +220,38 @@ const FileViewer = () => {
                       className="pdf-viewer"
                     />
                   ) : (file.fileType === 'excel' || file.fileType === 'csv') ? (
-                    <div className="file-type-message">
-                      <FiFile className="file-type-icon" />
-                      <p>This is an {file.fileType} file. Please download it to view the contents.</p>
-                      <button 
-                        className="download-button"
-                        onClick={() => handleDownload(file._id, file.originalName)}
-                      >
-                        <FiDownload /> Download {file.originalName}
-                      </button>
-                    </div>
+                    previewData ? (
+                      <div className="table-preview">
+                        <div className="table-info">
+                          <p>Showing {previewData.previewRows} of {previewData.totalRows} rows</p>
+                        </div>
+                        <div className="table-container">
+                          <table>
+                            <thead>
+                              <tr>
+                                {previewData.headers.map((header, index) => (
+                                  <th key={index}>{header}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {previewData.data.map((row, rowIndex) => (
+                                <tr key={rowIndex}>
+                                  {previewData.headers.map((header, colIndex) => (
+                                    <td key={colIndex}>{row[header]}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="file-type-message">
+                        <FiFile className="file-type-icon" />
+                        <p>Loading preview...</p>
+                      </div>
+                    )
                   ) : (
                     <div className="file-type-message">
                       <FiFile className="file-type-icon" />

@@ -181,7 +181,7 @@ export default function UploadFilePage() {
                   <strong>Drag & drop your file here</strong> or click to browse
                 </p>
                 <p className="supported-formats">
-                  Supported formats: PDF, XLSX, DOCX. Max file size: 10MB.
+                  Supported formats: PDF, XLSX, XLS, CSV. Max file size: 10MB.
                 </p>
                 {fileName && <div className="selected-file-name">{fileName}</div>}
               </div>

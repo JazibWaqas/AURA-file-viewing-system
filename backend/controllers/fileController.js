@@ -1,6 +1,8 @@
 const File = require('../models/File');
 const fs = require('fs').promises;
 const path = require('path');
+const XLSX = require('xlsx');
+const { parse } = require('csv-parse/sync');
 
 
 
@@ -60,7 +62,8 @@ exports.uploadFile = async (req, res) => {
         const file = new File({
             filename: req.file.filename,
             originalName: req.file.originalname,
-            fileType: req.file.mimetype.includes('excel') ? 'excel' : 'pdf',
+            fileType: req.file.mimetype.includes('excel') ? 'excel' : 
+                     req.file.mimetype.includes('csv') ? 'csv' : 'pdf',
             category: req.body.category,
             year: parseInt(req.body.year),
             month: parseInt(req.body.month),
@@ -276,6 +279,63 @@ exports.deleteFile = async (req, res) => {
         
         res.json({ message: 'File deleted successfully' });
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get file preview data
+exports.getFilePreview = async (req, res) => {
+    try {
+        const file = await File.findById(req.params.id);
+        if (!file) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+
+        // Read the file content
+        const fileContent = await fs.readFile(file.path);
+
+        let data = [];
+        let headers = [];
+
+        if (file.fileType === 'csv') {
+            // Parse CSV
+            const records = parse(fileContent, {
+                columns: true,
+                skip_empty_lines: true
+            });
+            
+            if (records.length > 0) {
+                headers = Object.keys(records[0]);
+                data = records;
+            }
+        } else if (file.fileType === 'excel') {
+            // Parse Excel
+            const workbook = XLSX.read(fileContent, { type: 'buffer' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            
+            // Convert to JSON
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            
+            if (jsonData.length > 0) {
+                headers = Object.keys(jsonData[0]);
+                data = jsonData;
+            }
+        } else {
+            return res.status(400).json({ message: 'Preview not supported for this file type' });
+        }
+
+        // Limit the number of rows to prevent overwhelming the client
+        const previewData = data.slice(0, 100);
+
+        res.json({
+            headers,
+            data: previewData,
+            totalRows: data.length,
+            previewRows: previewData.length
+        });
+    } catch (error) {
+        console.error('Error in getFilePreview:', error);
         res.status(500).json({ message: error.message });
     }
 };

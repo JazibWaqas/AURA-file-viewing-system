@@ -60,13 +60,23 @@ const fileFilter = (req, file, cb) => {
     const pdfTypes = [
         'application/pdf'
     ];
+
+    // Accept CSV files
+    const csvTypes = [
+        'text/csv',
+        'application/csv',
+        'text/x-csv',
+        'application/x-csv',
+        'text/comma-separated-values',
+        'text/x-comma-separated-values'
+    ];
     
-    if ([...excelTypes, ...pdfTypes].includes(file.mimetype)) {
+    if ([...excelTypes, ...pdfTypes, ...csvTypes].includes(file.mimetype)) {
         console.log('File type accepted');
         cb(null, true);
     } else {
         console.log('File type rejected:', file.mimetype);
-        cb(new Error('Only Excel and PDF files are allowed!'), false);
+        cb(new Error('Only Excel, CSV, and PDF files are allowed!'), false);
     }
 };
 
