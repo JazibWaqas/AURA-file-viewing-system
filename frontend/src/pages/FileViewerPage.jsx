@@ -3,7 +3,7 @@ import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2 } from 'react-icons/fi';
 
 const FileViewer = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -13,6 +13,7 @@ const FileViewer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [previewData, setPreviewData] = useState(null);
+  const [previewError, setPreviewError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,35 +29,43 @@ const FileViewer = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      setPreviewError(null);
+      setPreviewData(null);
       try {
         if (id) {
-          // Fetch specific file details and content
-          const [fileRes, detailsRes] = await Promise.all([
-            fetch(`/api/files/${id}`),
-            fetch(`/api/files/${id}/details`)
-          ]);
-
-          if (!fileRes.ok || !detailsRes.ok) {
-            throw new Error(fileRes.status === 404 ? 'File not found' : 'Error fetching file');
+          // Fetch file details first
+          const detailsRes = await fetch(`/api/files/${id}/details`);
+          if (!detailsRes.ok) {
+            throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
           }
 
-          const [fileBlob, fileDetails] = await Promise.all([
-            fileRes.blob(),
-            detailsRes.json()
-          ]);
+          const fileDetails = await detailsRes.json();
+          setFile(fileDetails);
 
-          setFile({
-            blob: fileBlob,
-            url: URL.createObjectURL(fileBlob),
-            ...fileDetails
-          });
-
+          // If it's a PDF file, fetch the file for viewing
+          if (fileDetails.fileType === 'pdf') {
+            const viewResponse = await fetch(`/api/files/${id}/view`);
+            if (viewResponse.ok) {
+              const blob = await viewResponse.blob();
+              fileDetails.url = URL.createObjectURL(blob);
+              setFile(fileDetails);
+            }
+          }
           // If it's a CSV or Excel file, fetch the preview
-          if (fileDetails.fileType === 'csv' || fileDetails.fileType === 'excel') {
-            const previewResponse = await fetch(`/api/files/${id}/preview`);
-            if (previewResponse.ok) {
-              const previewData = await previewResponse.json();
-              setPreviewData(previewData);
+          else if (fileDetails.fileType === 'csv' || fileDetails.fileType === 'excel') {
+            try {
+              const previewResponse = await fetch(`/api/files/${id}/preview`);
+              if (previewResponse.ok) {
+                const previewData = await previewResponse.json();
+                setPreviewData(previewData);
+                if (!previewData.headers || previewData.headers.length === 0) {
+                  setPreviewError('No data found in this file.');
+                }
+              } else {
+                setPreviewError('Failed to load preview data.');
+              }
+            } catch (err) {
+              setPreviewError('Error loading preview data.');
             }
           }
         } else {
@@ -107,6 +116,31 @@ const FileViewer = () => {
     } catch (error) {
       console.error('Error downloading file:', error);
       alert('Failed to download file. Please try again.');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!file || !file._id) return;
+
+    if (window.confirm(`Are you sure you want to delete the file "${file.originalName}"? This action cannot be undone.`)) {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/files/${file._id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to delete file');
+        }
+
+        alert('File deleted successfully!');
+        navigate('/file-index'); // Navigate back to the file index page
+      } catch (error) {
+        console.error('Error deleting file:', error);
+        setError(error.message || 'Failed to delete file. Please try again.');
+        setLoading(false);
+      }
     }
   };
 
@@ -209,6 +243,12 @@ const FileViewer = () => {
                     >
                       <FiDownload /> Download File
                     </button>
+                    <button 
+                      className="delete-button"
+                      onClick={handleDelete}
+                    >
+                      <FiTrash2 /> Delete File
+                    </button>
                   </div>
                 </div>
 
@@ -219,8 +259,13 @@ const FileViewer = () => {
                       title={file.originalName} 
                       className="pdf-viewer"
                     />
-                  ) : (file.fileType === 'excel' || file.fileType === 'csv') ? (
-                    previewData ? (
+                  ) : (file.fileType === 'csv' || file.fileType === 'excel') ? (
+                    previewError ? (
+                      <div className="file-type-message">
+                        <FiFile className="file-type-icon" />
+                        <p>{previewError}</p>
+                      </div>
+                    ) : previewData ? (
                       <div className="table-preview">
                         <div className="table-info">
                           <p>Showing {previewData.previewRows} of {previewData.totalRows} rows</p>

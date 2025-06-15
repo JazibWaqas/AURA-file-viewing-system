@@ -43,7 +43,7 @@
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .file-details-sidebar {
@@ -134,6 +134,27 @@
 
 .download-button:hover {
   background: #357abd;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.delete-button:hover {
+  background: #c82333;
 }
 
 .file-preview {
@@ -368,7 +389,7 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .table-info {
@@ -386,14 +407,21 @@
 }
 
 .table-preview table {
-  width: 100%;
+  min-width: max-content;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
 
+.table-preview th,
+.table-preview td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #dee2e6;
+  color: #212529;
+  white-space: nowrap;
+}
+
 .table-preview th {
   background: #f8f9fa;
-  padding: 12px 16px;
   text-align: left;
   font-weight: 600;
   color: #495057;
@@ -401,12 +429,6 @@
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.table-preview td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #dee2e6;
-  color: #212529;
 }
 
 .table-preview tr:hover {

@@ -4,7 +4,27 @@ const path = require('path');
 const XLSX = require('xlsx');
 const { parse } = require('csv-parse/sync');
 
+const isExcelMimeType = (mimetype) => {
+    const excelTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
+        'application/vnd.ms-excel.sheet.binary.macroEnabled.12' // .xlsb
+    ];
+    return excelTypes.includes(mimetype);
+};
 
+const isCsvMimeType = (mimetype) => {
+    const csvTypes = [
+        'text/csv',
+        'application/csv',
+        'text/x-csv',
+        'application/x-csv',
+        'text/comma-separated-values',
+        'text/x-comma-separated-values'
+    ];
+    return csvTypes.includes(mimetype);
+};
 
 //upload lots of files 
 // Upload multiple files (bulk upload)
@@ -17,7 +37,8 @@ exports.uploadBulkFiles = async (req, res) => {
         const filesToSave = req.files.map(file => ({
             filename: file.filename,
             originalName: file.originalname,
-            fileType: file.mimetype.includes('excel') ? 'excel' : 'pdf',
+            fileType: isExcelMimeType(file.mimetype) ? 'excel' : 
+                      isCsvMimeType(file.mimetype) ? 'csv' : 'pdf',
             category: req.body.category,
             year: parseInt(req.body.year),
             month: parseInt(req.body.month),
@@ -62,8 +83,8 @@ exports.uploadFile = async (req, res) => {
         const file = new File({
             filename: req.file.filename,
             originalName: req.file.originalname,
-            fileType: req.file.mimetype.includes('excel') ? 'excel' : 
-                     req.file.mimetype.includes('csv') ? 'csv' : 'pdf',
+            fileType: isExcelMimeType(req.file.mimetype) ? 'excel' : 
+                      isCsvMimeType(req.file.mimetype) ? 'csv' : 'pdf',
             category: req.body.category,
             year: parseInt(req.body.year),
             month: parseInt(req.body.month),
@@ -98,20 +119,8 @@ exports.uploadFile = async (req, res) => {
             file: savedFile
         });
     } catch (error) {
-        console.error('Error in uploadFile:', error);
-        // If there's an error, try to delete the uploaded file
-        if (req.file) {
-            try {
-                await fs.unlink(req.file.path);
-                console.log('Deleted uploaded file after error');
-            } catch (unlinkError) {
-                console.error('Error deleting file after failed upload:', unlinkError);
-            }
-        }
-        res.status(500).json({ 
-            message: 'Error uploading file',
-            error: error.message 
-        });
+        console.error('Error uploading file:', error);
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -182,7 +191,7 @@ exports.getFilesByCategoryAndDate = async (req, res) => {
     }
 };
 
-// Download/View a file
+// Download a file
 exports.getFile = async (req, res) => {
     try {
         const file = await File.findById(req.params.id);
@@ -190,10 +199,35 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        // Serve the file directly for in-browser viewing
-        res.sendFile(file.path, { root: '.' }); // Use root to resolve absolute path
+        // Set headers for file download
+        res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
+        res.setHeader('Content-Type', file.fileType === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+                                    file.fileType === 'csv' ? 'text/csv' : 'application/pdf');
+
+        // Serve the file for download
+        res.sendFile(file.path, { root: '.' });
     } catch (error) {
-        console.error('Error fetching file for viewing:', error);
+        console.error('Error downloading file:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// View a file (for in-browser viewing)
+exports.viewFile = async (req, res) => {
+    try {
+        const file = await File.findById(req.params.id);
+        if (!file) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+
+        // Set headers for in-browser viewing
+        res.setHeader('Content-Type', file.fileType === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
+                                    file.fileType === 'csv' ? 'text/csv' : 'application/pdf');
+
+        // Serve the file for viewing
+        res.sendFile(file.path, { root: '.' });
+    } catch (error) {
+        console.error('Error viewing file:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -251,7 +285,8 @@ exports.updateFile = async (req, res) => {
             // Update with new file details
             file.filename = req.file.filename;
             file.originalName = req.file.originalname;
-            file.fileType = req.file.mimetype.includes('excel') ? 'excel' : 'pdf';
+            file.fileType = isExcelMimeType(req.file.mimetype) ? 'excel' : 
+                      isCsvMimeType(req.file.mimetype) ? 'csv' : 'pdf';
             file.path = req.file.path;
             file.size = req.file.size;
         }
@@ -292,50 +327,99 @@ exports.getFilePreview = async (req, res) => {
         }
 
         // Read the file content
-        const fileContent = await fs.readFile(file.path);
+        let fileContent;
+        try {
+            fileContent = await fs.readFile(file.path);
+        } catch (readError) {
+            console.error(`Error reading file ${file.path}:`, readError);
+            return res.status(500).json({ message: 'Failed to read file content.', details: readError.message });
+        }
 
         let data = [];
         let headers = [];
 
         if (file.fileType === 'csv') {
             // Parse CSV
-            const records = parse(fileContent, {
-                columns: true,
-                skip_empty_lines: true
-            });
-            
-            if (records.length > 0) {
-                headers = Object.keys(records[0]);
-                data = records;
+            try {
+                const records = parse(fileContent, {
+                    columns: true,
+                    skip_empty_lines: true
+                });
+                
+                if (records.length > 0) {
+                    headers = Object.keys(records[0]);
+                    data = records;
+                }
+            } catch (parseError) {
+                console.error('Error parsing CSV file:', parseError);
+                return res.status(500).json({ message: 'Failed to parse CSV content.', details: parseError.message });
             }
         } else if (file.fileType === 'excel') {
             // Parse Excel
-            const workbook = XLSX.read(fileContent, { type: 'buffer' });
+            let workbook;
+            try {
+                workbook = XLSX.read(fileContent, { type: 'buffer' });
+            } catch (readXlsxError) {
+                console.error('Error reading XLSX workbook:', readXlsxError);
+                return res.status(500).json({ message: 'Failed to read Excel workbook. File might be corrupted or not a valid Excel file.', details: readXlsxError.message });
+            }
+
+            if (workbook.SheetNames.length === 0) {
+                return res.status(400).json({ message: 'Excel file contains no sheets.' });
+            }
+
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             
-            // Convert to JSON
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-            
-            if (jsonData.length > 0) {
-                headers = Object.keys(jsonData[0]);
-                data = jsonData;
+            // Convert to JSON (array of arrays to preserve all columns)
+            try {
+                // Get raw data as array of arrays, including all cells
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true, defval: '' });
+                
+                if (sheetData.length > 0) {
+                    // Assume the first non-empty row is the header row
+                    let headerRow = sheetData[0];
+                    // If the first row contains no meaningful headers, try to infer from first few rows or use generic names
+                    if (headerRow.every(cell => !String(cell).trim())) {
+                        // Fallback: If first row is empty, generate generic headers based on the longest row
+                        const maxCols = sheetData.reduce((max, row) => Math.max(max, row.length), 0);
+                        headers = Array.from({ length: maxCols }, (_, i) => `Column ${String.fromCharCode(65 + i)}`);
+                        data = sheetData.map(row => {
+                            const rowObject = {};
+                            headers.forEach((header, index) => {
+                                rowObject[header] = String(row[index] || '');
+                            });
+                            return rowObject;
+                        });
+                    } else {
+                        // Use the first row as headers
+                        headers = headerRow.map((h, i) => String(h).trim() || `Column ${String.fromCharCode(65 + i)}`);
+                        // Process subsequent rows as data
+                        data = sheetData.slice(1).map(row => {
+                            const rowObject = {};
+                            headers.forEach((header, index) => {
+                                rowObject[header] = String(row[index] || '');
+                            });
+                            return rowObject;
+                        });
+                    }
+                }
+            } catch (jsonError) {
+                console.error('Error converting Excel sheet to JSON:', jsonError);
+                return res.status(500).json({ message: 'Failed to convert Excel sheet to JSON.', details: jsonError.message });
             }
         } else {
             return res.status(400).json({ message: 'Preview not supported for this file type' });
         }
 
-        // Limit the number of rows to prevent overwhelming the client
-        const previewData = data.slice(0, 100);
-
         res.json({
             headers,
-            data: previewData,
+            data,
             totalRows: data.length,
-            previewRows: previewData.length
+            previewRows: data.length // previewRows will now be totalRows
         });
     } catch (error) {
-        console.error('Error in getFilePreview:', error);
-        res.status(500).json({ message: error.message });
+        console.error('General error in getFilePreview:', error);
+        res.status(500).json({ message: 'An unexpected error occurred during preview generation.', details: error.message });
     }
 };
