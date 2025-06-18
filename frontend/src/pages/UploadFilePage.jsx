@@ -6,6 +6,63 @@ import { FiUploadCloud, FiFile, FiEye, FiDownload } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { initializeGoogleDrive, showGoogleDrivePicker, downloadFile } from '../services/googleDriveService';
 
+const defaultCategories = [
+    {
+        name: 'Financial Statements',
+        description: 'Financial reports and statements',
+        subCategories: ['Financial Reports', 'Monthly Accounts', 'Trial Balance', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Income & Donations',
+        description: 'Income and donation records',
+        subCategories: ['Donations', 'Fee Records', 'Other Income', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Expenses',
+        description: 'Expense records and bills',
+        subCategories: ['Operating Expenses', 'Utility Bills', 'Salary Records', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Bank & Cash',
+        description: 'Bank and cash related documents',
+        subCategories: ['Bank Statements', 'Cash Books', 'Bank Reconciliations', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Tax & Compliance',
+        description: 'Tax and compliance related documents',
+        subCategories: ['Tax Returns', 'Tax Exemptions', 'Regulatory Filings', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Audit Reports',
+        description: 'Internal and external audit reports',
+        subCategories: ['External Audit', 'Internal Audit', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Budgets',
+        description: 'Budget planning and tracking documents',
+        subCategories: ['Annual Budgets', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Organizational Documents',
+        description: 'Organization related documents',
+        subCategories: ['Board Documents', 'Certificates', 'Constitution', 'General', 'Policies', 'Registration Documents', 'Staff Policies', 'Other'],
+        isDefault: true
+    },
+    {
+        name: 'Other',
+        description: 'Miscellaneous documents',
+        subCategories: ['Other'],
+        isDefault: true
+    }
+];
+
 export default function UploadFilePage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [file, setFile] = useState(null);
@@ -17,6 +74,7 @@ export default function UploadFilePage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [isGoogleDriveInitialized, setIsGoogleDriveInitialized] = useState(false);
+  const [subCategory, setSubCategory] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,6 +162,7 @@ export default function UploadFilePage() {
       formData.append('fileName', fileName);
       formData.append('description', description);
       formData.append('category', category);
+      formData.append('subCategory', subCategory);
       formData.append('year', year);
       formData.append('month', new Date().getMonth() + 1);
       const response = await fetch('/api/files/upload', {
@@ -120,6 +179,7 @@ export default function UploadFilePage() {
       setDescription('');
       setCategory('');
       setYear('');
+      setSubCategory('');
       navigate('/file-index');
     } catch (error) {
       setError(error.message || 'Failed to upload file');
@@ -150,6 +210,11 @@ export default function UploadFilePage() {
     } catch (error) {
       alert('Failed to download file. Please try again.');
     }
+  };
+
+  const getSubCategories = () => {
+    const cat = defaultCategories.find(c => c.name === category);
+    return cat ? cat.subCategories : [];
   };
 
   return (
@@ -222,15 +287,16 @@ export default function UploadFilePage() {
                     <select
                       id="category"
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      onChange={(e) => {
+                        setCategory(e.target.value);
+                        setSubCategory('');
+                      }}
                       required
                     >
                       <option value="">Select a category</option>
-                      <option value="Income Statement">Income Statement</option>
-                      <option value="Balance Sheet">Balance Sheet</option>
-                      <option value="Cashflow">Cashflow</option>
-                      <option value="Payroll">Payroll</option>
-                      <option value="Tax">Tax</option>
+                      {defaultCategories.map((cat, idx) => (
+                        <option key={idx} value={cat.name}>{cat.name}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="dropdown-wrapper">
@@ -248,6 +314,21 @@ export default function UploadFilePage() {
                     </select>
                   </div>
                 </div>
+                <div className="dropdown-wrapper">
+                  <label htmlFor="subCategory">Sub Category</label>
+                  <select
+                    id="subCategory"
+                    value={subCategory}
+                    onChange={e => setSubCategory(e.target.value)}
+                    required
+                    disabled={!category}
+                  >
+                    <option value="">Select a sub category</option>
+                    {getSubCategories().map((sub, idx) => (
+                      <option key={idx} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="form-actions">
                   <button
                     className="cancel-button"
@@ -258,6 +339,7 @@ export default function UploadFilePage() {
                       setDescription('');
                       setCategory('');
                       setYear('');
+                      setSubCategory('');
                     }}
                   >
                     Cancel
@@ -281,7 +363,6 @@ export default function UploadFilePage() {
                       <div className="file-info">
                         <h3>{file.originalName || file.filename || file.name || 'Untitled'}</h3>
                         <p>Category: {file.category || 'Uncategorized'}</p>
-                        <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
                         <button

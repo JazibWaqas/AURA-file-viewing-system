@@ -221,11 +221,6 @@ const FileViewer = () => {
                         <span>Size:</span>
                         <strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong>
                       </li>
-                      <li>
-                        <FiCalendar />
-                        <span>Uploaded:</span>
-                        <strong>{file.createdAt ? new Date(file.createdAt).toLocaleDateString() : 'Unknown'}</strong>
-                      </li>
                     </ul>
                   </div>
 
@@ -337,7 +332,6 @@ const FileViewer = () => {
                       <div className="file-info">
                         <h3>{f.originalName || f.filename || f.name || 'Untitled'}</h3>
                         <p><FiFolder /> {f.category || 'Uncategorized'}</p>
-                        <p><FiCalendar /> {f.createdAt ? new Date(f.createdAt).toLocaleDateString() : 'Unknown'}</p>
                       </div>
                       <div className="file-actions">
                         <button 

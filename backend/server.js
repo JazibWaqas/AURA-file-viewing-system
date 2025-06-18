@@ -18,6 +18,18 @@ app.use(express.urlencoded({ extended: true }));
 // Multer setup for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Helper to ensure valid ISO string for dates
+function toISODate(val) {
+  if (!val) return new Date().toISOString();
+  if (typeof val === 'string') {
+    const d = new Date(val);
+    return isNaN(d) ? new Date().toISOString() : d.toISOString();
+  }
+  if (val.toDate) return val.toDate().toISOString(); // Firestore Timestamp
+  if (val instanceof Date) return val.toISOString();
+  return new Date(val).toISOString();
+}
+
 // --- List categories endpoint ---
 app.get('/api/categories', async (req, res) => {
   try {
@@ -49,24 +61,26 @@ app.get('/api/files', async (req, res) => {
   try {
     // Get file metadata from Firestore
     const snapshot = await db.collection('uploads').get();
-    const files = snapshot.docs.map(doc => ({
-      _id: doc.id,
-      originalName: doc.data().filename || doc.data().originalName,
-      category: doc.data().category || '',
-      year: doc.data().year || new Date().getFullYear(),
-      month: doc.data().month || new Date().getMonth() + 1,
-      fileType: doc.data().fileType || 'pdf',
-      size: doc.data().size || 0,
-      description: doc.data().description || '',
-      uploadedBy: doc.data().uploadedBy || 'anonymous',
-      createdAt: doc.data().uploadedAt || doc.data().createdAt || new Date(),
-      updatedAt: doc.data().updatedAt || new Date(),
-      url: `https://storage.googleapis.com/${bucket.name}/${doc.data().filename || doc.data().originalName}`
-    }));
-    
+    const files = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        _id: doc.id,
+        originalName: data.filename || data.originalName,
+        category: data.category || '',
+        subCategory: data.subCategory || '',
+        year: data.year || new Date().getFullYear(),
+        month: data.month || new Date().getMonth() + 1,
+        fileType: data.fileType || 'pdf',
+        size: data.size || 0,
+        description: data.description || '',
+        uploadedBy: data.uploadedBy || 'anonymous',
+        createdAt: toISODate(data.uploadedAt || data.createdAt),
+        updatedAt: toISODate(data.updatedAt),
+        url: `https://storage.googleapis.com/${bucket.name}/${data.filename || data.originalName}`
+      };
+    });
     // Sort by creation date (newest first)
     files.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
     res.json(files);
   } catch (error) {
     console.error('Error fetching files:', error);
@@ -81,7 +95,7 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { fileName, description, category, year, month } = req.body;
+    const { fileName, description, category, subCategory, year, month } = req.body;
     
     // Upload file to Firebase Storage
     const blob = bucket.file(req.file.originalname);
@@ -96,6 +110,7 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
           mimetype: req.file.mimetype,
           size: req.file.size,
           category: category || '',
+          subCategory: subCategory || '',
           year: parseInt(year) || new Date().getFullYear(),
           month: parseInt(month) || new Date().getMonth() + 1,
           description: description || '',
@@ -194,30 +209,28 @@ app.get('/api/files/:id', async (req, res) => {
 app.get('/api/files/:id/details', async (req, res) => {
   try {
     const fileId = req.params.id;
-    
     // Get file metadata from Firestore
     const doc = await db.collection('uploads').doc(fileId).get();
     if (!doc.exists) {
       return res.status(404).json({ error: 'File not found' });
     }
-    
-    const fileData = doc.data();
-    const fileName = fileData.filename || fileData.originalName;
-    
+    const data = doc.data();
+    const fileName = data.filename || data.originalName;
     res.json({
       _id: doc.id,
-      originalName: fileData.originalName || fileData.filename,
-      filename: fileData.filename,
-      category: fileData.category || '',
-      year: fileData.year || new Date().getFullYear(),
-      month: fileData.month || new Date().getMonth() + 1,
-      fileType: fileData.fileType || 'pdf',
-      size: fileData.size || 0,
-      description: fileData.description || '',
-      uploadedBy: fileData.uploadedBy || 'anonymous',
-      createdAt: fileData.uploadedAt || fileData.createdAt || new Date(),
-      updatedAt: fileData.updatedAt || new Date(),
-      mimetype: fileData.mimetype || 'application/octet-stream',
+      originalName: data.originalName || data.filename,
+      filename: data.filename,
+      category: data.category || '',
+      subCategory: data.subCategory || '',
+      year: data.year || new Date().getFullYear(),
+      month: data.month || new Date().getMonth() + 1,
+      fileType: data.fileType || 'pdf',
+      size: data.size || 0,
+      description: data.description || '',
+      uploadedBy: data.uploadedBy || 'anonymous',
+      createdAt: toISODate(data.uploadedAt || data.createdAt),
+      updatedAt: toISODate(data.updatedAt),
+      mimetype: data.mimetype || 'application/octet-stream',
       url: `https://storage.googleapis.com/${bucket.name}/${fileName}`
     });
   } catch (error) {

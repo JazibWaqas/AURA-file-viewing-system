@@ -282,9 +282,6 @@ const FileIndex = () => {
                         <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
-                        <p className="upload-date">
-                          Uploaded: {new Date(file.createdAt).toLocaleDateString()}
-                        </p>
                       </div>
                       <div className="file-actions">
                         <button onClick={() => handleViewFile(file._id)} className="action-button">
@@ -323,9 +320,6 @@ const FileIndex = () => {
                         <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
-                        <p className="upload-date">
-                          Uploaded: {new Date(file.createdAt).toLocaleDateString()}
-                        </p>
                       </div>
                       <div className="file-actions">
                         <button onClick={() => handleViewFile(file._id)} className="action-button">
