@@ -4,6 +4,7 @@ import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import { useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
+import CategorySidebar from '../components/CategorySidebar.jsx';
 
 const FileIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -14,6 +15,7 @@ const FileIndex = () => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [showYearFilter, setShowYearFilter] = useState(false);
@@ -112,6 +114,11 @@ const FileIndex = () => {
     setShowYearFilter(false);
   };
 
+  const handleCategorySelect = (cat, sub) => {
+    setSelectedCategory(cat);
+    setSelectedSubCategory(sub);
+  };
+
   const getUniqueCategories = () => {
     return categories.map(category => category.name);
   };
@@ -124,24 +131,12 @@ const FileIndex = () => {
   const filteredFiles = allFiles.filter(file => {
     const fileName = file.originalName || file.filename || file.name || '';
     const fileCategory = file.category || '';
-    const fileYear = file.year || '';
-    
+    const fileSubCategory = file.subCategory || '';
     const matchesSearch = fileName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || fileCategory === selectedCategory;
-    const matchesYear = !selectedYear || fileYear === parseInt(selectedYear);
-    
-    console.log('Filtering file:', {
-      fileName,
-      fileCategory,
-      fileYear,
-      selectedCategory,
-      selectedYear,
-      matchesSearch,
-      matchesCategory,
-      matchesYear
-    });
-    
-    return matchesSearch && matchesCategory && matchesYear;
+    const matchesSubCategory = !selectedSubCategory || fileSubCategory === selectedSubCategory;
+    const matchesYear = !selectedYear || file.year === parseInt(selectedYear);
+    return matchesSearch && matchesCategory && matchesSubCategory && matchesYear;
   });
 
   useEffect(() => {
@@ -297,41 +292,48 @@ const FileIndex = () => {
               </div>
             </div>
 
-            <div className="file-list-section">
-              <h2>All Files</h2>
-              <div className="file-list-grid">
-                {isLoadingFiles ? (
-                  <div className="loading-indicator">
-                    <FiLoader className="spinner-icon" />
-                    <p>Loading files...</p>
+            <div style={{ display: 'flex', gap: 24 }}>
+              <div style={{ minWidth: 220 }}>
+                <CategorySidebar onSelect={handleCategorySelect} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="file-list-section">
+                  <h2>All Files</h2>
+                  <div className="file-list-grid">
+                    {isLoadingFiles ? (
+                      <div className="loading-indicator">
+                        <FiLoader className="spinner-icon" />
+                        <p>Loading files...</p>
+                      </div>
+                    ) : filteredFiles.length === 0 ? (
+                      <div className="empty-state">
+                        <FiFile className="empty-icon" />
+                        <p>No files found matching your criteria</p>
+                      </div>
+                    ) : (
+                      filteredFiles.map((file) => (
+                        <div key={file._id} className="file-card">
+                          <div className="file-icon">
+                            <FiFile />
+                          </div>
+                          <div className="file-info">
+                            <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                            <p>Category: {file.category || 'Uncategorized'}</p>
+                            <p>Year: {file.year || 'N/A'}</p>
+                          </div>
+                          <div className="file-actions">
+                            <button onClick={() => handleViewFile(file._id)} className="action-button">
+                              <FiEye />
+                            </button>
+                            <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
+                              <FiDownload />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
-                ) : filteredFiles.length === 0 ? (
-                  <div className="empty-state">
-                    <FiFile className="empty-icon" />
-                    <p>No files found matching your criteria</p>
-                  </div>
-                ) : (
-                  filteredFiles.map((file) => (
-                    <div key={file._id} className="file-card">
-                      <div className="file-icon">
-                        <FiFile />
-                      </div>
-                      <div className="file-info">
-                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
-                        <p>Category: {file.category || 'Uncategorized'}</p>
-                        <p>Year: {file.year || 'N/A'}</p>
-                      </div>
-                      <div className="file-actions">
-                        <button onClick={() => handleViewFile(file._id)} className="action-button">
-                          <FiEye />
-                        </button>
-                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
-                          <FiDownload />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
+                </div>
               </div>
             </div>
           </div>
