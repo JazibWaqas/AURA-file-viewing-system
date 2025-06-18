@@ -108,7 +108,7 @@ exports.uploadFile = async (req, res) => {
         const savedFile = await file.save();
         
         console.log('File saved successfully to database:', {
-            id: savedFile._id,
+            id: savedFile.id,
             filename: savedFile.filename,
             path: savedFile.path
         });
@@ -133,12 +133,7 @@ exports.getAllFiles = async (req, res) => {
 
         // Handle search
         if (search) {
-            const searchRegex = new RegExp(search, 'i'); // Case-insensitive regex
-            query.$or = [
-                { originalName: { $regex: searchRegex } },
-                { description: { $regex: searchRegex } },
-                { category: { $regex: searchRegex } }
-            ];
+            query.search = search;
         }
 
         // Handle category filter
@@ -151,13 +146,13 @@ exports.getAllFiles = async (req, res) => {
             query.year = parseInt(year);
         }
 
-        const files = await File.find(query).sort({ createdAt: -1 });
+        const files = await File.find(query);
         console.log(`Found ${files.length} files in database`);
         
         // Log each file's details
         files.forEach(file => {
             console.log('File in database:', {
-                id: file._id,
+                id: file.id,
                 filename: file.filename,
                 originalName: file.originalName,
                 category: file.category,
@@ -184,7 +179,7 @@ exports.getFilesByCategoryAndDate = async (req, res) => {
         if (year) query.year = parseInt(year);
         if (month) query.month = parseInt(month);
 
-        const files = await File.find(query).sort({ createdAt: -1 });
+        const files = await File.find(query);
         res.json(files);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -244,7 +239,7 @@ exports.getFileDetails = async (req, res) => {
 
         // Return only the necessary metadata
         res.json({
-            _id: file._id,
+            id: file.id,
             filename: file.filename,
             originalName: file.originalName,
             fileType: file.fileType,
@@ -272,10 +267,11 @@ exports.updateFile = async (req, res) => {
         }
 
         // Update only the fields that are provided
-        if (req.body.category) file.category = req.body.category;
-        if (req.body.year) file.year = parseInt(req.body.year);
-        if (req.body.month) file.month = parseInt(req.body.month);
-        if (req.body.uploadedBy) file.uploadedBy = req.body.uploadedBy;
+        const updates = {};
+        if (req.body.category) updates.category = req.body.category;
+        if (req.body.year) updates.year = parseInt(req.body.year);
+        if (req.body.month) updates.month = parseInt(req.body.month);
+        if (req.body.uploadedBy) updates.uploadedBy = req.body.uploadedBy;
 
         // If a new file is uploaded, update the file details
         if (req.file) {
@@ -283,15 +279,15 @@ exports.updateFile = async (req, res) => {
             await fs.unlink(file.path);
             
             // Update with new file details
-            file.filename = req.file.filename;
-            file.originalName = req.file.originalname;
-            file.fileType = isExcelMimeType(req.file.mimetype) ? 'excel' : 
+            updates.filename = req.file.filename;
+            updates.originalName = req.file.originalname;
+            updates.fileType = isExcelMimeType(req.file.mimetype) ? 'excel' : 
                       isCsvMimeType(req.file.mimetype) ? 'csv' : 'pdf';
-            file.path = req.file.path;
-            file.size = req.file.size;
+            updates.path = req.file.path;
+            updates.size = req.file.size;
         }
 
-        await file.save();
+        await file.update(updates);
         res.json(file);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -310,7 +306,7 @@ exports.deleteFile = async (req, res) => {
         await fs.unlink(file.path);
         
         // Delete file record from database
-        await file.deleteOne();
+        await file.delete();
         
         res.json({ message: 'File deleted successfully' });
     } catch (error) {

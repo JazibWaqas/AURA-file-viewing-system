@@ -279,8 +279,8 @@ export default function UploadFilePage() {
                         <FiFile className="file-icon" />
                       </div>
                       <div className="file-info">
-                        <h3>{file.originalName}</h3>
-                        <p>Category: {file.category}</p>
+                        <h3>{file.originalName || file.filename || file.name || 'Untitled'}</h3>
+                        <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Uploaded: {new Date(file.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="file-actions">
@@ -294,7 +294,7 @@ export default function UploadFilePage() {
                         <button
                           className="action-button"
                           title="Download"
-                          onClick={() => handleDownload(file._id, file.originalName)}
+                          onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
                         >
                           <FiDownload />
                         </button>

@@ -122,7 +122,7 @@ const FileViewer = () => {
   const handleDelete = async () => {
     if (!file || !file._id) return;
 
-    if (window.confirm(`Are you sure you want to delete the file "${file.originalName}"? This action cannot be undone.`)) {
+    if (window.confirm(`Are you sure you want to delete the file "${file.originalName || file.filename || file.name || 'Untitled'}"? This action cannot be undone.`)) {
       try {
         setLoading(true);
         const response = await fetch(`/api/files/${file._id}`, {
@@ -193,7 +193,7 @@ const FileViewer = () => {
                 <button className="back-button" onClick={() => navigate('/file-index')}>
                   <FiArrowLeft /> Back to Files
                 </button>
-                <h1>{file.originalName}</h1>
+                <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
               </div>
 
               <div className="file-viewer-content">
@@ -204,27 +204,27 @@ const FileViewer = () => {
                       <li>
                         <FiFolder />
                         <span>Category:</span>
-                        <strong>{file.category}</strong>
+                        <strong>{file.category || 'Uncategorized'}</strong>
                       </li>
                       <li>
                         <FiCalendar />
                         <span>Year:</span>
-                        <strong>{file.year}</strong>
+                        <strong>{file.year || 'N/A'}</strong>
                       </li>
                       <li>
                         <FiUser />
                         <span>Uploaded By:</span>
-                        <strong>{file.uploadedBy}</strong>
+                        <strong>{file.uploadedBy || 'Anonymous'}</strong>
                       </li>
                       <li>
                         <FiInfo />
                         <span>Size:</span>
-                        <strong>{(file.size / 1024).toFixed(2)} KB</strong>
+                        <strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong>
                       </li>
                       <li>
                         <FiCalendar />
                         <span>Uploaded:</span>
-                        <strong>{new Date(file.createdAt).toLocaleDateString()}</strong>
+                        <strong>{file.createdAt ? new Date(file.createdAt).toLocaleDateString() : 'Unknown'}</strong>
                       </li>
                     </ul>
                   </div>
@@ -239,7 +239,7 @@ const FileViewer = () => {
                   <div className="actions-section">
                     <button 
                       className="download-button"
-                      onClick={() => handleDownload(file._id, file.originalName)}
+                      onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
                     >
                       <FiDownload /> Download File
                     </button>
@@ -256,7 +256,7 @@ const FileViewer = () => {
                   {file.fileType === 'pdf' ? (
                     <iframe 
                       src={file.url} 
-                      title={file.originalName} 
+                      title={file.originalName || file.filename || file.name || 'Untitled'} 
                       className="pdf-viewer"
                     />
                   ) : (file.fileType === 'csv' || file.fileType === 'excel') ? (
@@ -268,22 +268,22 @@ const FileViewer = () => {
                     ) : previewData ? (
                       <div className="table-preview">
                         <div className="table-info">
-                          <p>Showing {previewData.previewRows} of {previewData.totalRows} rows</p>
+                          <p>Showing {previewData.data ? previewData.data.length : 0} of {previewData.totalRows || 0} rows</p>
                         </div>
                         <div className="table-container">
                           <table>
                             <thead>
                               <tr>
-                                {previewData.headers.map((header, index) => (
+                                {previewData.headers && previewData.headers.map((header, index) => (
                                   <th key={index}>{header}</th>
                                 ))}
                               </tr>
                             </thead>
                             <tbody>
-                              {previewData.data.map((row, rowIndex) => (
+                              {previewData.data && previewData.data.map((row, rowIndex) => (
                                 <tr key={rowIndex}>
-                                  {previewData.headers.map((header, colIndex) => (
-                                    <td key={colIndex}>{row[header]}</td>
+                                  {previewData.headers && previewData.headers.map((header, colIndex) => (
+                                    <td key={colIndex}>{Array.isArray(row) ? row[colIndex] : row[header]}</td>
                                   ))}
                                 </tr>
                               ))}
@@ -303,9 +303,9 @@ const FileViewer = () => {
                       <p>This file type cannot be previewed. Please download it to view the contents.</p>
                       <button 
                         className="download-button"
-                        onClick={() => handleDownload(file._id, file.originalName)}
+                        onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
                       >
-                        <FiDownload /> Download {file.originalName}
+                        <FiDownload /> Download {file.originalName || file.filename || file.name}
                       </button>
                     </div>
                   )}
@@ -335,9 +335,9 @@ const FileViewer = () => {
                         <FiFile />
                       </div>
                       <div className="file-info">
-                        <h3>{f.originalName}</h3>
-                        <p><FiFolder /> {f.category}</p>
-                        <p><FiCalendar /> {new Date(f.createdAt).toLocaleDateString()}</p>
+                        <h3>{f.originalName || f.filename || f.name || 'Untitled'}</h3>
+                        <p><FiFolder /> {f.category || 'Uncategorized'}</p>
+                        <p><FiCalendar /> {f.createdAt ? new Date(f.createdAt).toLocaleDateString() : 'Unknown'}</p>
                       </div>
                       <div className="file-actions">
                         <button 
@@ -350,7 +350,7 @@ const FileViewer = () => {
                         <button 
                           className="action-button" 
                           title="Download" 
-                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName); }}
+                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
                         >
                           <FiDownload />
                         </button>
