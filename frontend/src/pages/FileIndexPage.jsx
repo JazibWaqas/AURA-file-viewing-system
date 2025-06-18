@@ -122,14 +122,18 @@ const FileIndex = () => {
   };
 
   const filteredFiles = allFiles.filter(file => {
-    const matchesSearch = file.originalName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || file.category === selectedCategory;
-    const matchesYear = !selectedYear || file.year === parseInt(selectedYear);
+    const fileName = file.originalName || file.filename || file.name || '';
+    const fileCategory = file.category || '';
+    const fileYear = file.year || '';
+    
+    const matchesSearch = fileName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || fileCategory === selectedCategory;
+    const matchesYear = !selectedYear || fileYear === parseInt(selectedYear);
     
     console.log('Filtering file:', {
-      fileName: file.originalName,
-      fileCategory: file.category,
-      fileYear: file.year,
+      fileName,
+      fileCategory,
+      fileYear,
       selectedCategory,
       selectedYear,
       matchesSearch,
@@ -275,9 +279,9 @@ const FileIndex = () => {
                         <FiFile />
                       </div>
                       <div className="file-info">
-                        <h4>{file.originalName}</h4>
-                        <p>Category: {file.category}</p>
-                        <p>Year: {file.year}</p>
+                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <p>Category: {file.category || 'Uncategorized'}</p>
+                        <p>Year: {file.year || 'N/A'}</p>
                         <p className="upload-date">
                           Uploaded: {new Date(file.createdAt).toLocaleDateString()}
                         </p>
@@ -286,7 +290,7 @@ const FileIndex = () => {
                         <button onClick={() => handleViewFile(file._id)} className="action-button">
                           <FiEye />
                         </button>
-                        <button onClick={() => handleDownload(file._id, file.originalName)} className="action-button">
+                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
                           <FiDownload />
                         </button>
                       </div>
@@ -316,9 +320,9 @@ const FileIndex = () => {
                         <FiFile />
                       </div>
                       <div className="file-info">
-                        <h4>{file.originalName}</h4>
-                        <p>Category: {file.category}</p>
-                        <p>Year: {file.year}</p>
+                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <p>Category: {file.category || 'Uncategorized'}</p>
+                        <p>Year: {file.year || 'N/A'}</p>
                         <p className="upload-date">
                           Uploaded: {new Date(file.createdAt).toLocaleDateString()}
                         </p>
@@ -327,7 +331,7 @@ const FileIndex = () => {
                         <button onClick={() => handleViewFile(file._id)} className="action-button">
                           <FiEye />
                         </button>
-                        <button onClick={() => handleDownload(file._id, file.originalName)} className="action-button">
+                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
                           <FiDownload />
                         </button>
                       </div>

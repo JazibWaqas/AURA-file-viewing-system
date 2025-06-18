@@ -17,7 +17,7 @@ exports.createCategory = async (req, res) => {
 // Get all categories
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.find().sort({ name: 1 });
+        const categories = await Category.find();
         res.json(categories);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -45,10 +45,11 @@ exports.updateCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
         
-        category.name = req.body.name || category.name;
-        category.description = req.body.description || category.description;
+        const updates = {};
+        if (req.body.name) updates.name = req.body.name;
+        if (req.body.description) updates.description = req.body.description;
         
-        await category.save();
+        await category.update(updates);
         res.json(category);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -63,7 +64,7 @@ exports.deleteCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
         
-        await category.deleteOne();
+        await category.delete();
         res.json({ message: 'Category deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
