@@ -98,14 +98,14 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
     const { fileName, description, category, subCategory, year, month } = req.body;
     
     // Upload file to Firebase Storage
-    const blob = bucket.file(req.file.originalname);
+    const blob = bucket.file(fileName || req.file.originalname);
     const blobStream = blob.createWriteStream({ resumable: false });
     
     blobStream.on('finish', async () => {
       try {
         // Save file metadata to Firestore
         const fileMetadata = {
-          filename: req.file.originalname,
+          filename: fileName || req.file.originalname,
           originalName: fileName || req.file.originalname,
           mimetype: req.file.mimetype,
           size: req.file.size,

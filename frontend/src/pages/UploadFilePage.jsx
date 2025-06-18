@@ -269,7 +269,7 @@ export default function UploadFilePage() {
                 <input
                   type="text"
                   id="fileName"
-                  placeholder="e.g., Q1 2024 Income Statement"
+                  placeholder="e.g., Income Statement"
                   value={fileName}
                   onChange={(e) => setFileName(e.target.value)}
                   required
@@ -301,17 +301,19 @@ export default function UploadFilePage() {
                   </div>
                   <div className="dropdown-wrapper">
                     <label htmlFor="year">Year</label>
-                    <select
+                    <input
+                      type="number"
                       id="year"
+                      placeholder="e.g., 2024"
                       value={year}
-                      onChange={(e) => setYear(e.target.value)}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) setYear(val);
+                      }}
+                      min="1900"
+                      max={new Date().getFullYear()}
                       required
-                    >
-                      <option value="">Select a year</option>
-                      <option value="2024">2024</option>
-                      <option value="2023">2023</option>
-                      <option value="2022">2022</option>
-                    </select>
+                    />
                   </div>
                 </div>
                 <div className="dropdown-wrapper">
