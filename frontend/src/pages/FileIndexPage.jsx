@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import Sidebar from '../components/Sidebar.jsx';
+import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
-import CategorySidebar from '../components/CategorySidebar.jsx';
-import { FaChartBar, FaDonate, FaMoneyBill, FaUniversity, FaBalanceScale, FaClipboardCheck, FaFolderOpen, FaBuilding, FaEllipsisH } from "react-icons/fa";
 
 const FileIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -18,20 +17,19 @@ const FileIndex = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
-  const [expandedCategory, setExpandedCategory] = useState(null);
-  const [categorySidebarOpen, setCategorySidebarOpen] = useState(true);
 
+  // Responsive sidebar
   useEffect(() => {
     const handleResize = () => setSidebarOpen(window.innerWidth >= 900);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Fetch files and categories
   useEffect(() => {
     const fetchData = async () => {
       setIsLoadingFiles(true);
@@ -41,42 +39,31 @@ const FileIndex = () => {
           fetch('/api/files'),
           fetch('/api/categories')
         ]);
-
-        if (!filesRes.ok || !categoriesRes.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
+        if (!filesRes.ok || !categoriesRes.ok) throw new Error('Failed to fetch data');
         const [filesData, categoriesData] = await Promise.all([
           filesRes.json(),
           categoriesRes.json()
         ]);
-
         const sortedFiles = filesData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setAllFiles(sortedFiles);
         setRecentFiles(sortedFiles.slice(0, 5));
         setCategories(categoriesData);
       } catch (err) {
-        console.error('Error fetching data:', err);
         setError(err.message);
       } finally {
         setIsLoadingFiles(false);
         setIsLoadingCategories(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const handleViewFile = (fileId) => {
-    navigate(`/file-viewer/${fileId}`);
-  };
-
+  // Handlers
+  const handleViewFile = (fileId) => navigate(`/file-viewer/${fileId}`);
   const handleDownload = async (fileId, fileName) => {
     try {
       const response = await fetch(`/api/files/${fileId}`);
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
+      if (!response.ok) throw new Error('Failed to download file');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -87,62 +74,25 @@ const FileIndex = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error downloading file:', error);
       alert('Failed to download file. Please try again.');
     }
   };
-
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
-    debounceTimeout.current = setTimeout(() => {
-      // Implement search logic here
-    }, 300);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {}, 300);
   };
-
-  const handleCategoryFilter = (category) => {
-    console.log('Selected category:', category);
-    setSelectedCategory(category === selectedCategory ? '' : category);
-    setShowCategoryFilter(false);
-  };
-
-  const handleYearFilter = (year) => {
-    console.log('Selected year:', year);
-    setSelectedYear(year === selectedYear ? '' : year);
-    setShowYearFilter(false);
-  };
-
   const handleCategorySelect = (cat, sub) => {
     setSelectedCategory(cat);
     setSelectedSubCategory(sub);
   };
 
-  const getUniqueCategories = () => {
-    return categories.map(category => category.name);
-  };
-
+  // Filtering
   const getUniqueYears = () => {
     const years = Array.from(new Set(allFiles.map(file => file.year))).filter(Boolean);
     return years.sort((a, b) => b - a);
   };
-
-  const categoryIconMap = {
-    "Financial Statements": <FaChartBar />,
-    "Income & Donations": <FaDonate />,
-    "Expenses": <FaMoneyBill />,
-    "Bank & Cash": <FaUniversity />,
-    "Tax & Compliance": <FaBalanceScale />,
-    "Audit Reports": <FaClipboardCheck />,
-    "Budgets": <FaFolderOpen />,
-    "Organizational Documents": <FaBuilding />,
-    "Other": <FaEllipsisH />,
-  };
-
   const filteredFiles = allFiles.filter(file => {
     const fileName = file.originalName || file.filename || file.name || '';
     const fileCategory = file.category || '';
@@ -153,19 +103,17 @@ const FileIndex = () => {
     const matchesYear = !selectedYear || file.year === parseInt(selectedYear);
     return matchesSearch && matchesCategory && matchesSubCategory && matchesYear;
   });
-
-  useEffect(() => {
-    console.log('Current filters:', {
-      selectedCategory,
-      selectedYear,
-      searchTerm,
-      totalFiles: allFiles.length,
-      filteredFilesCount: filteredFiles.length
-    });
-  }, [selectedCategory, selectedYear, searchTerm, allFiles, filteredFiles]);
-
   const filteredRecentFiles = filteredFiles.slice(0, 5);
 
+  // Dynamic section title
+  const getSectionTitle = () => {
+    if (selectedSubCategory) return selectedSubCategory;
+    if (selectedCategory) return selectedCategory;
+    if (searchTerm) return `Search Results`;
+    return 'Recent Files';
+  };
+
+  // Error state
   if (error) {
     return (
       <div className="app-root">
@@ -189,58 +137,15 @@ const FileIndex = () => {
   return (
     <div className="app-root">
       <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-      <div className="app-content-row">
+      <div className={`app-content-row${sidebarOpen ? ' sidebar-open' : ''}`}>
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        {/* Category Sidebar Toggle Button */}
-        {!categorySidebarOpen && (
-          <button className="category-sidebar-toggle" onClick={() => setCategorySidebarOpen(true)} aria-label="Open categories">
-            &#9776; Categories
-          </button>
-        )}
-        {/* Category Sidebar */}
-        {categorySidebarOpen && (
-          <aside className="sidebar category-sidebar">
-            <button className="category-sidebar-close" onClick={() => setCategorySidebarOpen(false)} aria-label="Close categories">&times;</button>
-            <div className="category-toc-title">Categories</div>
-            <nav>
-              <ul>
-                {categories.map((cat) => (
-                  <li key={cat.name}>
-                    <button
-                      className={`category-toc-link${selectedCategory === cat.name ? ' active' : ''}`}
-                      onClick={() => setExpandedCategory(expandedCategory === cat.name ? null : cat.name)}
-                      aria-expanded={expandedCategory === cat.name}
-                    >
-                      <span className="category-toc-icon">{categoryIconMap[cat.name] || <FaEllipsisH />}</span>
-                      {cat.name}
-                    </button>
-                    {cat.subCategories && expandedCategory === cat.name && (
-                      <ul className="subcategory-list">
-                        {cat.subCategories.map((sub) => (
-                          <li key={sub}>
-                            <button
-                              className={`subcategory-link${selectedSubCategory === sub && selectedCategory === cat.name ? ' active' : ''}`}
-                              onClick={() => handleCategorySelect(cat.name, sub)}
-                            >
-                              {sub}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </aside>
-        )}
+        <CategorySidebar onSelect={handleCategorySelect} />
         <main className="main-content">
           <div className="file-index-page">
             <div className="page-header">
               <h1>File Management</h1>
               <p>Browse and manage all your files in one place</p>
             </div>
-
             <div className="search-filter-bar">
               <div className="search-container">
                 <FiSearch className="search-icon" />
@@ -252,35 +157,18 @@ const FileIndex = () => {
                   onChange={handleSearchChange}
                 />
               </div>
-              
               <div className="filter-container">
                 <button 
                   className={`filter-button ${selectedCategory ? 'active' : ''}`}
-                  onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSelectedSubCategory('');
+                  }}
                 >
                   <FiFilter />
-                  Category {selectedCategory && `(${selectedCategory})`}
+                  {selectedCategory ? `Category (${selectedCategory})` : 'Category'}
                 </button>
-                {showCategoryFilter && (
-                  <div className="category-toc-panel">
-                    <div className="category-toc-title">Categories</div>
-                    <ul>
-                      {getUniqueCategories().map((cat) => (
-                        <li key={cat}>
-                          <button
-                            className={`category-toc-link${selectedCategory === cat ? ' active' : ''}`}
-                            onClick={() => handleCategoryFilter(cat)}
-                          >
-                            <span className="category-toc-icon">{categoryIconMap[cat] || <FaEllipsisH />}</span>
-                            {cat}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
-
               <div className="filter-container">
                 <button 
                   className={`filter-button ${selectedYear ? 'active' : ''}`}
@@ -295,7 +183,7 @@ const FileIndex = () => {
                       <button
                         key={year}
                         className={`filter-option ${selectedYear === year ? 'selected' : ''}`}
-                        onClick={() => handleYearFilter(year)}
+                        onClick={() => setSelectedYear(year)}
                       >
                         {year}
                       </button>
@@ -303,12 +191,12 @@ const FileIndex = () => {
                   </div>
                 )}
               </div>
-
               {(selectedCategory || selectedYear) && (
                 <button 
                   className="clear-filters-button"
                   onClick={() => {
                     setSelectedCategory('');
+                    setSelectedSubCategory('');
                     setSelectedYear('');
                   }}
                 >
@@ -316,19 +204,19 @@ const FileIndex = () => {
                 </button>
               )}
             </div>
-
-            <div className="recent-files-section">
-              <h2>Recent Files</h2>
-              <div className="recent-files-grid">
+            {/* Filtered/Category Section */}
+            <section className="files-section">
+              <h2 className="files-section-title">{getSectionTitle()}</h2>
+              <div className="files-scroll-grid">
                 {isLoadingFiles ? (
                   <div className="loading-indicator">
                     <FiLoader className="spinner-icon" />
-                    <p>Loading recent files...</p>
+                    <p>Loading files...</p>
                   </div>
                 ) : filteredRecentFiles.length === 0 ? (
                   <div className="empty-state">
                     <FiFile className="empty-icon" />
-                    <p>No recent files found</p>
+                    <p>No files found</p>
                   </div>
                 ) : (
                   filteredRecentFiles.map((file) => (
@@ -353,52 +241,45 @@ const FileIndex = () => {
                   ))
                 )}
               </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 24 }}>
-              <div style={{ minWidth: 220 }}>
-                <CategorySidebar onSelect={handleCategorySelect} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className="file-list-section">
-                  <h2>All Files</h2>
-                  <div className="file-list-grid">
-                    {isLoadingFiles ? (
-                      <div className="loading-indicator">
-                        <FiLoader className="spinner-icon" />
-                        <p>Loading files...</p>
-                      </div>
-                    ) : filteredFiles.length === 0 ? (
-                      <div className="empty-state">
-                        <FiFile className="empty-icon" />
-                        <p>No files found matching your criteria</p>
-                      </div>
-                    ) : (
-                      filteredFiles.map((file) => (
-                        <div key={file._id} className="file-card">
-                          <div className="file-icon">
-                            <FiFile />
-                          </div>
-                          <div className="file-info">
-                            <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
-                            <p>Category: {file.category || 'Uncategorized'}</p>
-                            <p>Year: {file.year || 'N/A'}</p>
-                          </div>
-                          <div className="file-actions">
-                            <button onClick={() => handleViewFile(file._id)} className="action-button">
-                              <FiEye />
-                            </button>
-                            <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
-                              <FiDownload />
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
+            </section>
+            {/* All Files Section */}
+            <section className="files-section">
+              <h2 className="files-section-title">All Files</h2>
+              <div className="files-scroll-grid">
+                {isLoadingFiles ? (
+                  <div className="loading-indicator">
+                    <FiLoader className="spinner-icon" />
+                    <p>Loading files...</p>
                   </div>
-                </div>
+                ) : filteredFiles.length === 0 ? (
+                  <div className="empty-state">
+                    <FiFile className="empty-icon" />
+                    <p>No files found matching your criteria</p>
+                  </div>
+                ) : (
+                  filteredFiles.map((file) => (
+                    <div key={file._id} className="file-card">
+                      <div className="file-icon">
+                        <FiFile />
+                      </div>
+                      <div className="file-info">
+                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <p>Category: {file.category || 'Uncategorized'}</p>
+                        <p>Year: {file.year || 'N/A'}</p>
+                      </div>
+                      <div className="file-actions">
+                        <button onClick={() => handleViewFile(file._id)} className="action-button">
+                          <FiEye />
+                        </button>
+                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
+                          <FiDownload />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            </div>
+            </section>
           </div>
         </main>
       </div>
