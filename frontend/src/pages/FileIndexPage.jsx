@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
-import Sidebar from '../components/Sidebar.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
 
-const FileIndex = () => {
+export default function FileIndexPage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [recentFiles, setRecentFiles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -117,31 +116,27 @@ const FileIndex = () => {
   if (error) {
     return (
       <div className="app-root">
-        <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-        <div className="app-content-row">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <main className="main-content">
-            <div className="error-container">
-              <h2>Error Loading Files</h2>
-              <p>{error}</p>
-              <button onClick={() => window.location.reload()} className="retry-button">
-                Retry
-              </button>
-            </div>
-          </main>
-        </div>
+        <Header />
+        <main className="main-content">
+          <div className="error-container">
+            <h2>Error Loading Files</h2>
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Retry
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
     <div className="app-root">
-      <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-      <div className={`app-content-row${sidebarOpen ? ' sidebar-open' : ''}`}>
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <CategorySidebar onSelect={handleCategorySelect} />
-        <main className="main-content">
-          <div className="file-index-page">
+      <Header />
+      <main className="main-content" style={{ padding: 0 }}>
+        <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
+          <CategorySidebar onSelect={handleCategorySelect} />
+          <div className="file-index-page" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
             <div className="page-header">
               <h1>File Management</h1>
               <p>Browse and manage all your files in one place</p>
@@ -281,10 +276,8 @@ const FileIndex = () => {
               </div>
             </section>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default FileIndex;
+}

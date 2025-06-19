@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
-import Sidebar from '../components/Sidebar.jsx';
-import '../styles/UploadFile.css';
 import { FiUploadCloud, FiFile, FiEye, FiDownload } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { initializeGoogleDrive, showGoogleDrivePicker, downloadFile } from '../services/googleDriveService';
+import '../styles/UploadFile.css';
 
 const defaultCategories = [
     {
@@ -64,7 +63,6 @@ const defaultCategories = [
 ];
 
 export default function UploadFilePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [description, setDescription] = useState('');
@@ -219,11 +217,10 @@ export default function UploadFilePage() {
 
   return (
     <div className="app-root">
-      <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-      <div className="app-content-row">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="main-content">
-          <div className="upload-content-row">
+      <Header />
+      <main className="main-content" style={{ padding: 0 }}>
+        <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
+          <div className="upload-content-row" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
             <div className="upload-card large">
               <h2 className="upload-title">Upload New Accounting File</h2>
               <p className="upload-subtitle">
@@ -390,8 +387,8 @@ export default function UploadFilePage() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

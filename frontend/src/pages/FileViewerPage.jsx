@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
-import Sidebar from '../components/Sidebar.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2 } from 'react-icons/fi';
 
 const FileViewer = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const { id } = useParams();
   const [file, setFile] = useState(null);
   const [allFiles, setAllFiles] = useState([]);
@@ -15,15 +13,6 @@ const FileViewer = () => {
   const [previewData, setPreviewData] = useState(null);
   const [previewError, setPreviewError] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setSidebarOpen(window.innerWidth >= 900);
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,16 +136,13 @@ const FileViewer = () => {
   if (loading) {
     return (
       <div className="app-root">
-        <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-        <div className="app-content-row">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <main className="main-content">
-            <div className="loading-container">
-              <FiLoader className="spinner-icon" />
-              <p>Loading content...</p>
-            </div>
-          </main>
-        </div>
+        <Header />
+        <main className="main-content">
+          <div className="loading-container">
+            <FiLoader className="spinner-icon" />
+            <p>Loading content...</p>
+          </div>
+        </main>
       </div>
     );
   }
@@ -164,19 +150,16 @@ const FileViewer = () => {
   if (error) {
     return (
       <div className="app-root">
-        <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-        <div className="app-content-row">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <main className="main-content">
-            <div className="error-container">
-              <h2>Error Loading File</h2>
-              <p>{error}</p>
-              <button onClick={() => window.location.reload()} className="retry-button">
-                Retry
-              </button>
-            </div>
-          </main>
-        </div>
+        <Header />
+        <main className="main-content">
+          <div className="error-container">
+            <h2>Error Loading File</h2>
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Retry
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
@@ -184,11 +167,10 @@ const FileViewer = () => {
   if (id && file) {
     return (
       <div className="app-root">
-        <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-        <div className="app-content-row">
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <main className="main-content">
-            <div className="file-viewer-page">
+        <Header />
+        <main className="main-content" style={{ padding: 0 }}>
+          <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
+            <div className="file-viewer-page" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
               <div className="file-viewer-header">
                 <button className="back-button" onClick={() => navigate('/file-index')}>
                   <FiArrowLeft /> Back to Files
@@ -307,61 +289,58 @@ const FileViewer = () => {
                 </div>
               </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
     <div className="app-root">
-      <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-      <div className="app-content-row">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="main-content">
-          <div className="file-viewer-page">
-            <div className="file-list-section">
-              <h2>All Available Files</h2>
-              <div className="file-list-grid">
-                {allFiles.length > 0 ? (
-                  allFiles.map((f) => (
-                    <div key={f._id} className="file-card" onClick={() => handleFileClick(f._id)}>
-                      <div className="file-icon">
-                        <FiFile />
-                      </div>
-                      <div className="file-info">
-                        <h3>{f.originalName || f.filename || f.name || 'Untitled'}</h3>
-                        <p><FiFolder /> {f.category || 'Uncategorized'}</p>
-                      </div>
-                      <div className="file-actions">
-                        <button 
-                          className="action-button" 
-                          title="View" 
-                          onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
-                        >
-                          <FiEye />
-                        </button>
-                        <button 
-                          className="action-button" 
-                          title="Download" 
-                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
-                        >
-                          <FiDownload />
-                        </button>
-                      </div>
+      <Header />
+      <main className="main-content">
+        <div className="file-viewer-page">
+          <div className="file-list-section">
+            <h2>All Available Files</h2>
+            <div className="file-list-grid">
+              {allFiles.length > 0 ? (
+                allFiles.map((f) => (
+                  <div key={f._id} className="file-card" onClick={() => handleFileClick(f._id)}>
+                    <div className="file-icon">
+                      <FiFile />
                     </div>
-                  ))
-                ) : (
-                  <div className="empty-state">
-                    <FiFile className="empty-icon" />
-                    <p>No files found in the database.</p>
+                    <div className="file-info">
+                      <h3>{f.originalName || f.filename || f.name || 'Untitled'}</h3>
+                      <p><FiFolder /> {f.category || 'Uncategorized'}</p>
+                    </div>
+                    <div className="file-actions">
+                      <button 
+                        className="action-button" 
+                        title="View" 
+                        onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
+                      >
+                        <FiEye />
+                      </button>
+                      <button 
+                        className="action-button" 
+                        title="Download" 
+                        onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
+                      >
+                        <FiDownload />
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <FiFile className="empty-icon" />
+                  <p>No files found in the database.</p>
+                </div>
+              )}
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Sidebar from '../components/Sidebar.jsx';
+import React from 'react';
 import Header from '../components/Header.jsx';
 
 const Home = () => {
@@ -19,17 +17,17 @@ const Home = () => {
         <div className="quick-actions" style={{ flex: 2 }}>
           <h4>Quick Actions</h4>
           <div className="action-buttons">
-            <Link className="action-button" to="/file-index">Edit File</Link>
-            <Link className="action-button" to="/create-file">Create File</Link>
-            <Link className="action-button" to="/upload-file">Upload File</Link>
-            <Link className="action-button" to="/file-index">View Files</Link>
+            <a className="action-button" href="/file-index">Edit File</a>
+            <a className="action-button" href="/create-file">Create File</a>
+            <a className="action-button" href="/upload-file">Upload File</a>
+            <a className="action-button" href="/file-index">View Files</a>
           </div>
         </div>
         <div className="quick-actions" style={{ flex: 1 }}>
           <h4>Categories</h4>
           <div className="action-buttons">
-            <Link className="action-button" to="/create-category">Create Category</Link>
-            <Link className="action-button" to="/file-index">Edit Categories</Link>
+            <a className="action-button" href="/create-category">Create Category</a>
+            <a className="action-button" href="/file-index">Edit Categories</a>
           </div>
         </div>
       </div>
@@ -72,26 +70,12 @@ const Home = () => {
 };
 
 export default function DashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setSidebarOpen(window.innerWidth >= 900);
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <div className="app-root">
-      <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
-      <div className="app-content-row">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="main-content">
-          <Home />
-        </main>
-      </div>
+      <Header />
+      <main className="main-content">
+        <Home />
+      </main>
     </div>
   );
 }
