@@ -170,71 +170,74 @@ const FileViewer = () => {
         <Header />
         <main className="main-content" style={{ padding: 0 }}>
           <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
-            <div className="file-viewer-page" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
-              <div className="file-viewer-header">
-                <button className="back-button" onClick={() => navigate('/file-index')}>
-                  <FiArrowLeft /> Back to Files
+            <div className="file-viewer-page" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto', maxWidth: 1400, margin: '0 auto' }}>
+              <div className="file-viewer-header" style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <button className="back-button" onClick={() => navigate('/file-index')}>
+                    <FiArrowLeft /> Back to All Files
+                  </button>
+                  <h1 style={{ fontSize: '2rem', color: '#2c3e50', margin: 0 }}>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
+                </div>
+                <button 
+                  className="download-button"
+                  style={{ maxWidth: 200, minWidth: 120, marginLeft: 'auto' }}
+                  onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
+                >
+                  <FiDownload /> Download
                 </button>
-                <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
               </div>
-
-              <div className="file-viewer-content">
-                <div className="file-details-sidebar">
-                  <div className="details-section">
-                    <h3>File Information</h3>
-                    <ul>
-                      <li>
+              <div className="file-viewer-content" style={{ gap: '0', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                <div className="file-details-sidebar" style={{ borderRight: '1.5px solid #ececec', minWidth: 300, maxWidth: 340, background: '#f8f9fa', borderRadius: '12px 0 0 12px', boxShadow: 'none', padding: '2rem 1.5rem' }}>
+                  <div className="details-section" style={{ marginBottom: '2.5rem' }}>
+                    <h3 style={{ fontSize: '1.15rem', color: '#6d28d9', marginBottom: '1.2rem', letterSpacing: 0.5 }}>{'File Information'}</h3>
+                    <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+                      <li style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                         <FiFolder />
                         <span>Category:</span>
                         <strong>{file.category || 'Uncategorized'}</strong>
                       </li>
-                      <li>
+                      <li style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                         <FiCalendar />
                         <span>Year:</span>
                         <strong>{file.year || 'N/A'}</strong>
                       </li>
-                      <li>
+                      <li style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                         <FiUser />
                         <span>Uploaded By:</span>
                         <strong>{file.uploadedBy || 'Anonymous'}</strong>
                       </li>
-                      <li>
+                      <li style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                         <FiInfo />
                         <span>Size:</span>
                         <strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong>
                       </li>
                     </ul>
                   </div>
-
                   {file.description && (
-                    <div className="description-section">
-                      <h3>Description</h3>
-                      <p>{file.description}</p>
+                    <div className="description-section" style={{ marginBottom: '2.5rem' }}>
+                      <h3 style={{ fontSize: '1.08rem', color: '#6d28d9', marginBottom: 8 }}>Description</h3>
+                      <p style={{ color: '#555', fontSize: '0.98rem', lineHeight: 1.6 }}>{file.description}</p>
                     </div>
                   )}
-
-                  <div className="actions-section">
-                    <button 
-                      className="download-button"
-                      onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
-                    >
-                      <FiDownload /> Download File
-                    </button>
+                  <div className="actions-section" style={{ marginTop: '2.5rem' }}>
                     <button 
                       className="delete-button"
+                      title="Delete this file permanently"
+                      style={{ marginTop: 0 }}
                       onClick={handleDelete}
                     >
                       <FiTrash2 /> Delete File
                     </button>
                   </div>
                 </div>
-
-                <div className="file-preview">
+                <div style={{ width: 1, background: '#ececec', minHeight: '100%' }} />
+                <div className="file-preview" style={{ padding: '2rem 2.5rem', background: '#fff', borderRadius: '0 12px 12px 0', minHeight: 500 }}>
                   {file.fileType === 'pdf' ? (
                     <iframe 
                       src={file.url} 
                       title={file.originalName || file.filename || file.name || 'Untitled'} 
                       className="pdf-viewer"
+                      style={{ border: '1px solid #eee', borderRadius: 8, minHeight: 500 }}
                     />
                   ) : (file.fileType === 'csv' || file.fileType === 'excel') ? (
                     previewError ? (
@@ -299,44 +302,46 @@ const FileViewer = () => {
     <div className="app-root">
       <Header />
       <main className="main-content">
-        <div className="file-viewer-page">
-          <div className="file-list-section">
-            <h2>All Available Files</h2>
-            <div className="file-list-grid">
-              {allFiles.length > 0 ? (
-                allFiles.map((f) => (
-                  <div key={f._id} className="file-card" onClick={() => handleFileClick(f._id)}>
-                    <div className="file-icon">
-                      <FiFile />
+        <div style={{height: '100%', minHeight: '100vh', overflowY: 'auto'}}>
+          <div className="file-viewer-page">
+            <div className="file-list-section">
+              <h2 style={{ textAlign: 'center', fontSize: '2rem', color: '#2c3e50', marginBottom: '2rem' }}>All Available Files</h2>
+              <div className="files-scroll-grid" style={{ maxHeight: 'unset', minHeight: 200, margin: '0 auto', paddingBottom: 32 }}>
+                {allFiles.length > 0 ? (
+                  allFiles.map((f) => (
+                    <div key={f._id} className="file-card" style={{ cursor: 'pointer' }} onClick={() => handleFileClick(f._id)}>
+                      <div className="file-info">
+                        <h4 style={{ margin: 0, fontSize: '0.98rem', color: '#2c3e50', textAlign: 'center', wordBreak: 'break-word', whiteSpace: 'normal', minHeight: '2.4em', lineHeight: '1.2' }}>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
+                        <div style={{ marginTop: '1.1em', marginBottom: '0.2em' }}>
+                          <p style={{ margin: 0, fontSize: '0.92rem', color: '#666', textAlign: 'center' }}><FiFolder /> {f.category || 'Uncategorized'}</p>
+                          <p style={{ margin: 0, fontSize: '0.92rem', color: '#666', textAlign: 'center' }}><FiCalendar /> {f.year || 'N/A'}</p>
+                        </div>
+                      </div>
+                      <div className="file-actions">
+                        <button 
+                          className="action-button" 
+                          title="View" 
+                          onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
+                        >
+                          <FiEye />
+                        </button>
+                        <button 
+                          className="action-button" 
+                          title="Download" 
+                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
+                        >
+                          <FiDownload />
+                        </button>
+                      </div>
                     </div>
-                    <div className="file-info">
-                      <h3>{f.originalName || f.filename || f.name || 'Untitled'}</h3>
-                      <p><FiFolder /> {f.category || 'Uncategorized'}</p>
-                    </div>
-                    <div className="file-actions">
-                      <button 
-                        className="action-button" 
-                        title="View" 
-                        onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
-                      >
-                        <FiEye />
-                      </button>
-                      <button 
-                        className="action-button" 
-                        title="Download" 
-                        onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
-                      >
-                        <FiDownload />
-                      </button>
-                    </div>
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <FiFile className="empty-icon" />
+                    <p>No files found in the database.</p>
                   </div>
-                ))
-              ) : (
-                <div className="empty-state">
-                  <FiFile className="empty-icon" />
-                  <p>No files found in the database.</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

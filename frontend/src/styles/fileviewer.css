@@ -444,3 +444,36 @@
 .table-preview td:last-child {
   padding-right: 24px;
 }
+
+/* Responsive grid for all files section */
+.files-scroll-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .files-scroll-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .files-scroll-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.file-card h4, .file-info h4 {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 auto 0.25rem auto;
+  font-size: 1.05rem;
+  color: #2c3e50;
+  text-align: center;
+}

@@ -8,6 +8,8 @@
     padding-bottom: 0;
     margin-bottom: 2rem;
     align-self: flex-start;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
   }
   
   .category-sidebar-title {

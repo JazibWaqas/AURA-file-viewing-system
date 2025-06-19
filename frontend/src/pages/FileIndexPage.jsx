@@ -216,11 +216,8 @@ export default function FileIndexPage() {
                 ) : (
                   filteredRecentFiles.map((file) => (
                     <div key={file._id} className="file-card">
-                      <div className="file-icon">
-                        <FiFile />
-                      </div>
                       <div className="file-info">
-                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <h4 style={{ margin: 0, fontSize: '0.98rem', color: '#2c3e50', textAlign: 'center', wordBreak: 'break-word', whiteSpace: 'normal', minHeight: '2.4em', lineHeight: '1.2' }}>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
@@ -254,11 +251,8 @@ export default function FileIndexPage() {
                 ) : (
                   filteredFiles.map((file) => (
                     <div key={file._id} className="file-card">
-                      <div className="file-icon">
-                        <FiFile />
-                      </div>
                       <div className="file-info">
-                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <h4 style={{ margin: 0, fontSize: '0.98rem', color: '#2c3e50', textAlign: 'center', wordBreak: 'break-word', whiteSpace: 'normal', minHeight: '2.4em', lineHeight: '1.2' }}>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
