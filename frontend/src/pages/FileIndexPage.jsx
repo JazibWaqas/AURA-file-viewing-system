@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar.jsx';
 import { useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
 import CategorySidebar from '../components/CategorySidebar.jsx';
+import { FaChartBar, FaDonate, FaMoneyBill, FaUniversity, FaBalanceScale, FaClipboardCheck, FaFolderOpen, FaBuilding, FaEllipsisH } from "react-icons/fa";
 
 const FileIndex = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -22,6 +23,8 @@ const FileIndex = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [categorySidebarOpen, setCategorySidebarOpen] = useState(true);
 
   useEffect(() => {
     const handleResize = () => setSidebarOpen(window.innerWidth >= 900);
@@ -128,6 +131,18 @@ const FileIndex = () => {
     return years.sort((a, b) => b - a);
   };
 
+  const categoryIconMap = {
+    "Financial Statements": <FaChartBar />,
+    "Income & Donations": <FaDonate />,
+    "Expenses": <FaMoneyBill />,
+    "Bank & Cash": <FaUniversity />,
+    "Tax & Compliance": <FaBalanceScale />,
+    "Audit Reports": <FaClipboardCheck />,
+    "Budgets": <FaFolderOpen />,
+    "Organizational Documents": <FaBuilding />,
+    "Other": <FaEllipsisH />,
+  };
+
   const filteredFiles = allFiles.filter(file => {
     const fileName = file.originalName || file.filename || file.name || '';
     const fileCategory = file.category || '';
@@ -176,6 +191,49 @@ const FileIndex = () => {
       <Header onMenuClick={() => setSidebarOpen((open) => !open)} />
       <div className="app-content-row">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        {/* Category Sidebar Toggle Button */}
+        {!categorySidebarOpen && (
+          <button className="category-sidebar-toggle" onClick={() => setCategorySidebarOpen(true)} aria-label="Open categories">
+            &#9776; Categories
+          </button>
+        )}
+        {/* Category Sidebar */}
+        {categorySidebarOpen && (
+          <aside className="sidebar category-sidebar">
+            <button className="category-sidebar-close" onClick={() => setCategorySidebarOpen(false)} aria-label="Close categories">&times;</button>
+            <div className="category-toc-title">Categories</div>
+            <nav>
+              <ul>
+                {categories.map((cat) => (
+                  <li key={cat.name}>
+                    <button
+                      className={`category-toc-link${selectedCategory === cat.name ? ' active' : ''}`}
+                      onClick={() => setExpandedCategory(expandedCategory === cat.name ? null : cat.name)}
+                      aria-expanded={expandedCategory === cat.name}
+                    >
+                      <span className="category-toc-icon">{categoryIconMap[cat.name] || <FaEllipsisH />}</span>
+                      {cat.name}
+                    </button>
+                    {cat.subCategories && expandedCategory === cat.name && (
+                      <ul className="subcategory-list">
+                        {cat.subCategories.map((sub) => (
+                          <li key={sub}>
+                            <button
+                              className={`subcategory-link${selectedSubCategory === sub && selectedCategory === cat.name ? ' active' : ''}`}
+                              onClick={() => handleCategorySelect(cat.name, sub)}
+                            >
+                              {sub}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )}
         <main className="main-content">
           <div className="file-index-page">
             <div className="page-header">
@@ -204,16 +262,21 @@ const FileIndex = () => {
                   Category {selectedCategory && `(${selectedCategory})`}
                 </button>
                 {showCategoryFilter && (
-                  <div className="filter-dropdown">
-                    {getUniqueCategories().map(category => (
-                      <button
-                        key={category}
-                        className={`filter-option ${selectedCategory === category ? 'selected' : ''}`}
-                        onClick={() => handleCategoryFilter(category)}
-                      >
-                        {category}
-                      </button>
-                    ))}
+                  <div className="category-toc-panel">
+                    <div className="category-toc-title">Categories</div>
+                    <ul>
+                      {getUniqueCategories().map((cat) => (
+                        <li key={cat}>
+                          <button
+                            className={`category-toc-link${selectedCategory === cat ? ' active' : ''}`}
+                            onClick={() => handleCategoryFilter(cat)}
+                          >
+                            <span className="category-toc-icon">{categoryIconMap[cat] || <FaEllipsisH />}</span>
+                            {cat}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
