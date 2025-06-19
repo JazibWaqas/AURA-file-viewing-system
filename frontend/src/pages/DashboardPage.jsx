@@ -3,80 +3,67 @@ import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
 import Header from '../components/Header.jsx';
 
-const Dashboard = () => {
+const Home = () => {
   return (
     <div className="dashboard-page">
-      <div className="dashboard-overview">
-        <div className="metric-card">
-          <h4>Year total revenue</h4>
-          <h3>$187,450</h3>
-          <p>from all categories</p>
-        </div>
-        <div className="metric-card">
-          <h4>Monthly average expenses</h4>
-          <h3>$8,230</h3>
-          <p>in the current fiscal year</p>
-        </div>
-        <div className="metric-card">
-          <h4>Current month profit</h4>
-          <h3>$15,120</h3>
-          <p>3% above target</p>
-        </div>
+      {/* Welcome Section */}
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: '2.2rem', margin: 0 }}>Welcome to the AURA File Management System</h1>
+        <p style={{ color: '#555', fontSize: '1.1rem', marginTop: 8 }}>
+          Manage, view, and organize your NGO's documents with ease. Use the quick actions below to get started.
+        </p>
       </div>
 
-      <div className="charts-section">
-        <div className="chart-card">
-          <h4>Income, Expenses & Profit Trends</h4>
-          <div className="chart-placeholder">
-            <img src="/placeholder-line-chart.png" alt="Income, Expenses & Profit Trends" />
-          </div>
-        </div>
-        <div className="chart-card">
-          <h4>Monthly Expenses by Category</h4>
-          <div className="chart-placeholder">
-            <img src="/placeholder-bar-chart.png" alt="Monthly Expenses by Category" />
-          </div>
-        </div>
-      </div>
-
-      <div className="content-section">
-        <div className="recent-files">
-          <h4>Recently Viewed Files</h4>
-          <ul>
-            <li>Q3 2023 Income Statement</li>
-            <li>Cashflow Report - Sep 2023</li>
-            <li>Balance Sheet - Q4 2022</li>
-            <li>Payroll Expenses - Nov 2023</li>
-            <li>Annual Budget 2024 Draft</li>
-            <li>Tax Filing Documents 2022</li>
-          </ul>
-        </div>
-
-        <div className="quick-actions">
+      {/* Quick Actions Section */}
+      <div className="content-section" style={{ marginBottom: 32 }}>
+        <div className="quick-actions" style={{ flex: 2 }}>
           <h4>Quick Actions</h4>
           <div className="action-buttons">
-            <Link className="action-button" to="/file-index">File Index</Link>
-            <Link className="action-button" to="/upload-file">Upload File</Link>
+            <Link className="action-button" to="/file-index">Edit File</Link>
             <Link className="action-button" to="/create-file">Create File</Link>
-            <Link className="action-button" to="/file-viewer">View Reports</Link>
+            <Link className="action-button" to="/upload-file">Upload File</Link>
+            <Link className="action-button" to="/file-index">View Files</Link>
+          </div>
+        </div>
+        <div className="quick-actions" style={{ flex: 1 }}>
+          <h4>Categories</h4>
+          <div className="action-buttons">
+            <Link className="action-button" to="/create-category">Create Category</Link>
+            <Link className="action-button" to="/file-index">Edit Categories</Link>
           </div>
         </div>
       </div>
 
+      {/* Recent Activity Section */}
+      <div className="recent-files" style={{ marginBottom: 32 }}>
+        <h4>Recent Activity</h4>
+        <ul>
+          <li>File "Annual Report 2023" uploaded by Admin</li>
+          <li>Category "Donations" created</li>
+          <li>File "Budget 2024" edited by User1</li>
+          <li>Category "Expenses" updated</li>
+        </ul>
+      </div>
+
+      {/* Categories Overview Section */}
       <div className="categories-overview">
-        <h4>Account Health at a Glance</h4>
+        <h4>Categories Overview</h4>
         <div className="health-metrics">
           <div className="metric-item">
-            <h3>$12.5M</h3>
-            <p>Invoices Paid On Time</p>
+            <h3>Financial Statements</h3>
+            <p>All balance sheets, income statements, and more</p>
           </div>
           <div className="metric-item">
-            <h3>Total Assets</h3>
-            <p>Current</p>
+            <h3>Donations</h3>
+            <p>Donation records and receipts</p>
           </div>
           <div className="metric-item">
-            <h3>$-50K</h3>
-            <p>Outstanding Liabilities</p>
+            <h3>Expenses</h3>
+            <p>Expense reports and bills</p>
+          </div>
+          <div className="metric-item">
+            <h3>Other</h3>
+            <p>Miscellaneous documents</p>
           </div>
         </div>
       </div>
@@ -102,7 +89,7 @@ export default function DashboardPage() {
       <div className="app-content-row">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="main-content">
-          <Dashboard />
+          <Home />
         </main>
       </div>
     </div>
