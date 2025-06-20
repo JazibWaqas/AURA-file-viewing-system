@@ -7,13 +7,13 @@ html, body {
   font-family: Arial, sans-serif;
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto; /* Allow vertical scroll */
+  overflow-y: auto; /* Allow vertical scroll only when needed */
 }
 
 #root {
   min-height: 100vh;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto; /* Allow vertical scroll */
+  overflow-y: auto;
 }
 
 /* Layout components */
@@ -42,7 +42,7 @@ html, body {
   padding: 32px 40px;
   background: #f0f2f5;
   min-height: calc(100vh - 64px);
-  overflow-x: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
   overflow-y: auto;
   width: 100%;
   box-sizing: border-box;
@@ -55,7 +55,8 @@ html, body {
   position: relative;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%; /* Use 100% to avoid overflow from 100vw */
+  min-width: 0;
   height: 64px;
   display: flex;
   align-items: center;
@@ -63,13 +64,17 @@ html, body {
   border-bottom: 1px solid #e5e5e5;
   z-index: 1100;
   padding: 0 2rem 0 1rem;
+  box-sizing: border-box;
 }
 
 .header-content {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  min-width: 0;
 }
 
 .header-title {
@@ -115,6 +120,8 @@ html, body {
   list-style: none;
   margin: 0;
   padding: 0;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .header-nav-item {
@@ -160,6 +167,7 @@ html, body {
   cursor: pointer;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(109,40,217,0.08);
+  white-space: nowrap;
 }
 
 .header-login-btn:hover {
@@ -314,4 +322,43 @@ html, body {
   .sidebar .close-btn {
     display: none;
   }
+}
+
+@media (max-width: 1100px) {
+  .header-content {
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+  .header-login-btn {
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-700px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    width: 100%;
+  }
+  .header-nav-list {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .header-login-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+.app-root, .app-content-row {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }

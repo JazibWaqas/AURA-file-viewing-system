@@ -28,6 +28,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 .files-section-title {
   font-size: 1.3rem;
@@ -39,13 +41,18 @@
 /* --- Responsive Scrollable Grid for Files --- */
 .files-scroll-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.2rem;
   overflow-y: auto;
   max-height: 340px;
   min-height: 120px;
   padding-bottom: 1rem;
   scroll-behavior: smooth;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 @media (max-width: 1200px) {
   .files-scroll-grid {
@@ -62,7 +69,7 @@
 
 /* --- File Card --- */
 .file-card {
-  background: white;
+  background: #fff;
   border-radius: 12px;
   padding: 1rem 0.5rem;
   display: flex;
@@ -133,9 +140,12 @@
 }
 
 .file-index-page {
-  padding: 2rem;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -153,15 +163,17 @@
 }
 
 .search-filter-bar {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
   align-items: center;
-  background: #fff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 .search-container {
   position: relative;
@@ -176,12 +188,14 @@
   color: #666;
 }
 .search-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #ddd;
+  background: #fff;
+  color: #222;
+  border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 .search-input:focus {
   outline: none;
@@ -280,6 +294,26 @@
   }
   .files-scroll-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .file-index-page {
+    padding: 1rem;
+    width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  .files-scroll-grid {
+    grid-template-columns: 1fr;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 600px) {
+  .file-index-page {
+    padding: 0.5rem;
   }
 }
 

@@ -3,7 +3,6 @@ import DashboardPage from "./pages/DashboardPage";
 import FileIndexPage from "./pages/FileIndexPage";
 import FileViewerPage from "./pages/FileViewerPage";
 import UploadFilePage from "./pages/UploadFilePage";
-import CreateFilePage from "./pages/CreateFilePage";
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
         <Route path="/file-viewer" element={<FileViewerPage />} />
         <Route path="/file-viewer/:id" element={<FileViewerPage />} />
         <Route path="/upload-file" element={<UploadFilePage />} />
-        <Route path="/create-file" element={<CreateFilePage />} />
       </Routes>
     </Router>
   );

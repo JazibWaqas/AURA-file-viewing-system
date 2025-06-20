@@ -8,7 +8,6 @@ const navLinks = [
   { to: '/file-index', label: 'File Index', icon: <FaFolderOpen /> },
   { to: '/file-viewer', label: 'File Viewer', icon: <FaEye /> },
   { to: '/upload-file', label: 'Upload File', icon: <FaUpload /> },
-  { to: '/create-file', label: 'Create File', icon: <FaPlus /> },
 ];
 
 const Header = () => {

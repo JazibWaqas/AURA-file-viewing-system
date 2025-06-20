@@ -6,7 +6,6 @@ import './styles/globals.css';
 import './styles/dashboard.css';
 import './styles/fileviewer.css';
 import './styles/FileIndex.css';
-import './styles/CreateFile.css';
 import './styles/UploadFile.css';
 
 createRoot(document.getElementById('root')).render(
