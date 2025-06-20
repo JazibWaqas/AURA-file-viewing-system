@@ -21,7 +21,7 @@ export default function CategorySidebar({ onSelect }) {
     <div className="category-sidebar-container">
       <h3 className="category-sidebar-title">Categories</h3>
       <ul className="category-list">
-        {categories.map((cat, idx) => (
+        {[...categories].sort((a, b) => a.name.localeCompare(b.name)).map((cat, idx) => (
           <li key={cat.name}>
             <div
               className={`category-name${expanded === idx ? ' expanded' : ''}`}
