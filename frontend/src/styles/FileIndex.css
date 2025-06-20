@@ -45,8 +45,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 2rem;
-  overflow-y: auto;
-  max-height: 340px;
   min-height: 120px;
   padding: 2rem 1.5rem 1.5rem 1.5rem;
   scroll-behavior: smooth;
@@ -59,13 +57,11 @@
 @media (max-width: 1200px) {
   .files-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    max-height: 260px;
   }
 }
 @media (max-width: 900px) {
   .files-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    max-height: 180px;
     gap: 1rem;
     padding: 1rem 0.5rem 1rem 0.5rem;
   }
@@ -374,8 +370,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 2rem;
-  overflow-y: auto;
-  max-height: 420px;
   min-height: 120px;
   padding: 2rem 1.5rem 1.5rem 1.5rem;
   background: #fff;
@@ -387,13 +381,11 @@
 @media (max-width: 1200px) {
   .all-files-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    max-height: 320px;
   }
 }
 @media (max-width: 900px) {
   .all-files-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    max-height: 200px;
   }
 }
 
@@ -437,4 +429,22 @@
 /* --- Remove top padding/margin so content is flush with header --- */
 .file-index-content-wrapper {
   padding-top: 0;
+}
+
+/* Custom scrollbar for the main page (body/html) */
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  width: 14px;
+  background: #e0e7ef;
+}
+body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+  background: #b0b8c9;
+  border-radius: 8px;
+  border: 3px solid #e0e7ef;
+}
+body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+  background: #4a90e2;
+}
+body, html {
+  scrollbar-width: thin;
+  scrollbar-color: #b0b8c9 #e0e7ef;
 }
