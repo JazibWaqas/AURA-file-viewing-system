@@ -16,6 +16,7 @@
   padding: 32px 24px;
   overflow: hidden;
   transition: margin 0.3s;
+  padding-top: 3.5rem;
 }
 
 /* --- Files Section --- */
@@ -42,11 +43,11 @@
 .files-scroll-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.2rem;
+  gap: 2rem;
   overflow-y: auto;
   max-height: 340px;
   min-height: 120px;
-  padding-bottom: 1rem;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
   scroll-behavior: smooth;
   background: #fff;
   border-radius: 8px;
@@ -64,6 +65,8 @@
   .files-scroll-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     max-height: 180px;
+    gap: 1rem;
+    padding: 1rem 0.5rem 1rem 0.5rem;
   }
 }
 
@@ -71,7 +74,7 @@
 .file-card {
   background: #fff;
   border-radius: 12px;
-  padding: 1rem 0.5rem;
+  padding: 1.2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,16 +86,17 @@
   min-height: 180px;
   max-width: 220px;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
+  box-sizing: border-box;
 }
 .file-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.10);
   transform: translateY(-2px) scale(1.03);
 }
 .file-icon {
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   color: #4a90e2;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 .file-info h4 {
   margin: 0 0 0.25rem 0;
@@ -146,6 +150,7 @@
   padding: 2rem;
   box-sizing: border-box;
   overflow-x: hidden;
+  padding-top: 3.5rem;
 }
 
 .page-header {
@@ -299,15 +304,12 @@
 
 @media (max-width: 900px) {
   .file-index-page {
-    padding: 1rem;
-    width: 100vw;
-    box-sizing: border-box;
-    overflow-x: hidden;
+    padding-top: 2.5rem;
   }
-  .files-scroll-grid {
-    grid-template-columns: 1fr;
-    max-width: 100vw;
-    overflow-x: hidden;
+  .files-scroll-grid,
+  .all-files-scroll-grid {
+    gap: 1rem;
+    padding: 1rem 0.5rem 1rem 0.5rem;
   }
 }
 
@@ -341,4 +343,92 @@
 }
 .retry-button:hover {
   background: #357abd;
+}
+
+/* --- Flex root for file index page --- */
+.file-index-flex-root {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  width: 100vw;
+  background: #f0f2f5;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* --- All Files Section --- */
+.all-files-section {
+  margin-top: 2.5rem;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box;
+}
+.all-files-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.all-files-scroll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+  overflow-y: auto;
+  max-height: 420px;
+  min-height: 120px;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 1200px) {
+  .all-files-scroll-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    max-height: 320px;
+  }
+}
+@media (max-width: 900px) {
+  .all-files-scroll-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    max-height: 200px;
+  }
+}
+
+.file-view-btn {
+  flex: 1 1 45%;
+  min-width: 80px;
+  max-width: 100%;
+  padding: 8px 0;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 2px 0;
+}
+.file-view-btn:hover {
+  background: #1d4ed8;
+}
+.file-download-btn {
+  flex: 1 1 45%;
+  min-width: 80px;
+  max-width: 100%;
+  padding: 8px 0;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 2px 0;
+}
+.file-download-btn:hover {
+  background: #15803d;
 }
