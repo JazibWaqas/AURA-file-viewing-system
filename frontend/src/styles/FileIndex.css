@@ -16,7 +16,8 @@
   padding: 32px 24px;
   overflow: hidden;
   transition: margin 0.3s;
-  padding-top: 3.5rem;
+  padding-top: 0;
+  box-shadow: none;
 }
 
 /* --- Files Section --- */
@@ -150,7 +151,7 @@
   padding: 2rem;
   box-sizing: border-box;
   overflow-x: hidden;
-  padding-top: 3.5rem;
+  padding-top: 0;
 }
 
 .page-header {
@@ -431,4 +432,9 @@
 }
 .file-download-btn:hover {
   background: #15803d;
+}
+
+/* --- Remove top padding/margin so content is flush with header --- */
+.file-index-content-wrapper {
+  padding-top: 0;
 }

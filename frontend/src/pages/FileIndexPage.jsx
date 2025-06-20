@@ -46,7 +46,11 @@ export default function FileIndexPage() {
         const sortedFiles = filesData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setAllFiles(sortedFiles);
         setRecentFiles(sortedFiles.slice(0, 5));
-        setCategories(categoriesData);
+        // Sort categories: 'Financial Statements' at the top, 'Other' at the end
+        const financialStatements = categoriesData.filter(cat => cat === 'Financial Statements');
+        const other = categoriesData.filter(cat => cat === 'Other');
+        const rest = categoriesData.filter(cat => cat !== 'Financial Statements' && cat !== 'Other');
+        setCategories([...financialStatements, ...rest, ...other]);
       } catch (err) {
         setError(err.message);
       } finally {
