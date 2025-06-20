@@ -81,7 +81,7 @@ export default function UploadFilePage() {
         const res = await fetch('/api/files');
         if (!res.ok) throw new Error('Failed to fetch files');
         const data = await res.json();
-        const recentFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+        const recentFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
         setRecentUploads(recentFiles);
       } catch (error) {
         setRecentUploads([]);
@@ -350,9 +350,9 @@ export default function UploadFilePage() {
               </form>
               {error && <div className="error-message">{error}</div>}
             </div>
-            <div className="recent-uploads-card large">
+            <div className="recent-uploads-card large" style={{ minHeight: 320, padding: '1.5rem 1.2rem' }}>
               <h3>Recent Uploads</h3>
-              <div className="recent-uploads-list">
+              <div className="recent-uploads-list" style={{ overflowX: 'hidden' }}>
                 {recentUploads.length > 0 ? (
                   recentUploads.map((file) => (
                     <div key={file._id} className="recent-upload-item">

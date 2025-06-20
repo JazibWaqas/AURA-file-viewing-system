@@ -102,7 +102,7 @@ export default function FileIndexPage() {
     const matchesYear = !selectedYear || file.year === parseInt(selectedYear);
     return matchesSearch && matchesCategory && matchesSubCategory && matchesYear;
   });
-  const filteredRecentFiles = filteredFiles.slice(0, 5);
+  const filteredRecentFiles = filteredFiles.slice(0, 4);
 
   // Dynamic section title
   const getSectionTitle = () => {
@@ -202,7 +202,7 @@ export default function FileIndexPage() {
             {/* Filtered/Category Section */}
             <section className="files-section">
               <h2 className="files-section-title">{getSectionTitle()}</h2>
-              <div className="files-scroll-grid">
+              <div className="files-scroll-grid" style={{ overflowX: 'hidden', gridTemplateColumns: 'repeat(4, 1fr)' }}>
                 {isLoadingFiles ? (
                   <div className="loading-indicator">
                     <FiLoader className="spinner-icon" />
@@ -215,19 +215,15 @@ export default function FileIndexPage() {
                   </div>
                 ) : (
                   filteredRecentFiles.map((file) => (
-                    <div key={file._id} className="file-card">
+                    <div key={file._id} className="file-card" style={{ minHeight: 170, minWidth: 0, padding: '1.2rem 1rem', boxSizing: 'border-box' }}>
                       <div className="file-info">
                         <h4 style={{ margin: 0, fontSize: '0.98rem', color: '#2c3e50', textAlign: 'center', wordBreak: 'break-word', whiteSpace: 'normal', minHeight: '2.4em', lineHeight: '1.2' }}>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
-                      <div className="file-actions">
-                        <button onClick={() => handleViewFile(file._id)} className="action-button">
-                          <FiEye />
-                        </button>
-                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
-                          <FiDownload />
-                        </button>
+                      <div className="file-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
+                        <button onClick={() => handleViewFile(file._id)} style={{ flex: '1 1 45%', minWidth: 80, maxWidth: '100%', padding: '8px 0', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '0.98rem', cursor: 'pointer', transition: 'background 0.2s', margin: '2px 0' }}>View</button>
+                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} style={{ flex: '1 1 45%', minWidth: 8, maxWidth: '100%', padding: '8px 0', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '0.98rem', cursor: 'pointer', transition: 'background 0.2s', margin: '2px 0' }}>Download</button>
                       </div>
                     </div>
                   ))
@@ -235,40 +231,57 @@ export default function FileIndexPage() {
               </div>
             </section>
             {/* All Files Section */}
-            <section className="files-section">
-              <h2 className="files-section-title">All Files</h2>
-              <div className="files-scroll-grid">
-                {isLoadingFiles ? (
-                  <div className="loading-indicator">
-                    <FiLoader className="spinner-icon" />
-                    <p>Loading files...</p>
-                  </div>
-                ) : filteredFiles.length === 0 ? (
-                  <div className="empty-state">
-                    <FiFile className="empty-icon" />
-                    <p>No files found matching your criteria</p>
-                  </div>
-                ) : (
-                  filteredFiles.map((file) => (
-                    <div key={file._id} className="file-card">
-                      <div className="file-info">
-                        <h4 style={{ margin: 0, fontSize: '0.98rem', color: '#2c3e50', textAlign: 'center', wordBreak: 'break-word', whiteSpace: 'normal', minHeight: '2.4em', lineHeight: '1.2' }}>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
-                        <p>Category: {file.category || 'Uncategorized'}</p>
-                        <p>Year: {file.year || 'N/A'}</p>
-                      </div>
-                      <div className="file-actions">
-                        <button onClick={() => handleViewFile(file._id)} className="action-button">
-                          <FiEye />
-                        </button>
-                        <button onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} className="action-button">
-                          <FiDownload />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
+<section className="px-6 py-8 bg-white rounded-2xl shadow-md">
+  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">All Files</h2>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {isLoadingFiles ? (
+      <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-12">
+        <FiLoader className="animate-spin text-3xl mb-2" />
+        <p className="text-sm font-medium">Loading files...</p>
+      </div>
+    ) : filteredFiles.length === 0 ? (
+      <div className="col-span-full flex flex-col items-center justify-center text-gray-400 py-12">
+        <FiFile className="text-4xl mb-2" />
+        <p className="text-base font-medium">No files found matching your criteria</p>
+      </div>
+    ) : (
+      filteredFiles.map((file) => (
+        <div
+          key={file._id}
+          className="flex flex-col justify-between bg-gray-50 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 p-4 min-h-[210px]"
+        >
+          <div className="text-center mb-4">
+            <h4 className="text-base font-semibold text-gray-800 break-words min-h-[2.4em] leading-tight">
+              {file.originalName || file.filename || file.name || 'Untitled'}
+            </h4>
+            <p className="text-sm text-gray-600 mt-1">Category: {file.category || 'Uncategorized'}</p>
+            <p className="text-sm text-gray-600">Year: {file.year || 'N/A'}</p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+          <button
+  onClick={() => handleViewFile(file._id)}
+  className="flex-1 min-w-[80px] max-w-full h-10 px-3 bg-blue-600 text-white text-[0.98rem] font-semibold leading-none rounded-md hover:bg-blue-700 transition-colors duration-200 my-[2px] flex items-center justify-center"
+>
+  View
+</button>
+
+<button
+  onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
+  className="flex-1 min-w-[80px] max-w-full h-10 px-3 bg-green-600 text-white text-[0.98rem] font-semibold leading-none rounded-md hover:bg-green-700 transition-colors duration-200 my-[2px] flex items-center justify-center"
+>
+  Download
+</button>
+
+
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</section>
+
           </div>
         </div>
       </main>

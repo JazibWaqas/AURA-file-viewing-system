@@ -318,20 +318,21 @@ const FileViewer = () => {
                         </div>
                       </div>
                       <div className="file-actions">
-                        <button 
-                          className="action-button" 
-                          title="View" 
-                          onClick={(e) => { e.stopPropagation(); handleFileClick(f._id); }}
+                      <button 
+                          
+                          onClick={() => handleViewFile(file._id)}
+                          className="flex-1 min-w-[80px] max-w-full h-10 px-3 bg-blue-600 text-white text-[0.98rem] font-semibold leading-none rounded-md hover:bg-blue-700 transition-colors duration-200 my-[2px] flex items-center justify-center"
                         >
-                          <FiEye />
+                          View
                         </button>
-                        <button 
-                          className="action-button" 
-                          title="Download" 
-                          onClick={(e) => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}
+                        
+                        <button
+                          onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}
+                          className="flex-1 min-w-[80px] max-w-full h-10 px-3 bg-green-600 text-white text-[0.98rem] font-semibold leading-none rounded-md hover:bg-green-700 transition-colors duration-200 my-[2px] flex items-center justify-center"
                         >
-                          <FiDownload />
+                          Download
                         </button>
+                        
                       </div>
                     </div>
                   ))
