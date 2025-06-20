@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const multer = require('multer');
 const { db, bucket } = require('./config/firebase');
+const XLSX = require('xlsx');
 
 // Load environment variables
 dotenv.config();
@@ -276,34 +277,61 @@ app.get('/api/files/:id/view', async (req, res) => {
 app.get('/api/files/:id/preview', async (req, res) => {
   try {
     const fileId = req.params.id;
-    
     // Get file metadata from Firestore
     const doc = await db.collection('uploads').doc(fileId).get();
     if (!doc.exists) {
       return res.status(404).json({ error: 'File not found' });
     }
-    
     const fileData = doc.data();
     const fileName = fileData.filename || fileData.originalName;
-    
+    const fileType = fileData.fileType || '';
     // Get file from Firebase Storage
     const file = bucket.file(fileName);
     const [exists] = await file.exists();
-    
     if (!exists) {
       return res.status(404).json({ error: 'File not found in storage' });
     }
-    
-    // For now, return a simple preview structure
-    // In a real implementation, you would parse CSV/Excel files here
-    res.json({
-      headers: ['Column 1', 'Column 2', 'Column 3'],
-      data: [
-        ['Sample Data 1', 'Sample Data 2', 'Sample Data 3'],
-        ['Sample Data 4', 'Sample Data 5', 'Sample Data 6']
-      ],
-      totalRows: 2,
-      fileName: fileName
+    // Download file to memory buffer
+    const stream = file.createReadStream();
+    const chunks = [];
+    stream.on('data', chunk => chunks.push(chunk));
+    stream.on('error', err => {
+      console.error('Error reading file from storage:', err);
+      return res.status(500).json({ error: 'Failed to read file from storage.' });
+    });
+    stream.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        let headers = [];
+        let data = [];
+        if (fileType === 'csv') {
+          // Parse CSV
+          const csv = buffer.toString('utf8');
+          const rows = csv.split(/\r?\n/).filter(Boolean).map(row => row.split(','));
+          if (rows.length > 0) {
+            headers = rows[0];
+            data = rows.slice(1);
+          }
+        } else if (fileType === 'excel') {
+          // Parse Excel
+          const workbook = XLSX.read(buffer, { type: 'buffer' });
+          if (workbook.SheetNames.length > 0) {
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true, defval: '' });
+            if (sheetData.length > 0) {
+              headers = sheetData[0].map((h, i) => String(h).trim() || `Column ${String.fromCharCode(65 + i)}`);
+              data = sheetData.slice(1);
+            }
+          }
+        } else {
+          return res.status(400).json({ error: 'Preview not supported for this file type' });
+        }
+        return res.json({ headers, rows: data, totalRows: data.length, fileName });
+      } catch (err) {
+        console.error('Error parsing file for preview:', err);
+        return res.status(500).json({ error: 'Failed to parse file for preview.' });
+      }
     });
   } catch (error) {
     console.error('Error generating preview:', error);

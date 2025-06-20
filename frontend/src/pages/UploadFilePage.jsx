@@ -75,6 +75,26 @@ export default function UploadFilePage() {
   const [subCategory, setSubCategory] = useState('');
   const navigate = useNavigate();
 
+  // Allowed file extensions and MIME types
+  const allowedExtensions = [
+    '.pdf', '.docx', '.doc', '.csv', '.xls', '.xlsx', '.xlsm', '.xlsb'
+  ];
+  const allowedMimeTypes = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/msword', // .doc
+    'text/csv',
+    'application/csv',
+    'text/x-csv',
+    'application/x-csv',
+    'text/comma-separated-values',
+    'text/x-comma-separated-values',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-excel', // .xls
+    'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
+    'application/vnd.ms-excel.sheet.binary.macroEnabled.12' // .xlsb
+  ];
+
   useEffect(() => {
     const fetchFiles = async () => {
       try {
@@ -99,8 +119,16 @@ export default function UploadFilePage() {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      const ext = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(selectedFile.type)) {
+        setError('Invalid file type. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
+        setFile(null);
+        setFileName('');
+        return;
+      }
       setFile(selectedFile);
       setFileName(selectedFile.name);
+      setError(null);
     }
   };
 
@@ -109,8 +137,16 @@ export default function UploadFilePage() {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
+      const ext = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(droppedFile.type)) {
+        setError('Invalid file type. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
+        setFile(null);
+        setFileName('');
+        return;
+      }
       setFile(droppedFile);
       setFileName(droppedFile.name);
+      setError(null);
     }
   };
 
@@ -237,13 +273,14 @@ export default function UploadFilePage() {
                   id="fileInput"
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
+                  accept=".pdf,.docx,.doc,.csv,.xls,.xlsx,.xlsm,.xlsb"
                 />
                 <FiUploadCloud className="upload-icon" />
                 <p>
                   <strong>Drag & drop your file here</strong> or click to browse
                 </p>
                 <p className="supported-formats">
-                  Supported formats: PDF, XLSX, XLS, CSV. Max file size: 10MB.
+                  Supported formats: PDF, DOCX, DOC, XLSX, XLS, XLSM, XLSB, CSV. Max file size: 10MB.
                 </p>
                 {fileName && <div className="selected-file-name">{fileName}</div>}
               </div>
@@ -348,7 +385,7 @@ export default function UploadFilePage() {
                   </button>
                 </div>
               </form>
-              {error && <div className="error-message">{error}</div>}
+              {error && <div className="error-message" style={{marginTop: '16px'}}>{error}</div>}
             </div>
             <div className="recent-uploads-card large" style={{ minHeight: 320, padding: '1.5rem 1.2rem' }}>
               <h3>Recent Uploads</h3>

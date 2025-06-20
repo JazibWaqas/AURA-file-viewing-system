@@ -71,12 +71,18 @@ const fileFilter = (req, file, cb) => {
         'text/x-comma-separated-values'
     ];
     
-    if ([...excelTypes, ...pdfTypes, ...csvTypes].includes(file.mimetype)) {
+    // Accept Word files (DOCX and DOC)
+    const wordTypes = [
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/msword' // .doc
+    ];
+    
+    if ([...excelTypes, ...pdfTypes, ...csvTypes, ...wordTypes].includes(file.mimetype)) {
         console.log('File type accepted');
         cb(null, true);
     } else {
         console.log('File type rejected:', file.mimetype);
-        cb(new Error('Only Excel, CSV, and PDF files are allowed!'), false);
+        cb(new Error('Only Excel, CSV, PDF, DOCX, and DOC files are allowed!'), false);
     }
 };
 

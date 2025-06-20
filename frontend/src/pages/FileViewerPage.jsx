@@ -3,6 +3,8 @@ import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2 } from 'react-icons/fi';
+import mammoth from 'mammoth/mammoth.browser';
+import * as XLSX from 'xlsx';
 
 const FileViewer = () => {
   const { id } = useParams();
@@ -55,6 +57,27 @@ const FileViewer = () => {
               }
             } catch (err) {
               setPreviewError('Error loading preview data.');
+            }
+          }
+          // If it's a DOCX or DOC file, fetch and convert to HTML
+          else if (fileDetails.fileType === 'docx' || fileDetails.fileType === 'doc') {
+            try {
+              setPreviewData(null);
+              setPreviewError(null);
+              setLoading(true);
+              const viewResponse = await fetch(`/api/files/${id}/view`);
+              if (viewResponse.ok) {
+                const blob = await viewResponse.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+                const result = await mammoth.convertToHtml({ arrayBuffer });
+                setPreviewData(result.value);
+              } else {
+                setPreviewError('Failed to load document preview.');
+              }
+            } catch (err) {
+              setPreviewError('Error loading document preview.');
+            } finally {
+              setLoading(false);
             }
           }
         } else {
@@ -133,6 +156,49 @@ const FileViewer = () => {
     }
   };
 
+  // Helper to render spreadsheet preview
+  const renderSpreadsheet = () => {
+    if (!previewData || !previewData.headers) return null;
+    return (
+      <div className="spreadsheet-preview-container">
+        <table className="spreadsheet-table">
+          <thead>
+            <tr>
+              {previewData.headers.map((header, idx) => (
+                <th key={idx}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {previewData.rows && previewData.rows.length > 0 ? (
+              previewData.rows.map((row, rIdx) => (
+                <tr key={rIdx}>
+                  {row.map((cell, cIdx) => (
+                    <td key={cIdx}>{cell}</td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan={previewData.headers.length}>No data found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Helper to render DOCX/DOC preview
+  const renderDocx = () => {
+    if (loading) return <div className="docx-loading"><FiLoader className="spinner-icon" /> Loading document preview...</div>;
+    if (previewError) return <div className="docx-error">{previewError}</div>;
+    if (previewData) {
+      return (
+        <div className="docx-preview" dangerouslySetInnerHTML={{ __html: previewData }} />
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="app-root">
@@ -169,98 +235,72 @@ const FileViewer = () => {
       <div className="app-root">
         <Header />
         <main className="main-content">
+          <div className="file-viewer-header file-viewer-page">
+            <div className="file-viewer-header-left">
+              <button className="back-button" onClick={() => navigate('/file-index')}>
+                <FiArrowLeft /> Back to All Files
+              </button>
+              <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
+            </div>
+            <button className="download-button" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>
+              <FiDownload /> Download
+            </button>
+          </div>
           <div className="file-viewer-flex-root">
-            <div className="file-viewer-page">
-              <div className="file-viewer-header">
-                <div className="file-viewer-header-left">
-                  <button className="back-button" onClick={() => navigate('/file-index')}>
-                    <FiArrowLeft /> Back to All Files
-                  </button>
-                  <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
+            <div className="file-details-sidebar">
+              <div className="details-section">
+                <h3>{'File Information'}</h3>
+                <ul>
+                  <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
+                  <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
+                  <li><FiUser /><span>Uploaded By:</span><strong>{file.uploadedBy || 'Anonymous'}</strong></li>
+                  <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
+                </ul>
+              </div>
+              {file.description && (
+                <div className="description-section">
+                  <h3>Description</h3>
+                  <p>{file.description}</p>
                 </div>
-                <button className="download-button" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>
-                  <FiDownload /> Download
+              )}
+              <div className="actions-section">
+                <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}>
+                  <FiTrash2 /> Delete File
                 </button>
               </div>
-              <div className="file-viewer-content">
-                <div className="file-details-sidebar">
-                  <div className="details-section">
-                    <h3>{'File Information'}</h3>
-                    <ul>
-                      <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
-                      <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
-                      <li><FiUser /><span>Uploaded By:</span><strong>{file.uploadedBy || 'Anonymous'}</strong></li>
-                      <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
-                    </ul>
+            </div>
+            <div className="file-viewer-divider" />
+            <div className="file-viewer-content">
+              <div className="file-preview">
+                {/* File preview logic */}
+                {file.fileType === 'pdf' && file.url && (
+                  <iframe
+                    src={file.url}
+                    title="PDF Preview"
+                    className="pdf-preview-frame"
+                    frameBorder="0"
+                    width="100%"
+                    height="700px"
+                  />
+                )}
+                {(file.fileType === 'csv' || file.fileType === 'excel') && (
+                  <div className="spreadsheet-preview-wrapper">
+                    {previewError ? (
+                      <div className="spreadsheet-error">{previewError}</div>
+                    ) : renderSpreadsheet()}
                   </div>
-                  {file.description && (
-                    <div className="description-section">
-                      <h3>Description</h3>
-                      <p>{file.description}</p>
-                    </div>
-                  )}
-                  <div className="actions-section">
-                    <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}>
-                      <FiTrash2 /> Delete File
-                    </button>
+                )}
+                {(file.fileType === 'docx' || file.fileType === 'doc') && (
+                  <div className="docx-preview-wrapper">
+                    {renderDocx()}
                   </div>
-                </div>
-                <div className="file-viewer-divider" />
-                <div className="file-preview">
-                  {file.fileType === 'pdf' ? (
-                    <iframe 
-                      src={file.url} 
-                      title={file.originalName || file.filename || file.name || 'Untitled'} 
-                      className="pdf-viewer"
-                    />
-                  ) : (file.fileType === 'csv' || file.fileType === 'excel') ? (
-                    previewError ? (
-                      <div className="file-type-message">
-                        <FiFile className="file-type-icon" />
-                        <p>{previewError}</p>
-                      </div>
-                    ) : previewData ? (
-                      <div className="table-preview">
-                        <div className="table-info">
-                          <p>Showing {previewData.data ? previewData.data.length : 0} of {previewData.totalRows || 0} rows</p>
-                        </div>
-                        <div className="table-container">
-                          <table>
-                            <thead>
-                              <tr>
-                                {previewData.headers && previewData.headers.map((header, index) => (
-                                  <th key={index}>{header}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {previewData.data && previewData.data.map((row, rowIndex) => (
-                                <tr key={rowIndex}>
-                                  {previewData.headers && previewData.headers.map((header, colIndex) => (
-                                    <td key={colIndex}>{Array.isArray(row) ? row[colIndex] : row[header]}</td>
-                                  ))}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="file-type-message">
-                        <FiFile className="file-type-icon" />
-                        <p>Loading preview...</p>
-                      </div>
-                    )
-                  ) : (
-                    <div className="file-type-message">
-                      <FiFile className="file-type-icon" />
-                      <p>This file type cannot be previewed. Please download it to view the contents.</p>
-                      <button className="download-button" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>
-                        <FiDownload /> Download {file.originalName || file.filename || file.name}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                )}
+                {!(file.fileType === 'pdf' || file.fileType === 'csv' || file.fileType === 'excel' || file.fileType === 'docx' || file.fileType === 'doc') && (
+                  <div className="unsupported-preview">
+                    <FiFile style={{ fontSize: 48, color: '#b3b3b3' }} />
+                    <p>Preview not available for this file type.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

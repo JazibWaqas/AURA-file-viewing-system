@@ -69,15 +69,17 @@
 
 /* Ensure .file-viewer-content stretches full width and scrolls only at the far right */
 .file-viewer-content {
+  flex: 1 1 0;
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  overflow-x: auto;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-  overflow-y: hidden;
-  width: 100vw;
-  box-sizing: border-box;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .file-details-sidebar {
@@ -389,15 +391,14 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
-  .file-viewer-content {
+@media (max-width: 1100px) {
+  .file-viewer-flex-root {
     flex-direction: column;
+    gap: 0;
   }
-
-  .file-details-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #eee;
+  .file-details-sidebar, .file-viewer-content {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -524,4 +525,120 @@
   font-size: 1.05rem;
   color: #2c3e50;
   text-align: center;
+}
+
+.spreadsheet-preview-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+  padding: 18px 8px 18px 8px;
+}
+.spreadsheet-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1rem;
+  background: #fafbfc;
+}
+.spreadsheet-table th, .spreadsheet-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+  min-width: 80px;
+  color: #111;
+  background: inherit;
+}
+.spreadsheet-table th {
+  background: #f4f6fa;
+  font-weight: 600;
+  color: #111;
+}
+.spreadsheet-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+.spreadsheet-error {
+  color: #d32f2f;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.docx-preview-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  padding: 24px 18px;
+  margin-bottom: 24px;
+  min-height: 200px;
+  max-height: 700px;
+  overflow-y: auto;
+}
+.docx-preview {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #222;
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+.docx-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6c63ff;
+  font-size: 1.1rem;
+  padding: 1.5rem 0;
+}
+.docx-error {
+  color: #d32f2f;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.unsupported-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #b3b3b3;
+  font-size: 1.1rem;
+  padding: 2rem 0;
+}
+
+.pdf-preview-frame {
+  width: 100%;
+  max-width: 100%;
+  height: 80vh;
+  min-height: 500px;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: #f4f6fa;
+}
+
+@media (max-width: 1200px) {
+  .pdf-preview-frame {
+    height: 60vh;
+    min-height: 350px;
+  }
+}
+@media (max-width: 900px) {
+  .pdf-preview-frame {
+    height: 45vh;
+    min-height: 200px;
+  }
+}
+@media (max-width: 700px) {
+  .pdf-preview-frame {
+    height: 35vh;
+    min-height: 120px;
+  }
+  .file-viewer-content {
+    padding: 0 2vw;
+  }
 }
