@@ -7,6 +7,7 @@ import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
 import 'handsontable/dist/handsontable.full.min.css';
+import '../styles/FileIndex.css';
 
 const FileViewer = () => {
   const { id } = useParams();
@@ -317,7 +318,41 @@ const FileViewer = () => {
   }
 
   // Fallback: file list page
-  return <div className="app-root">{/* your file index view remains here unchanged */}</div>;
+  return (
+    <div className="app-root">
+      <Header />
+      <main className="main-content">
+        <div className="file-index-page">
+          <div className="page-header">
+            <h1>File Viewer</h1>
+            <p>Select a file to view its details.</p>
+          </div>
+          <div className="all-files-scroll-grid">
+            {allFiles.length > 0 ? (
+              allFiles.map((f) => (
+                <div key={f._id} className="file-card">
+                  <div className="file-info">
+                    <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
+                    <p>Category: {f.category || 'Uncategorized'}</p>
+                    <p>Year: {f.year || 'N/A'}</p>
+                  </div>
+                  <div className="file-actions">
+                    <button className="file-view-btn" onClick={() => handleFileClick(f._id)}>View</button>
+                    <button className="file-download-btn" onClick={() => handleDownload(f._id, f.originalName || f.filename || f.name)}>Download</button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <FiFile className="empty-icon" />
+                <p>No files found.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 };
 
 export default FileViewer;
