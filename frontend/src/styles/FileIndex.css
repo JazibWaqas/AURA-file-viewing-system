@@ -95,15 +95,21 @@
   color: #4a90e2;
   margin-bottom: 0.3rem;
 }
+.file-info {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
 .file-info h4 {
   margin: 0 0 0.25rem 0;
   font-size: 1.05rem;
   color: #2c3e50;
-  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  box-sizing: border-box;
+  padding: 0 5px;
 }
 .file-info p {
   margin: 0.1rem 0;

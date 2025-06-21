@@ -233,7 +233,9 @@ export default function FileIndexPage() {
                   filteredRecentFiles.map((file) => (
                     <div key={file._id} className="file-card">
                       <div className="file-info">
-                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                        <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
+                          {file.originalName || file.filename || file.name || 'Untitled'}
+                        </h4>
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
@@ -265,7 +267,9 @@ export default function FileIndexPage() {
                     {visibleFiles.map((file) => (
                       <div key={file._id} className="file-card">
                         <div className="file-info">
-                          <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                          <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
+                            {file.originalName || file.filename || file.name || 'Untitled'}
+                          </h4>
                           <p>Category: {file.category || 'Uncategorized'}</p>
                           <p>Year: {file.year || 'N/A'}</p>
                         </div>
