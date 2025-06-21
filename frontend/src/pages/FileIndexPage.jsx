@@ -18,7 +18,7 @@ export default function FileIndexPage() {
   const [selectedYear, setSelectedYear] = useState('');
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
-  const [visibleFilesCount, setVisibleFilesCount] = useState(24);
+  const [visibleFilesCount, setVisibleFilesCount] = useState(16);
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
 
@@ -113,11 +113,11 @@ export default function FileIndexPage() {
 
   // Reset visible files count when filters change
   useEffect(() => {
-    setVisibleFilesCount(24);
+    setVisibleFilesCount(16);
   }, [searchTerm, selectedCategory, selectedSubCategory, selectedYear]);
 
   const handleLoadMore = () => {
-    setVisibleFilesCount(prev => prev + 24);
+    setVisibleFilesCount(prev => prev + 16);
   };
 
   // Dynamic section title
