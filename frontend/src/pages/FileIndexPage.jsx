@@ -3,7 +3,7 @@ import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus } from 'react-icons/fi';
 
 export default function FileIndexPage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -18,6 +18,7 @@ export default function FileIndexPage() {
   const [selectedYear, setSelectedYear] = useState('');
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
+  const [visibleFilesCount, setVisibleFilesCount] = useState(24);
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
 
@@ -107,6 +108,17 @@ export default function FileIndexPage() {
     return matchesSearch && matchesCategory && matchesSubCategory && matchesYear;
   });
   const filteredRecentFiles = filteredFiles.slice(0, 4);
+  const visibleFiles = filteredFiles.slice(0, visibleFilesCount);
+  const hasMoreFiles = visibleFilesCount < filteredFiles.length;
+
+  // Reset visible files count when filters change
+  useEffect(() => {
+    setVisibleFilesCount(24);
+  }, [searchTerm, selectedCategory, selectedSubCategory, selectedYear]);
+
+  const handleLoadMore = () => {
+    setVisibleFilesCount(prev => prev + 24);
+  };
 
   // Dynamic section title
   const getSectionTitle = () => {
@@ -243,25 +255,35 @@ export default function FileIndexPage() {
                     <FiLoader className="spinner-icon" />
                     <p>Loading files...</p>
                   </div>
-                ) : filteredFiles.length === 0 ? (
+                ) : visibleFiles.length === 0 ? (
                   <div className="empty-state">
                     <FiFile className="empty-icon" />
                     <p>No files found matching your criteria</p>
                   </div>
                 ) : (
-                  filteredFiles.map((file) => (
-                    <div key={file._id} className="file-card">
-                      <div className="file-info">
-                        <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
-                        <p>Category: {file.category || 'Uncategorized'}</p>
-                        <p>Year: {file.year || 'N/A'}</p>
+                  <>
+                    {visibleFiles.map((file) => (
+                      <div key={file._id} className="file-card">
+                        <div className="file-info">
+                          <h4>{file.originalName || file.filename || file.name || 'Untitled'}</h4>
+                          <p>Category: {file.category || 'Uncategorized'}</p>
+                          <p>Year: {file.year || 'N/A'}</p>
+                        </div>
+                        <div className="file-actions">
+                          <button className="file-view-btn" onClick={() => handleViewFile(file._id)}>View</button>
+                          <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>Download</button>
+                        </div>
                       </div>
-                      <div className="file-actions">
-                        <button className="file-view-btn" onClick={() => handleViewFile(file._id)}>View</button>
-                        <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>Download</button>
+                    ))}
+                    {hasMoreFiles && (
+                      <div className="load-more-container">
+                        <button className="load-more-button" onClick={handleLoadMore}>
+                          <FiPlus className="load-more-icon" />
+                          Load More Files ({filteredFiles.length - visibleFilesCount} remaining)
+                        </button>
                       </div>
-                    </div>
-                  ))
+                    )}
+                  </>
                 )}
               </div>
             </section>
