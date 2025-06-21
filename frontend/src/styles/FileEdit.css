@@ -1,0 +1,323 @@
+/* FileEditPage Styles - Based on UploadFile.css */
+
+.edit-content-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.edit-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 40px 48px;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.edit-card.large {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.edit-header {
+  margin-bottom: 32px;
+}
+
+.back-button {
+  background: #f3f3f3;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.back-button:hover {
+  background: #e0e0e0;
+}
+
+.edit-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.edit-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  color: #666;
+}
+
+/* Two-column layout */
+.edit-content-layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.file-info-column {
+  flex: 0 0 400px;
+  min-width: 0;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 0;
+}
+
+/* File Information Display */
+.file-info-display {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.file-icon-background {
+  background: #6c63ff;
+  border-radius: 12px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.file-icon {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.file-details h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.file-details p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.file-details strong {
+  color: #111;
+}
+
+/* Form Styles - Reused from UploadFile.css */
+.file-details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-details-form label {
+  font-weight: 500;
+  margin-bottom: 2px;
+  color: #111;
+}
+
+.file-details-form input,
+.file-details-form textarea,
+.file-details-form select {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  background: #fafbfc;
+  margin-bottom: 8px;
+  outline: none;
+  color: #111;
+  transition: border-color 0.2s;
+}
+
+.file-details-form input:focus,
+.file-details-form textarea:focus,
+.file-details-form select:focus {
+  border-color: #6c63ff;
+}
+
+.file-details-form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.dropdown-row {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+
+.dropdown-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancel-button {
+  background: #f3f3f3;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-button:hover {
+  background: #e0e0e0;
+}
+
+.save-button {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-button:disabled {
+  background: #b3b3b3;
+  cursor: not-allowed;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #554ee2;
+}
+
+/* Error Message */
+.error-message {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.loading-container p,
+.error-container p {
+  margin-top: 16px;
+  color: #666;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+  color: #6c63ff;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.retry-button {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background 0.2s;
+}
+
+.retry-button:hover {
+  background: #554ee2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-content-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .edit-card {
+    padding: 24px 20px;
+    min-width: auto;
+  }
+  
+  .edit-content-layout {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .file-info-column {
+    flex: none;
+    width: 100%;
+  }
+  
+  .file-info-display {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .dropdown-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .save-button,
+  .cancel-button {
+    width: 100%;
+    justify-content: center;
+  }
+} 

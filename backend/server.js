@@ -339,6 +339,46 @@ app.get('/api/files/:id/preview', async (req, res) => {
   }
 });
 
+// --- Update file metadata endpoint ---
+app.put('/api/files/:id', async (req, res) => {
+  try {
+    const fileId = req.params.id;
+    
+    // Get file metadata from Firestore
+    const doc = await db.collection('uploads').doc(fileId).get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    const fileData = doc.data();
+    
+    // Update the metadata fields
+    const updateData = {
+      ...fileData,
+      originalName: req.body.fileName || fileData.originalName,
+      description: req.body.description || fileData.description,
+      category: req.body.category || fileData.category,
+      subCategory: req.body.subCategory || fileData.subCategory,
+      year: req.body.year || fileData.year,
+      updatedAt: new Date()
+    };
+    
+    // Update the document in Firestore
+    await db.collection('uploads').doc(fileId).update(updateData);
+    
+    res.json({ 
+      message: 'File metadata updated successfully',
+      file: {
+        _id: fileId,
+        ...updateData
+      }
+    });
+  } catch (error) {
+    console.error('Error updating file metadata:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // --- Delete file endpoint ---
 app.delete('/api/files/:id', async (req, res) => {
   try {

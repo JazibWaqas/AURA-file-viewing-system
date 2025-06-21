@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2 } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -278,6 +278,7 @@ const FileViewer = () => {
                 <h3>File Information</h3>
                 <ul>
                   <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
+                  <li><FiFolder /><span>SubCategory:</span><strong>{file.subCategory || 'N/A'}</strong></li>
                   <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
                   <li><FiUser /><span>Uploaded By:</span><strong>{file.uploadedBy || 'Anonymous'}</strong></li>
                   <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
@@ -285,6 +286,7 @@ const FileViewer = () => {
               </div>
               {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
               <div className="actions-section">
+                <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
                 <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>
               </div>
             </div>
