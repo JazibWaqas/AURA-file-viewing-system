@@ -6,17 +6,23 @@
   box-shadow: 2px 0 8px rgba(0,0,0,0.02);
   display: block;
   padding-bottom: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 0rem;
+  position: sticky;
+  top: 0;
+  bottom: 0;
   align-self: flex-start;
-  max-height: calc(100vh - 80px);
+  z-index: 10;
+  height: fit-content;
+  max-height: calc(100vh - 60px);
   overflow-y: auto;
 }
 
 .category-sidebar-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #6d28d9;
-  padding: 1rem 1.25rem 0.5rem 1.25rem;
+  color: #ce4545;
+  background: #000000;
+  padding: 1rem 1.25rem 0.75rem 2.25rem;
   margin-bottom: 0.25rem;
   letter-spacing: 0.5px;
 }
@@ -39,8 +45,8 @@
 
 .category-name.expanded,
 .category-name:hover {
-  background: #ede9fe;
-  color: #6d28d9;
+  background: #0a022f;
+  color: #6da8f9;
   font-weight: 600;
 }
 
@@ -53,7 +59,7 @@
 .subcategory-btn {
   background: none;
   border: none;
-  color: #555;
+  color: #0b0101;
   text-align: left;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -64,7 +70,7 @@
 }
 
 .subcategory-btn:hover {
-  background: #ede9fe;
-  color: #6d28d9;
+  background: #0d012f;
+  color: #a7f396;
   font-weight: 600;
 }

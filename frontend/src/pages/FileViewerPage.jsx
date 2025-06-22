@@ -171,15 +171,15 @@ const FileViewer = () => {
       return (
         <div className="spreadsheet-preview-container handsontable-container">
           {excelSheets.length > 1 && (
-            <div style={{ marginBottom: 12 }}>
-              <label htmlFor="sheetSelect" style={{ marginRight: 8, fontWeight: 'bold' }}>Sheet:</label>
+            <div className="sheet-select-row">
+              <label htmlFor="sheetSelect" className="sheet-select-label">Sheet:</label>
               <select
                 id="sheetSelect"
                 value={activeSheet.name}
                 onChange={(e) =>
                   setActiveSheet(excelSheets.find((s) => s.name === e.target.value))
                 }
-                style={{ padding: '6px 10px', borderRadius: 6 }}
+                className="sheet-select-dropdown"
               >
                 {excelSheets.map((sheet) => (
                   <option key={sheet.name} value={sheet.name}>{sheet.name}</option>
@@ -295,7 +295,7 @@ const FileViewer = () => {
             <div className="file-viewer-content">
               <div className="file-preview">
                 {file.fileType === 'pdf' && file.url && (
-                  <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" width="100%" height="700px" />
+                  <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
                 )}
                 {(file.fileType === 'csv' || file.fileType === 'excel' || file.fileType === 'xlsx') && (
                   <div className="spreadsheet-preview-wrapper">{renderSpreadsheet()}</div>
@@ -305,7 +305,7 @@ const FileViewer = () => {
                 )}
                 {!['pdf', 'csv', 'excel', 'xlsx', 'docx', 'doc'].includes(file.fileType) && (
                   <div className="unsupported-preview">
-                    <FiFile style={{ fontSize: 48, color: '#b3b3b3' }} />
+                    <FiFile className="unsupported-file-icon" />
                     <p>Preview not available for this file type.</p>
                   </div>
                 )}

@@ -18,6 +18,10 @@
   transition: margin 0.3s;
   padding-top: 0;
   box-shadow: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100vw;
+  max-width: 100vw;
 }
 
 /* --- Files Section --- */
@@ -26,7 +30,7 @@
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  padding: 1.5rem 1rem 1rem 1rem;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -53,6 +57,7 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   width: 100%;
   box-sizing: border-box;
+  overflow: unset !important;
 }
 @media (max-width: 1200px) {
   .files-scroll-grid {
@@ -147,13 +152,13 @@
 }
 
 .file-index-page {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: unset;
+  height: unset;
+  min-height: unset;
   box-sizing: border-box;
-  overflow-x: hidden;
-  padding-top: 0;
+  padding: 2rem;
 }
 
 .page-header {
@@ -383,6 +388,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   width: 100%;
   box-sizing: border-box;
+  overflow: unset !important;
 }
 @media (max-width: 1200px) {
   .all-files-scroll-grid {
@@ -435,27 +441,57 @@
 /* --- Remove top padding/margin so content is flush with header --- */
 .file-index-content-wrapper {
   padding-top: 0;
+  padding-bottom: 0;
 }
 
-/* Custom scrollbar for the main page (body/html) */
+/* Custom Scrollbars for all main content areas */
+.file-index-page::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
 body::-webkit-scrollbar, html::-webkit-scrollbar {
   width: 14px;
   background: #e0e7ef;
 }
+.file-index-page::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
   background: #b0b8c9;
   border-radius: 8px;
   border: 3px solid #e0e7ef;
 }
+.file-index-page::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   background: #4a90e2;
 }
-body, html {
+.file-index-page, .main-content, body, html {
   scrollbar-width: thin;
   scrollbar-color: #b0b8c9 #e0e7ef;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+}
+
+/* Standardize paddings to rem units */
+/* All files display */
+
+.file-index-page,
+.file-index-content {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: unset;
+  padding-left: 0.00000!important;
+  padding-right: 0.0000 !important;
+}
+.files-section {
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 2rem;
+}
+.all-files-section {
+  margin-top: 2.5rem;
+}
+.page-header {
+  margin-bottom: 2rem;
+}
+.search-filter-bar {
+  padding: 1rem;
+  margin-bottom: 2rem;
 }
 
 /* --- Load More Button --- */

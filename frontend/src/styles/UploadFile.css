@@ -10,7 +10,7 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  padding: 40px 48px;
+  padding: 2.5rem 3rem;
   flex: 2 1 0;
   min-width: 0;
   display: flex;
@@ -43,19 +43,19 @@ strong,
 .upload-title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .upload-subtitle {
   font-size: 1.1rem;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .upload-options-row {
   display: flex;
-  gap: 18px;
+  gap: 1.125rem;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .upload-file-main-button {
@@ -187,7 +187,7 @@ strong,
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  padding: 28px 18px 20px 18px;
+  padding: 1.5rem 1.2rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -885,4 +885,46 @@ strong,
 .upload-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Custom Scrollbars for all main content areas */
+.upload-card::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  width: 14px;
+  background: #e0e7ef;
+}
+.upload-card::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+  background: #b0b8c9;
+  border-radius: 8px;
+  border: 3px solid #e0e7ef;
+}
+.upload-card::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+  background: #4a90e2;
+}
+.upload-card, .main-content, body, html {
+  scrollbar-width: thin;
+  scrollbar-color: #b0b8c9 #e0e7ef;
+}
+
+/* Standardize paddings to rem units */
+.upload-card {
+  padding: 2.5rem 3rem;
+}
+.upload-title {
+  margin-bottom: 0.5rem;
+}
+.upload-subtitle {
+  margin-bottom: 1.5rem;
+}
+.upload-options-row {
+  gap: 1.125rem;
+  margin-bottom: 1.5rem;
+}
+.recent-uploads-card {
+  padding: 1.5rem 1.2rem;
 }

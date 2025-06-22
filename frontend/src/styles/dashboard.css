@@ -198,3 +198,119 @@
   font-size: 14px;
   color: #777;
 }
+
+.dashboard-bg {
+  background: #f8fafc;
+}
+
+.dashboard-welcome-section {
+  margin-bottom: 2rem;
+}
+.dashboard-welcome-title {
+  font-size: 2.2rem;
+  margin: 0;
+}
+.dashboard-welcome-desc {
+  color: #555;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-graphs-section {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dashboard-bar-chart {
+  flex: 1;
+  min-width: 25rem;
+  max-width: 33.75rem;
+  background: #fff;
+  border-radius: 1.125rem;
+  box-shadow: 0 4px 24px rgba(109,40,217,0.07);
+  padding: 2.25rem;
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+.dashboard-bar-chart-title {
+  margin: 0 0 1.2em 0;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-content-section {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 2rem;
+}
+.dashboard-quick-actions {
+  flex: 1;
+}
+
+.dashboard-recent-files {
+  margin-bottom: 2rem;
+}
+
+.dashboard-categories-overview {
+  margin-bottom: 0;
+}
+
+.dashboard-tooltip {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dashboard-tooltip-title {
+  font-weight: 600;
+  color: #6d28d9;
+  margin-bottom: 0.25rem;
+}
+.dashboard-tooltip-label {
+  font-size: 0.81rem;
+  color: #333;
+}
+.dashboard-tooltip-value {
+  font-size: 0.94rem;
+  color: #222;
+  margin-top: 0.2rem;
+}
+
+.dashboard-main-content {
+  height: 100vh;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+/* Custom Scrollbars for all main content areas */
+.dashboard-main-content::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  width: 14px;
+  background: #e0e7ef;
+}
+.dashboard-main-content::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+  background: #b0b8c9;
+  border-radius: 8px;
+  border: 3px solid #e0e7ef;
+}
+.dashboard-main-content::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+  background: #4a90e2;
+}
+.dashboard-main-content, .main-content, body, html {
+  scrollbar-width: thin;
+  scrollbar-color: #b0b8c9 #e0e7ef;
+}
