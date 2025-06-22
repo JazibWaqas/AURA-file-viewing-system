@@ -55,8 +55,8 @@
 .back-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: .5rem;
+  padding: 2.75rem 2.7rem;
   background: #f8f9fa;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -72,8 +72,8 @@
 
 .file-viewer-header h1 {
   margin: 0;
-  font-size: 2rem;
-  color: #2c3e50;
+  font-size: 1rem;
+  color: #50422c;
 }
 
 /* Make content use full width */
@@ -167,12 +167,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
+  width: 10%;
   padding: 0.75rem;
   background: #4a90e2;
   color: white;
   border: none;
   border-radius: 6px;
+  padding-right: 10px;
   font-size: 0.9rem;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -427,23 +428,24 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 
 /* Standardize paddings to rem units */
 .file-viewer-page {
-  padding: 2rem;
+  padding: 0rem;
 }
 .file-viewer-header {
   margin-bottom: 2rem;
 }
 .file-viewer-content {
   padding: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0rem;
 }
 .file-details-sidebar {
-  padding: 1.5rem;
+  padding: 1.0rem;
 }
 .file-preview {
   padding: 1.5rem;
 }
 .spreadsheet-preview-container {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0rem;
+  padding: 0rem;
 }
 
 .app-root,

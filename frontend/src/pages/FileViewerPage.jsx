@@ -194,6 +194,7 @@ const FileViewer = () => {
             rowHeaders={true}
             width="100%"
             height="70vh"
+            colWidths={160}
             autoColumnSize={true}
             licenseKey="non-commercial-and-evaluation"
             contextMenu={true}
