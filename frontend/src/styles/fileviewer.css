@@ -8,11 +8,11 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  background: #f0f2f5;
+  /* Inherit background and color from globals.css */
   box-sizing: border-box;
   overflow-x: auto;
   margin: 0;
-  gap: 0; /* added */
+  gap: 0;
 }
 
 .file-viewer-page,
@@ -22,6 +22,7 @@
   overflow-x: unset;
   padding-left: 0 !important;
   padding-right: 0 !important;
+  /* Inherit background and color from globals.css */
 }
 
 .main-content {
@@ -29,6 +30,7 @@
   overflow-x: hidden;
   width: 100vw;
   max-width: 100vw;
+  /* Inherit background and color from globals.css */
 }
 
 .file-viewer-header {
@@ -76,27 +78,10 @@
   color: #50422c;
 }
 
-/* Make content use full width */
-.file-viewer-content {
-  flex: 1;
-  width: calc(100% - 250px); /* adjusted for sidebar */
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  overflow-x: auto;
+/* --- Card/section backgrounds: white for clarity --- */
+.file-viewer-content, .file-details-sidebar {
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-.file-details-sidebar {
-  width: 250px; /* reduced from 300px */
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-right: 1px solid #eee;
+  color: #384959;
 }
 
 .details-section {

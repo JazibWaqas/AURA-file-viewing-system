@@ -1,16 +1,20 @@
 /* FileEditPage Styles - Based on UploadFile.css */
 
+/* --- Layout root for file edit page --- */
 .edit-content-row {
   display: flex;
   flex-direction: row;
   width: 100%;
   align-items: flex-start;
+  /* Inherit background and color from globals.css */
 }
 
-.edit-card {
+/* --- Card/section backgrounds: white for clarity --- */
+.edit-card, .file-info-display {
   background: #fff;
+  color: #384959;
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px #38495922;
   padding: 2.5rem 3rem;
   flex: 1;
   min-width: 0;
@@ -82,9 +86,6 @@
 
 /* File Information Display */
 .file-info-display {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;

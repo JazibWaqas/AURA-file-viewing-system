@@ -48,9 +48,7 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Common components */
-
-/* header styles */
+/* Header styles */
 .header {
   position: relative;
   top: 0;
@@ -188,7 +186,7 @@ html, body {
   color: #fff;
 }
 
-/* side bar styles */
+/* Sidebar styles */
 .sidebar {
   width: 240px;
   min-width: 240px;
@@ -202,14 +200,13 @@ html, body {
   top: 0;
   transition: left 0.3s;
   z-index: 1000;
-
   display: flex;
   flex-direction: column;
 }
 
 .sidebar nav {
-  flex: 1;  /* Add this */
-  overflow-y: auto;  /* Add this */
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar .close-btn {
@@ -263,23 +260,23 @@ html, body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0.75rem 1.5rem;  /* Match the nav a padding */
+  padding: 0.75rem 1.5rem;
   margin-top: auto;
-  color: #333;  /* Match the nav a color */
+  color: #333;
   text-decoration: none;
-  font-size: 1rem;  /* Match the nav a font size */
+  font-size: 1rem;
 }
 
 .sidebar-user-avatar {
-  width: 24px;  /* Match the icon size */
+  width: 24px;
   height: 24px;
   border-radius: 50%;
   background: #d1d5db;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2em;  /* Match the nav a span font size */
-  color: #333;  /* Match the nav a color */
+  font-size: 1.2em;
+  color: #333;
 }
 
 .sidebar-user-info {
@@ -289,14 +286,14 @@ html, body {
 }
 
 .sidebar-user-name {
-  font-weight: normal;  /* Remove bold */
-  color: #333;  /* Match the nav a color */
-  font-size: 1rem;  /* Match the nav a font size */
+  font-weight: normal;
+  color: #333;
+  font-size: 1rem;
 }
 
 .sidebar-user-email {
-  color: #666;  /* Slightly lighter than the name */
-  font-size: 0.9rem;  /* Slightly smaller than the name */
+  color: #666;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 899px) {
@@ -327,11 +324,9 @@ html, body {
     z-index: 1000;
     transition: left 0.3s;
   }
-
   .sidebar.open {
     left: 0;
   }
-
   .sidebar .close-btn {
     display: none;
   }

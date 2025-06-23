@@ -1,9 +1,10 @@
+/* --- Sidebar container inherits global background --- */
 .category-sidebar-container {
   min-width: 220px;
   max-width: 260px;
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.02);
+  /* Inherit background and color from globals.css */
+  border-right: 1px solid #6A89A7;
+  box-shadow: 2px 0 8px #38495922;
   display: block;
   padding-bottom: 0;
   margin-bottom: 0rem;
@@ -20,8 +21,8 @@
 .category-sidebar-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #ce4545;
-  background: #000000;
+  color: #6A89A7;
+  background: #384959;
   padding: 1rem 1.25rem 0.75rem 2.25rem;
   margin-bottom: 0.25rem;
   letter-spacing: 0.5px;
@@ -39,14 +40,14 @@
   padding: 0.75rem 1.25rem;
   border-radius: 6px;
   transition: background 0.2s, color 0.2s;
-  color: #333;
+  color: #384959;
   margin-bottom: 0.2rem;
 }
 
 .category-name.expanded,
 .category-name:hover {
-  background: #0a022f;
-  color: #6da8f9;
+  background: #BDDDFC;
+  color: #6A89A7;
   font-weight: 600;
 }
 
@@ -59,7 +60,7 @@
 .subcategory-btn {
   background: none;
   border: none;
-  color: #0b0101;
+  color: #384959;
   text-align: left;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -70,7 +71,7 @@
 }
 
 .subcategory-btn:hover {
-  background: #0d012f;
-  color: #a7f396;
+  background: #BDDDFC;
+  color: #6A89A7;
   font-weight: 600;
 }

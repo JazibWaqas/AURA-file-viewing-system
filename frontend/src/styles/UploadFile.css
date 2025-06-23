@@ -1,15 +1,19 @@
+/* --- Layout root for upload page --- */
 .upload-content-row {
   display: flex;
   flex-direction: row;
   gap: 32px;
   width: 100%;
   align-items: flex-start;
+  /* Inherit background and color from globals.css */
 }
 
-.upload-card {
+/* --- Card/section backgrounds: white for clarity --- */
+.upload-card, .recent-uploads-card {
   background: #fff;
+  color: #384959;
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px #38495922;
   padding: 2.5rem 3rem;
   flex: 2 1 0;
   min-width: 0;
@@ -927,41 +931,4 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 }
 .recent-uploads-card {
   padding: 1.5rem 1.2rem;
-}
-
-.upload-auth-error-card {
-  margin: 0 auto 2rem auto;
-  max-width: 480px;
-  padding: 2.5rem 2rem;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(109,40,217,0.10);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px;
-  text-align: center;
-  border: 1px solid #ede9fe;
-}
-.upload-auth-error-icon {
-  font-size: 48px;
-  color: #6c63ff;
-  margin-bottom: 16px;
-}
-.upload-auth-error-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 8px;
-}
-.upload-auth-error-message {
-  color: #666;
-  font-size: 1.1rem;
-  margin-bottom: 24px;
-}
-.upload-auth-error-btn {
-  margin-top: 8px;
-  font-size: 1rem;
-  padding: 0.75rem 2rem;
 }

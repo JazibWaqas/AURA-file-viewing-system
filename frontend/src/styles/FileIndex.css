@@ -5,7 +5,7 @@
   display: flex;
   width: 100%;
   min-height: calc(100vh - 64px);
-  background: #f0f2f5;
+  /* Inherit background and color from globals.css */
   transition: all 0.3s;
 }
 .app-content-row.sidebar-open .main-content {
@@ -24,6 +24,7 @@
   overflow-x: hidden;
   width: 100vw;
   max-width: 100vw;
+  /* Inherit background and color from globals.css */
 }
 
 /* =============================
@@ -33,13 +34,13 @@
   display: flex;
   min-height: calc(100vh - 64px);
   width: 100vw;
-  background: #f0f2f5;
   box-sizing: border-box;
   overflow-x: hidden;
+  /* Inherit background and color from globals.css */
 }
 
 /* =============================
-   Page Header
+   Page Header (inherits color)
    ============================= */
 .page-header {
   margin-bottom: 2rem;
@@ -47,21 +48,21 @@
 }
 .page-header h1 {
   font-size: 2.5rem;
-  color: #2c3e50;
+  color: #6A89A7;
   margin-bottom: 0.5rem;
 }
 .page-header p {
-  color: #666;
+  color: #BDDDFC;
   font-size: 1.1rem;
 }
 
 /* =============================
-   Search & Filter Bar
+   Search & Filter Bar (card style)
    ============================= */
 .search-filter-bar {
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px #38495922;
   padding: 1rem;
   display: flex;
   gap: 1rem;
@@ -70,6 +71,7 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  color: #384959;
 }
 .search-container {
   position: relative;
@@ -185,6 +187,7 @@
   min-height: 0;
   width: 100%;
   box-sizing: border-box;
+  color: #384959;
 }
 .files-section-title {
   font-size: 1.3rem;
@@ -210,6 +213,7 @@
   margin: 0;
   box-sizing: border-box;
   overflow: unset !important;
+  color: #384959;
 }
 
 /* =============================
@@ -232,9 +236,12 @@
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  color: #384959;
 }
 .file-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 12px #38495933;
+  background: #f5faff;
+  color: #384959;
   transform: translateY(-2px) scale(1.03);
 }
 .file-icon {
@@ -288,9 +295,6 @@
   cursor: pointer;
   transition: background 0.2s;
   margin: 2px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 .file-view-btn:hover, .file-download-btn:hover {
   background: #a78bfa !important;
@@ -527,32 +531,5 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
     max-width: 100%;
     min-height: 80px;
     padding: 0.5rem 0.2rem;
-  }
-}
-
-/* File Index Page Container */
-.file-index-page {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  background: #f0f2f5;
-  min-height: 100%;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Loading State */
-.spinner-icon {
-  animation: spin 1s linear infinite;
-  font-size: 1.5rem;
-  color: #4a90e2;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }
