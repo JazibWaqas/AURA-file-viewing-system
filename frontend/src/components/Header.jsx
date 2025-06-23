@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import '../styles/globals.css';
 import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus } from 'react-icons/fa';
 import { auth, signInWithGoogle, signOutUser } from '../services/firebase';
+import auraLogo from '../assets/aura-logo.png';
 
 const navLinks = [
   { to: '/', label: 'Dashboard', icon: <FaHome /> },
@@ -27,7 +28,11 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-content">
-        <h1 className="header-title">Al Umeed Rehab</h1>
+        <div className="header-logo-container">
+          <Link to="/">
+            <img src={auraLogo} alt="AURA Logo" className="header-logo" />
+          </Link>
+        </div>
         <nav className="header-nav">
           <ul className="header-nav-list">
             {navLinks.map((link) => (

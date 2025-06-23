@@ -77,6 +77,19 @@ html, body {
   min-width: 0;
 }
 
+.header-logo-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.header-logo {
+  max-width: 300%;
+  height: 60px;
+  object-fit: contain;
+}
+
 .header-title {
   color: #000;
   font-size: 1.5rem;
