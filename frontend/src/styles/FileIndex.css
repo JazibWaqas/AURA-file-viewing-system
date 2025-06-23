@@ -288,6 +288,9 @@
   cursor: pointer;
   transition: background 0.2s;
   margin: 2px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .file-view-btn:hover, .file-download-btn:hover {
   background: #a78bfa !important;
@@ -524,5 +527,32 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
     max-width: 100%;
     min-height: 80px;
     padding: 0.5rem 0.2rem;
+  }
+}
+
+/* File Index Page Container */
+.file-index-page {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: #f0f2f5;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Loading State */
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  font-size: 1.5rem;
+  color: #4a90e2;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
