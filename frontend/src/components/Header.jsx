@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/globals.css';
 import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus } from 'react-icons/fa';
+import { auth, signInWithGoogle, signOutUser } from '../services/firebase';
 
 const navLinks = [
   { to: '/', label: 'Dashboard', icon: <FaHome /> },
@@ -10,8 +11,19 @@ const navLinks = [
   { to: '/upload-file', label: 'Upload File', icon: <FaUpload /> },
 ];
 
+// Simple auth state hook
+function useAuth() {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return unsubscribe;
+  }, []);
+  return user;
+}
+
 const Header = () => {
   const location = useLocation();
+  const user = useAuth();
   return (
     <header className="header">
       <div className="header-content">
@@ -31,7 +43,14 @@ const Header = () => {
             ))}
           </ul>
         </nav>
-        <button className="header-login-btn">Log In</button>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 14, color: '#333' }}>{user.displayName || user.email}</span>
+            <button className="header-login-btn" onClick={signOutUser}>Log Out</button>
+          </div>
+        ) : (
+          <button className="header-login-btn" onClick={signInWithGoogle}>Log In</button>
+        )}
       </div>
     </header>
   );
