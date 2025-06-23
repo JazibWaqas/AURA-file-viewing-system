@@ -1,4 +1,6 @@
-/* --- Layout for dynamic resizing and sidebar toggle --- */
+/* =============================
+   Layout & Structure
+   ============================= */
 .app-content-row {
   display: flex;
   width: 100%;
@@ -24,143 +26,21 @@
   max-width: 100vw;
 }
 
-/* --- Files Section --- */
-.files-section {
-  margin-bottom: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+/* =============================
+   Flex Root for File Index Page
+   ============================= */
+.file-index-flex-root {
   display: flex;
-  flex-direction: column;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-.files-section-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-}
-
-/* --- Responsive Scrollable Grid for Files --- */
-.files-scroll-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 2rem;
-  min-height: 120px;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  scroll-behavior: smooth;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  width: 100%;
-  box-sizing: border-box;
-  overflow: unset !important;
-}
-@media (max-width: 1200px) {
-  .files-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-}
-@media (max-width: 900px) {
-  .files-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-    padding: 1rem 0.5rem 1rem 0.5rem;
-  }
-}
-
-/* --- File Card --- */
-.file-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  transition: box-shadow 0.2s, transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
-  min-width: 0;
-  min-height: 180px;
-  max-width: 220px;
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-}
-.file-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-  transform: translateY(-2px) scale(1.03);
-}
-.file-icon {
-  font-size: 1.5rem;
-  color: #4a90e2;
-  margin-bottom: 0.3rem;
-}
-.file-info {
-  width: 100%;
-  min-width: 0;
-  text-align: center;
-}
-.file-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.05rem;
-  color: #2c3e50;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 5px;
-}
-.file-info p {
-  margin: 0.1rem 0;
-  font-size: 0.92rem;
-  color: #666;
-  text-align: center;
-}
-.file-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  justify-content: center;
-}
-.action-button {
-  background: none;
-  border: none;
-  padding: 0.4rem;
-  cursor: pointer;
-  color: #666;
-  transition: background 0.2s, color 0.2s;
-  border-radius: 4px;
-}
-.action-button:hover {
-  background: #f8f9fa;
-  color: #4a90e2;
-}
-
-/* --- Misc --- */
-.loading-indicator, .empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 2rem 0;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.file-index-page {
+  min-height: calc(100vh - 64px);
   width: 100vw;
-  max-width: 100vw;
-  overflow: unset;
-  height: unset;
-  min-height: unset;
+  background: #f0f2f5;
   box-sizing: border-box;
-  padding: 2rem;
+  overflow-x: hidden;
 }
 
+/* =============================
+   Page Header
+   ============================= */
 .page-header {
   margin-bottom: 2rem;
   text-align: center;
@@ -175,6 +55,9 @@
   font-size: 1.1rem;
 }
 
+/* =============================
+   Search & Filter Bar
+   ============================= */
 .search-filter-bar {
   background: #fff;
   border-radius: 8px;
@@ -215,6 +98,10 @@
   border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
 }
+
+/* =============================
+   Filter Buttons & Dropdowns
+   ============================= */
 .filter-container {
   position: relative;
 }
@@ -223,20 +110,18 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
+  background: #ede9fe !important;
+  color: #3b2f7f !important;
+  border: none;
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #444;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.filter-button:hover {
-  background: #e9ecef;
-}
+.filter-button:hover,
 .filter-button.active {
-  background: #4a90e2;
-  color: white;
+  background: #a78bfa !important;
+  color: #1e1b4b !important;
   border-color: #4a90e2;
 }
 .filter-dropdown {
@@ -274,96 +159,155 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
+  background: #ede9fe !important;
+  color: #3b2f7f !important;
+  border: none;
   border-radius: 6px;
-  color: #666;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .clear-filters-button:hover {
-  background: #e9ecef;
-  color: #dc3545;
+  background: #a78bfa !important;
+  color: #1e1b4b !important;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .file-index-page {
-    padding: 1rem;
-  }
-  .search-filter-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .search-container {
-    width: 100%;
-  }
-  .filter-container {
-    width: 100%;
-  }
-  .filter-button {
-    width: 100%;
-    justify-content: center;
-  }
-  .files-scroll-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 900px) {
-  .file-index-page {
-    padding-top: 2.5rem;
-  }
-  .files-scroll-grid,
-  .all-files-scroll-grid {
-    gap: 1rem;
-    padding: 1rem 0.5rem 1rem 0.5rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .file-index-page {
-    padding: 0.5rem;
-  }
-}
-
-/* Error and empty states */
-.error-container {
-  text-align: center;
-  padding: 3rem;
+/* =============================
+   Files Section (Recent Files)
+   ============================= */
+.files-section {
+  margin-bottom: 2rem;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
-.error-container h2 {
-  color: #dc3545;
+.files-section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
   margin-bottom: 1rem;
+  color: #2c3e50;
 }
-.retry-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #4a90e2;
-  color: white;
+
+/* =============================
+   Files Scrollable Grid
+   ============================= */
+.files-scroll-grid, .all-files-scroll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive, up to 4 per row */
+  gap: 1.2rem;
+  min-height: 80px;
+  padding: 1.2rem 0.8rem 1rem 0.8rem;
+  scroll-behavior: smooth;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: unset !important;
+}
+
+/* =============================
+   File Card
+   ============================= */
+.file-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  min-width: 0;
+  min-height: 160px;
+  max-width: 260px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.file-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  transform: translateY(-2px) scale(1.03);
+}
+.file-icon {
+  font-size: 1.5rem;
+  color: #4a90e2;
+  margin-bottom: 0.3rem;
+}
+.file-info {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+.file-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.05rem;
+  color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 5px;
+}
+.file-info p {
+  margin: 0.1rem 0;
+  font-size: 0.92rem;
+  color: #666;
+  text-align: center;
+}
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+/* =============================
+   File Card Buttons
+   ============================= */
+.file-view-btn, .file-download-btn {
+  flex: 1 1 45%;
+  min-width: 80px;
+  max-width: 100%;
+  padding: 8px 0;
+  background: #ede9fe !important;
+  color: #3b2f7f !important;
   border: none;
   border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.98rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s;
+  margin: 2px 0;
 }
-.retry-button:hover {
-  background: #357abd;
-}
-
-/* --- Flex root for file index page --- */
-.file-index-flex-root {
-  display: flex;
-  min-height: calc(100vh - 64px);
-  width: 100vw;
-  background: #f0f2f5;
-  box-sizing: border-box;
-  overflow-x: hidden;
+.file-view-btn:hover, .file-download-btn:hover {
+  background: #a78bfa !important;
+  color: #1e1b4b !important;
 }
 
-/* --- All Files Section --- */
+/* =============================
+   Miscellaneous States
+   ============================= */
+.loading-indicator, .empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* =============================
+   All Files Section
+   ============================= */
 .all-files-section {
   margin-top: 2.5rem;
   background: transparent;
@@ -377,74 +321,81 @@
   margin-bottom: 1.5rem;
   text-align: center;
 }
-.all-files-scroll-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 2rem;
-  min-height: 120px;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+
+/* =============================
+   Load More Button
+   ============================= */
+.load-more-container {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+.load-more-button {
+  background: #ede9fe !important;
+  color: #3b2f7f !important;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+}
+.load-more-button:hover {
+  background: #a78bfa !important;
+  color: #1e1b4b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+.load-more-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+}
+.load-more-icon {
+  font-size: 1.1rem;
+}
+
+/* =============================
+   Retry Button (Error State)
+   ============================= */
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #ede9fe !important;
+  color: #3b2f7f !important;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.retry-button:hover {
+  background: #a78bfa !important;
+  color: #1e1b4b !important;
+}
+
+/* =============================
+   Error and Empty States
+   ============================= */
+.error-container {
+  text-align: center;
+  padding: 3rem;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  width: 100%;
-  box-sizing: border-box;
-  overflow: unset !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-@media (max-width: 1200px) {
-  .all-files-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-}
-@media (max-width: 900px) {
-  .all-files-scroll-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
+.error-container h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
 }
 
-.file-view-btn {
-  flex: 1 1 45%;
-  min-width: 80px;
-  max-width: 100%;
-  padding: 8px 0;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.98rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin: 2px 0;
-}
-.file-view-btn:hover {
-  background: #1d4ed8;
-}
-.file-download-btn {
-  flex: 1 1 45%;
-  min-width: 80px;
-  max-width: 100%;
-  padding: 8px 0;
-  background: #16a34a;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.98rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin: 2px 0;
-}
-.file-download-btn:hover {
-  background: #15803d;
-}
-
-/* --- Remove top padding/margin so content is flush with header --- */
-.file-index-content-wrapper {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-/* Custom Scrollbars for all main content areas */
+/* =============================
+   Custom Scrollbars
+   ============================= */
 .file-index-page::-webkit-scrollbar,
 .main-content::-webkit-scrollbar,
 body::-webkit-scrollbar, html::-webkit-scrollbar {
@@ -468,9 +419,17 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   scrollbar-color: #b0b8c9 #e0e7ef;
 }
 
-/* Standardize paddings to rem units */
-/* All files display */
+/* =============================
+   Remove Top Padding/Margin for Content Flush with Header
+   ============================= */
+.file-index-content-wrapper {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 
+/* =============================
+   Standardize Paddings to rem Units
+   ============================= */
 .file-index-page,
 .file-index-content {
   width: 100%;
@@ -494,52 +453,76 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   margin-bottom: 2rem;
 }
 
-/* --- Load More Button --- */
-.load-more-container {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  padding: 2rem 0;
+/* =============================
+   Media Queries (Responsive Design)
+   ============================= */
+@media (max-width: 1200px) {
+  .files-scroll-grid, .all-files-scroll-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  .file-card {
+    max-width: 220px;
+    min-height: 140px;
+    padding: 1rem 0.8rem;
+  }
 }
-
-.load-more-button {
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+@media (max-width: 900px) {
+  .files-scroll-grid, .all-files-scroll-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+    padding: 0.7rem 0.3rem 0.7rem 0.3rem;
+  }
+  .file-card {
+    max-width: 160px;
+    min-height: 100px;
+    padding: 0.7rem 0.4rem;
+  }
+  .file-index-page {
+    padding-top: 2.5rem;
+  }
 }
-
-.load-more-button:hover {
-  background: linear-gradient(135deg, #357abd 0%, #2c5aa0 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
-}
-
-.load-more-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
-}
-
-.load-more-icon {
-  font-size: 1.1rem;
-}
-
 @media (max-width: 768px) {
+  .file-index-page {
+    padding: 1rem;
+  }
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-container {
+    width: 100%;
+  }
+  .filter-container {
+    width: 100%;
+  }
+  .filter-button {
+    width: 100%;
+    justify-content: center;
+  }
+  .files-scroll-grid {
+    grid-template-columns: 1fr;
+  }
   .load-more-button {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
   }
-  
   .load-more-icon {
     font-size: 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .file-index-page {
+    padding: 0.5rem;
+  }
+  .files-scroll-grid, .all-files-scroll-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+    padding: 0.5rem 0.1rem 0.5rem 0.1rem;
+  }
+  .file-card {
+    max-width: 100%;
+    min-height: 80px;
+    padding: 0.5rem 0.2rem;
   }
 }

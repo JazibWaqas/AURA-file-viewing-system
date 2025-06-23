@@ -240,8 +240,8 @@ export default function FileIndexPage() {
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
                       <div className="file-actions">
-                        <button className="file-view-btn" onClick={() => handleViewFile(file._id)}>View</button>
-                        <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>Download</button>
+                        <button className="file-view-btn" onClick={() => handleViewFile(file._id)}><FiEye /></button>
+                        <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /></button>
                       </div>
                     </div>
                   ))
@@ -274,8 +274,8 @@ export default function FileIndexPage() {
                           <p>Year: {file.year || 'N/A'}</p>
                         </div>
                         <div className="file-actions">
-                          <button className="file-view-btn" onClick={() => handleViewFile(file._id)}>View</button>
-                          <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}>Download</button>
+                          <button className="file-view-btn" onClick={() => handleViewFile(file._id)}><FiEye /></button>
+                          <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /></button>
                         </div>
                       </div>
                     ))}
