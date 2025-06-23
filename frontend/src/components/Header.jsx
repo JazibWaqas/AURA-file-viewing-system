@@ -27,7 +27,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-content">
-        <h1 className="header-title">Al Umeed organisation</h1>
+        <h1 className="header-title">Al Umeed Rehab</h1>
         <nav className="header-nav">
           <ul className="header-nav-list">
             {navLinks.map((link) => (

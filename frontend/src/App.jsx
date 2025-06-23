@@ -40,11 +40,7 @@ function App() {
               <FileEditPage />
             </PrivateRoute>
           } />
-          <Route path="/upload-file" element={
-            <PrivateRoute>
-              <UploadFilePage />
-            </PrivateRoute>
-          } />
+          <Route path="/upload-file" element={<UploadFilePage />} />
         </Routes>
       </Router>
     </AuthProvider>

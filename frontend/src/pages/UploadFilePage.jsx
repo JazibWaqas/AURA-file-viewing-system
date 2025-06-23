@@ -4,6 +4,7 @@ import { FiUploadCloud, FiFile, FiEye, FiDownload } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { initializeGoogleDrive, showGoogleDrivePicker, downloadFile } from '../services/googleDriveService';
 import '../styles/UploadFile.css';
+import { useAuth } from '../App';
 
 const defaultCategories = [
     {
@@ -74,6 +75,7 @@ export default function UploadFilePage() {
   const [isGoogleDriveInitialized, setIsGoogleDriveInitialized] = useState(false);
   const [subCategory, setSubCategory] = useState('');
   const navigate = useNavigate();
+  const user = useAuth();
 
   // Allowed file extensions and MIME types
   const allowedExtensions = [
@@ -257,11 +259,27 @@ export default function UploadFilePage() {
       <main className="main-content" style={{ padding: 0 }}>
         <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
           <div className="upload-content-row" style={{ flex: 1, padding: '32px 40px', overflowX: 'auto' }}>
+            {!user && (
+              <div className="upload-auth-error-card">
+                <FiUploadCloud className="upload-auth-error-icon" />
+                <h2 className="upload-auth-error-title">Sign In Required</h2>
+                <p className="upload-auth-error-message">
+                  You must be signed in to upload files.<br />Please log in to access the upload feature.
+                </p>
+                <button
+                  className="header-login-btn upload-auth-error-btn"
+                  onClick={() => window.scrollTo({top: 0, behavior: 'smooth'}) || document.querySelector('.header-login-btn')?.click()}
+                >
+                  Log In
+                </button>
+              </div>
+            )}
             <div className="upload-card large">
               <h2 className="upload-title">Upload New Accounting File</h2>
               <p className="upload-subtitle">
                 Select file, category, and year for accurate organization within your accounting hub.
               </p>
+              {user ? <>
               <div
                 className="drop-zone blue"
                 onDragOver={handleDragOver}
@@ -386,6 +404,7 @@ export default function UploadFilePage() {
                 </div>
               </form>
               {error && <div className="error-message" style={{marginTop: '16px'}}>{error}</div>}
+              </> : null}
             </div>
             <div className="recent-uploads-card large" style={{ minHeight: 320, padding: '1.5rem 1.2rem' }}>
               <h3>Recent Uploads</h3>
