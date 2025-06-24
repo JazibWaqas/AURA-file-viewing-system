@@ -77,7 +77,7 @@ app.get('/api/files', async (req, res) => {
         fileType: data.fileType || 'pdf',
         size: data.size || 0,
         description: data.description || '',
-        uploadedBy: data.uploadedBy || 'anonymous',
+        
         createdAt: toISODate(data.uploadedAt || data.createdAt),
         updatedAt: toISODate(data.updatedAt),
         url: `https://storage.googleapis.com/${bucket.name}/${data.filename || data.originalName}`
@@ -214,7 +214,7 @@ app.get('/api/files/:id/details', async (req, res) => {
       fileType: data.fileType || 'pdf',
       size: data.size || 0,
       description: data.description || '',
-      uploadedBy: data.uploadedBy || 'anonymous',
+      
       createdAt: toISODate(data.uploadedAt || data.createdAt),
       updatedAt: toISODate(data.updatedAt),
       mimetype: data.mimetype || 'application/octet-stream',

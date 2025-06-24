@@ -265,7 +265,6 @@ const FileViewer = () => {
 
   if (id && file) {
     const { user } = useAuth();
-    console.log('Current user state:', user);
     return (
       <div className="app-root">
         <Header />
@@ -285,13 +284,12 @@ const FileViewer = () => {
                   <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
                   <li><FiFolder /><span>SubCategory:</span><strong>{file.subCategory || 'N/A'}</strong></li>
                   <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
-                  <li><FiUser /><span>Uploaded By:</span><strong>{file.uploadedBy || 'Anonymous'}</strong></li>
                   <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
                 </ul>
               </div>
               {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
               <div className="actions-section">
-                {user?.firebaseUser && (
+                {user?.userData?.status === 'approved' && (
                   <>
                     <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
                     <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>
