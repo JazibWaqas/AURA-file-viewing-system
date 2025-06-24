@@ -124,8 +124,10 @@ app.post('/api/files/upload', upload.array('files'), async (req, res) => {
         uploadedAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        fileType: file.mimetype.includes('pdf') ? 'pdf' : 
-                 file.mimetype.includes('excel') || file.mimetype.includes('spreadsheet') ? 'excel' : 'csv'
+        fileType: file.mimetype.includes('pdf') ? 'pdf' :
+                 (file.mimetype.includes('wordprocessingml') || file.mimetype.includes('msword')) ? 'docx' :
+                 (file.mimetype.includes('excel') || file.mimetype.includes('spreadsheet')) ? 'excel' :
+                 file.mimetype.includes('csv') ? 'csv' : 'other'
       };
       const docRef = await db.collection('uploads').add(fileMetadata);
       uploadedFiles.push({ _id: docRef.id, ...fileMetadata });
@@ -248,7 +250,7 @@ app.get('/api/files/:id/view', async (req, res) => {
       return res.status(404).json({ error: 'File not found in storage' });
     }
     
-    // Set headers for file viewing
+    // Set proper content type for viewing
     res.setHeader('Content-Type', fileData.mimetype || 'application/octet-stream');
     
     // Stream the file

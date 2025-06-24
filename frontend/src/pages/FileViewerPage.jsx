@@ -21,6 +21,7 @@ const FileViewer = () => {
   const [excelSheets, setExcelSheets] = useState([]);
   const [activeSheet, setActiveSheet] = useState(null);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,11 +86,9 @@ const FileViewer = () => {
             try {
               setPreviewData(null);
               setPreviewError(null);
-              setLoading(true);
               const viewResponse = await fetch(`/api/files/${id}/view`);
               if (viewResponse.ok) {
-                const blob = await viewResponse.blob();
-                const arrayBuffer = await blob.arrayBuffer();
+                const arrayBuffer = await viewResponse.arrayBuffer();
                 const result = await mammoth.convertToHtml({ arrayBuffer });
                 setPreviewData(result.value);
               } else {
@@ -264,7 +263,6 @@ const FileViewer = () => {
   }
 
   if (id && file) {
-    const { user } = useAuth();
     return (
       <div className="app-root">
         <Header />
@@ -289,7 +287,7 @@ const FileViewer = () => {
               </div>
               {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
               <div className="actions-section">
-                {user?.userData?.status === 'approved' && (
+                {!authLoading && user?.userData?.status === 'approved' && (
                   <>
                     <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
                     <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>

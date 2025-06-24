@@ -26,6 +26,10 @@ const isCsvMimeType = (mimetype) => {
     return csvTypes.includes(mimetype);
 };
 
+const isDocxMimeType = (mimetype) => {
+    return mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || mimetype === 'application/msword';
+};
+
 //upload lots of files 
 // Upload multiple files (bulk upload)
 exports.uploadBulkFiles = async (req, res) => {
@@ -38,7 +42,8 @@ exports.uploadBulkFiles = async (req, res) => {
             filename: file.filename,
             originalName: file.originalname,
             fileType: isExcelMimeType(file.mimetype) ? 'excel' : 
-                      isCsvMimeType(file.mimetype) ? 'csv' : 'pdf',
+                      isCsvMimeType(file.mimetype) ? 'csv' :
+                      isDocxMimeType(file.mimetype) ? 'docx' : 'pdf',
             category: req.body.category,
             year: parseInt(req.body.year),
             month: parseInt(req.body.month),
@@ -83,8 +88,9 @@ exports.uploadFile = async (req, res) => {
         const file = new File({
             filename: req.file.filename,
             originalName: req.file.originalname,
-            fileType: isExcelMimeType(req.file.mimetype) ? 'excel' : 
-                      isCsvMimeType(req.file.mimetype) ? 'csv' : 'pdf',
+            fileType: isExcelMimeType(req.file.mimetype) ? 'excel' :
+                      isCsvMimeType(req.file.mimetype) ? 'csv' :
+                      isDocxMimeType(req.file.mimetype) ? 'docx' : 'pdf',
             category: req.body.category,
             year: parseInt(req.body.year),
             month: parseInt(req.body.month),
@@ -215,9 +221,19 @@ exports.viewFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
+        let contentType = 'application/octet-stream'; // Default content type
+        if (file.fileType === 'pdf') {
+            contentType = 'application/pdf';
+        } else if (file.fileType === 'excel') {
+            contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else if (file.fileType === 'csv') {
+            contentType = 'text/csv';
+        } else if (file.fileType === 'docx') {
+            contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+
         // Set headers for in-browser viewing
-        res.setHeader('Content-Type', file.fileType === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 
-                                    file.fileType === 'csv' ? 'text/csv' : 'application/pdf');
+        res.setHeader('Content-Type', contentType);
 
         // Serve the file for viewing
         res.sendFile(file.path, { root: '.' });
@@ -281,8 +297,9 @@ exports.updateFile = async (req, res) => {
             // Update with new file details
             updates.filename = req.file.filename;
             updates.originalName = req.file.originalname;
-            updates.fileType = isExcelMimeType(req.file.mimetype) ? 'excel' : 
-                      isCsvMimeType(req.file.mimetype) ? 'csv' : 'pdf';
+            updates.fileType = isExcelMimeType(req.file.mimetype) ? 'excel' :
+                      isCsvMimeType(req.file.mimetype) ? 'csv' :
+                      isDocxMimeType(req.file.mimetype) ? 'docx' : 'pdf';
             updates.path = req.file.path;
             updates.size = req.file.size;
         }
