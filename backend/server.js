@@ -5,6 +5,7 @@ const path = require('path');
 const multer = require('multer');
 const { db, bucket } = require('./config/firebase');
 const XLSX = require('xlsx');
+const userRoutes = require('./routes/users');
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +16,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/users', userRoutes);
 
 // Multer setup for memory storage
 const upload = multer({ storage: multer.memoryStorage() });

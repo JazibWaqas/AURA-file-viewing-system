@@ -17,5 +17,37 @@ export const auth = getAuth(app);
 
 const provider = new GoogleAuthProvider();
 
-export const signInWithGoogle = () => signInWithPopup(auth, provider);
-export const signOutUser = () => signOut(auth); 
+export const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const { user } = result;
+
+    // After successful sign-in, notify our backend
+    const response = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to sync user with backend');
+    }
+
+    const userData = await response.json();
+    return userData; // This will include the user's status
+  } catch (error) {
+    console.error("Error signing in with Google: ", error);
+  }
+};
+
+export const signOutUser = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error signing out: ", error);
+  }
+}; 
