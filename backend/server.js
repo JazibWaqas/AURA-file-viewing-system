@@ -89,64 +89,47 @@ app.get('/api/files', async (req, res) => {
   }
 });
 
-// --- File upload endpoint ---
-app.post('/api/files/upload', upload.single('file'), async (req, res) => {
+// --- File upload endpoint (multiple files) ---
+app.post('/api/files/upload', upload.array('files'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const { fileName, description, category, subCategory, year, month } = req.body;
-    
-    // Upload file to Firebase Storage
-    const blob = bucket.file(fileName || req.file.originalname);
-    const blobStream = blob.createWriteStream({ resumable: false });
-    
-    blobStream.on('finish', async () => {
-      try {
-        // Save file metadata to Firestore
-        const fileMetadata = {
-          filename: fileName || req.file.originalname,
-          originalName: fileName || req.file.originalname,
-          mimetype: req.file.mimetype,
-          size: req.file.size,
-          category: category || '',
-          subCategory: subCategory || '',
-          year: parseInt(year) || new Date().getFullYear(),
-          month: parseInt(month) || new Date().getMonth() + 1,
-          description: description || '',
-          uploadedBy: 'anonymous',
-          uploadedAt: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 
-                   req.file.mimetype.includes('excel') || req.file.mimetype.includes('spreadsheet') ? 'excel' : 'csv'
-        };
-        
-        const docRef = await db.collection('uploads').add(fileMetadata);
-        
-        res.status(201).json({ 
-          message: 'File uploaded successfully!',
-          fileId: docRef.id,
-          file: {
-            _id: docRef.id,
-            ...fileMetadata
-          }
-        });
-      } catch (error) {
-        console.error('Error saving metadata:', error);
-        res.status(500).json({ error: 'Failed to save file metadata' });
-      }
-    });
-    
-    blobStream.on('error', (err) => {
-      console.error('Error uploading to storage:', err);
-      res.status(500).json({ error: err.message });
-    });
-    
-    blobStream.end(req.file.buffer);
+    const { description, category, subCategory, year, month } = req.body;
+    const uploadedFiles = [];
+    for (const file of req.files) {
+      const blob = bucket.file(file.originalname);
+      const blobStream = blob.createWriteStream({ resumable: false });
+      await new Promise((resolve, reject) => {
+        blobStream.on('finish', resolve);
+        blobStream.on('error', reject);
+        blobStream.end(file.buffer);
+      });
+      // Save file metadata to Firestore
+      const fileMetadata = {
+        filename: file.originalname,
+        originalName: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        category: category || '',
+        subCategory: subCategory || '',
+        year: parseInt(year) || new Date().getFullYear(),
+        month: parseInt(month) || new Date().getMonth() + 1,
+        description: description || '',
+        uploadedBy: 'anonymous',
+        uploadedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        fileType: file.mimetype.includes('pdf') ? 'pdf' : 
+                 file.mimetype.includes('excel') || file.mimetype.includes('spreadsheet') ? 'excel' : 'csv'
+      };
+      const docRef = await db.collection('uploads').add(fileMetadata);
+      uploadedFiles.push({ _id: docRef.id, ...fileMetadata });
+    }
+    res.status(201).json({ message: 'Files uploaded successfully!', files: uploadedFiles });
   } catch (error) {
-    console.error('Error in upload endpoint:', error);
+    console.error('Error uploading files:', error);
     res.status(500).json({ error: error.message });
   }
 });

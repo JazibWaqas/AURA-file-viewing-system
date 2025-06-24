@@ -64,8 +64,7 @@ const defaultCategories = [
 ];
 
 export default function UploadFilePage() {
-  const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState('');
+  const [files, setFiles] = useState([]);
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [year, setYear] = useState('');
@@ -119,58 +118,55 @@ export default function UploadFilePage() {
   }, []);
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
+    const selectedFiles = Array.from(e.target.files);
+    const validFiles = selectedFiles.filter(selectedFile => {
       const ext = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
-      if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(selectedFile.type)) {
-        setError('Invalid file type. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
-        setFile(null);
-        setFileName('');
-        return;
-      }
-      setFile(selectedFile);
-      setFileName(selectedFile.name);
+      return allowedExtensions.includes(ext) && allowedMimeTypes.includes(selectedFile.type);
+    });
+    if (validFiles.length !== selectedFiles.length) {
+      setError('Some files are invalid. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
+    } else {
       setError(null);
     }
+    setFiles(validFiles);
   };
 
   const handleDragOver = (e) => e.preventDefault();
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const validFiles = droppedFiles.filter(droppedFile => {
       const ext = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
-      if (!allowedExtensions.includes(ext) || !allowedMimeTypes.includes(droppedFile.type)) {
-        setError('Invalid file type. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
-        setFile(null);
-        setFileName('');
-        return;
-      }
-      setFile(droppedFile);
-      setFileName(droppedFile.name);
+      return allowedExtensions.includes(ext) && allowedMimeTypes.includes(droppedFile.type);
+    });
+    if (validFiles.length !== droppedFiles.length) {
+      setError('Some files are invalid. Only PDF, DOCX, DOC, CSV, XLS, XLSX, XLSM, and XLSB files are allowed.');
+    } else {
       setError(null);
     }
+    setFiles(validFiles);
   };
 
   const handleGoogleDriveFileSelect = async () => {
     try {
       await showGoogleDrivePicker(async (data) => {
         if (data.action === window.google.picker.Action.PICKED) {
-          const pickedFile = data.docs[0];
-          if (pickedFile && pickedFile.id && pickedFile.name) {
+          const pickedFiles = data.docs.filter(pickedFile => pickedFile.id && pickedFile.name);
+          if (pickedFiles.length > 0) {
             try {
-              const blob = await downloadFile(pickedFile.id);
-              let mimeType = pickedFile.mimeType || blob.type;
-              if (!mimeType || mimeType === 'application/octet-stream') {
-                if (pickedFile.name.endsWith('.pdf')) mimeType = 'application/pdf';
-                else if (pickedFile.name.endsWith('.xlsx')) mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                else if (pickedFile.name.endsWith('.xls')) mimeType = 'application/vnd.ms-excel';
-              }
-              const fileObj = new File([blob], pickedFile.name, { type: mimeType });
-              setFile(fileObj);
-              setFileName(pickedFile.name);
+              const files = await Promise.all(pickedFiles.map(async pickedFile => {
+                const blob = await downloadFile(pickedFile.id);
+                let mimeType = pickedFile.mimeType || blob.type;
+                if (!mimeType || mimeType === 'application/octet-stream') {
+                  if (pickedFile.name.endsWith('.pdf')) mimeType = 'application/pdf';
+                  else if (pickedFile.name.endsWith('.xlsx')) mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                  else if (pickedFile.name.endsWith('.xls')) mimeType = 'application/vnd.ms-excel';
+                }
+                return new File([blob], pickedFile.name, { type: mimeType });
+              }));
+              setFiles(files);
             } catch (err) {
-              setError('Failed to download file from Google Drive.');
+              setError('Failed to download files from Google Drive.');
             }
           }
         }
@@ -182,11 +178,11 @@ export default function UploadFilePage() {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setError('Please select a file first');
+    if (!files.length) {
+      setError('Please select at least one file');
       return;
     }
-    if (!fileName || !category || !year) {
+    if (!category || !year) {
       setError('Please fill in all required fields');
       return;
     }
@@ -194,31 +190,25 @@ export default function UploadFilePage() {
       setUploading(true);
       setError(null);
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileName', fileName);
+      files.forEach(file => formData.append('files', file));
       formData.append('description', description);
       formData.append('category', category);
       formData.append('subCategory', subCategory);
       formData.append('year', year);
-      formData.append('month', new Date().getMonth() + 1);
-      const response = await fetch('/api/files/upload', {
+      const res = await fetch('/api/files/upload', {
         method: 'POST',
-        body: formData,
+        body: formData
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload failed');
-      }
-      const data = await response.json();
-      setFile(null);
-      setFileName('');
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setFiles([]);
       setDescription('');
       setCategory('');
-      setYear('');
       setSubCategory('');
+      setYear('');
       navigate('/file-index');
     } catch (error) {
-      setError(error.message || 'Failed to upload file');
+      setError(error.message);
     } finally {
       setUploading(false);
     }
@@ -292,15 +282,22 @@ export default function UploadFilePage() {
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
                   accept=".pdf,.docx,.doc,.csv,.xls,.xlsx,.xlsm,.xlsb"
+                  multiple
                 />
                 <FiUploadCloud className="upload-icon" />
                 <p>
-                  <strong>Drag & drop your file here</strong> or click to browse
+                  <strong>Drag & drop your files here</strong> or click to browse
                 </p>
                 <p className="supported-formats">
                   Supported formats: PDF, DOCX, DOC, XLSX, XLS, XLSM, XLSB, CSV. Max file size: 10MB.
                 </p>
-                {fileName && <div className="selected-file-name">{fileName}</div>}
+                {files.length > 0 && (
+                  <ul>
+                    {files.map((file, idx) => (
+                      <li key={idx}>{file.name}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div className="upload-options-row">
                 <button
@@ -317,19 +314,10 @@ export default function UploadFilePage() {
                 </button>
               </div>
               <form className="file-details-form" onSubmit={handleUpload}>
-                <label htmlFor="fileName">File Name</label>
-                <input
-                  type="text"
-                  id="fileName"
-                  placeholder="e.g., Income Statement"
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
-                  required
-                />
                 <label htmlFor="description">Description (Optional)</label>
                 <textarea
                   id="description"
-                  placeholder="Provide a brief summary or notes about this file..."
+                  placeholder="Provide a brief summary or notes about these files..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 ></textarea>
@@ -388,8 +376,7 @@ export default function UploadFilePage() {
                     className="cancel-button"
                     type="button"
                     onClick={() => {
-                      setFile(null);
-                      setFileName('');
+                      setFiles([]);
                       setDescription('');
                       setCategory('');
                       setYear('');
@@ -399,7 +386,7 @@ export default function UploadFilePage() {
                     Cancel
                   </button>
                   <button className="upload-file-button" type="submit" disabled={uploading}>
-                    {uploading ? 'Uploading...' : 'Upload File'}
+                    {uploading ? 'Uploading...' : 'Upload Files'}
                   </button>
                 </div>
               </form>
