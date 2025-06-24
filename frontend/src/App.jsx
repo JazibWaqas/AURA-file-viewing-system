@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import FileIndexPage from "./pages/FileIndexPage";
 import FileViewerPage from "./pages/FileViewerPage";
@@ -14,19 +14,18 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // Will hold { firebaseUser, userData }
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
-        const response = await fetch(`/api/users/status/${firebaseUser.uid}`);
-        if(response.ok) {
+        try {
+            const response = await fetch(`/api/users/status/${firebaseUser.uid}`);
             const userData = await response.json();
-            setUser({ firebaseUser, userData });
-        } else {
-            // Handle case where user exists in Firebase Auth but not in our DB
-             setUser({ firebaseUser, userData: { status: 'pending' } });
+            setUser({ firebaseUser, userData: userData || { status: 'pending' } });
+        } catch (error) {
+            setUser({ firebaseUser, userData: { status: 'pending' } });
         }
       } else {
         setUser(null);
@@ -37,21 +36,19 @@ function AuthProvider({ children }) {
   }, []);
   
   const value = { user, setUser, loading };
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-function ProtectedRoutes() {
+function PrivateRoute() {
     const { user, loading } = useAuth();
 
     if (loading) {
-        return <div>Loading...</div>; // Or a proper spinner component
+        return <div>Loading...</div>;
     }
-
+    
     if (!user) {
-        // Not logged in, show public routes or a login prompt
-        // For now, let's just show the main page which has a login button.
-        return <FileIndexPage />;
+        // This could be a dedicated "Please log in to access this page" component
+        return <UploadFilePage />; 
     }
 
     if (user.userData.status === 'pending') {
@@ -63,20 +60,9 @@ function ProtectedRoutes() {
     }
 
     if (user.userData.status === 'approved') {
-        return (
-            <Routes>
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/file-index" element={<FileIndexPage />} />
-                <Route path="/file-viewer/:id?" element={<FileViewerPage />} />
-                <Route path="/upload-file" element={<UploadFilePage />} />
-                <Route path="/file-edit/:id" element={<FileEditPage />} />
-                {/* Redirect any other path to dashboard for approved users */}
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-        );
+        return <Outlet />; // Renders the nested child route (e.g., FileEditPage)
     }
-    
-    // Fallback for any other state
+
     return <AccessDeniedPage />;
 }
 
@@ -84,7 +70,19 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-          <ProtectedRoutes />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/file-index" element={<FileIndexPage />} />
+          <Route path="/file-viewer/:id?" element={<FileViewerPage />} />
+          <Route path="/upload-file" element={<UploadFilePage />} />
+
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/file-edit/:id" element={<FileEditPage />} />
+          </Route>
+
+        </Routes>
       </Router>
     </AuthProvider>
   );

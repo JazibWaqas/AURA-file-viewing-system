@@ -264,7 +264,8 @@ const FileViewer = () => {
   }
 
   if (id && file) {
-    const user = useAuth();
+    const { user } = useAuth();
+    console.log('Current user state:', user);
     return (
       <div className="app-root">
         <Header />
@@ -290,10 +291,12 @@ const FileViewer = () => {
               </div>
               {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
               <div className="actions-section">
-                {user && <>
-                  <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
-                  <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>
-                </>}
+                {user?.firebaseUser && (
+                  <>
+                    <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
+                    <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>
+                  </>
+                )}
               </div>
             </div>
             <div className="file-viewer-divider" />

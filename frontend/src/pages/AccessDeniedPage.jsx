@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiXCircle } from 'react-icons/fi';
+import { signOutUser } from '../services/firebase';
 
 const AccessDeniedPage = () => (
     <div style={{
@@ -20,6 +21,21 @@ const AccessDeniedPage = () => (
         <p style={{ marginTop: '0.5rem', fontSize: '1.2rem' }}>
             Please contact the administrator if you believe this is a mistake.
         </p>
+        <button 
+            onClick={signOutUser}
+            style={{
+                marginTop: '2rem',
+                padding: '0.7em 1.5em',
+                background: 'var(--color-primary, #00897B)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '1rem',
+                cursor: 'pointer'
+            }}
+        >
+            Log Out & Return to Site
+        </button>
     </div>
 );
 

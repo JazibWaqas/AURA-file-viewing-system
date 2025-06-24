@@ -74,7 +74,7 @@ export default function UploadFilePage() {
   const [isGoogleDriveInitialized, setIsGoogleDriveInitialized] = useState(false);
   const [subCategory, setSubCategory] = useState('');
   const navigate = useNavigate();
-  const user = useAuth();
+  const { user } = useAuth();
 
   // Allowed file extensions and MIME types
   const allowedExtensions = [
@@ -264,135 +264,135 @@ export default function UploadFilePage() {
                 </button>
               </div>
             )}
-            <div className="upload-card large">
-              <h2 className="upload-title">Upload New Accounting File</h2>
-              <p className="upload-subtitle">
-                Select file, category, and year for accurate organization within your accounting hub.
-              </p>
-              {user ? <>
-              <div
-                className="drop-zone blue"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onClick={() => document.getElementById('fileInput').click()}
-              >
-                <input
-                  type="file"
-                  id="fileInput"
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                  accept=".pdf,.docx,.doc,.csv,.xls,.xlsx,.xlsm,.xlsb"
-                  multiple
-                />
-                <FiUploadCloud className="upload-icon" />
-                <p>
-                  <strong>Drag & drop your files here</strong> or click to browse
+            {user && (
+              <div className="upload-card large">
+                <h2 className="upload-title">Upload New Accounting File</h2>
+                <p className="upload-subtitle">
+                  Select file, category, and year for accurate organization within your accounting hub.
                 </p>
-                <p className="supported-formats">
-                  Supported formats: PDF, DOCX, DOC, XLSX, XLS, XLSM, XLSB, CSV. Max file size: 10MB.
-                </p>
-                {files.length > 0 && (
-                  <ul>
-                    {files.map((file, idx) => (
-                      <li key={idx}>{file.name}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="upload-options-row">
-                <button
-                  className="google-drive-button"
-                  onClick={handleGoogleDriveFileSelect}
-                  disabled={!isGoogleDriveInitialized}
+                <div
+                  className="drop-zone blue"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('fileInput').click()}
                 >
-                  <img
-                    src="https://www.google.com/drive/static/images/drive/logo-drive.png"
-                    alt="Google Drive"
-                    className="google-drive-icon"
+                  <input
+                    type="file"
+                    id="fileInput"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                    accept=".pdf,.docx,.doc,.csv,.xls,.xlsx,.xlsm,.xlsb"
+                    multiple
                   />
-                  <span>Import from Google Drive</span>
-                </button>
-              </div>
-              <form className="file-details-form" onSubmit={handleUpload}>
-                <label htmlFor="description">Description (Optional)</label>
-                <textarea
-                  id="description"
-                  placeholder="Provide a brief summary or notes about these files..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                ></textarea>
-                <div className="dropdown-row">
+                  <FiUploadCloud className="upload-icon" />
+                  <p>
+                    <strong>Drag & drop your files here</strong> or click to browse
+                  </p>
+                  <p className="supported-formats">
+                    Supported formats: PDF, DOCX, DOC, XLSX, XLS, XLSM, XLSB, CSV. Max file size: 10MB.
+                  </p>
+                  {files.length > 0 && (
+                    <ul>
+                      {files.map((file, idx) => (
+                        <li key={idx}>{file.name}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="upload-options-row">
+                  <button
+                    className="google-drive-button"
+                    onClick={handleGoogleDriveFileSelect}
+                    disabled={!isGoogleDriveInitialized}
+                  >
+                    <img
+                      src="https://www.google.com/drive/static/images/drive/logo-drive.png"
+                      alt="Google Drive"
+                      className="google-drive-icon"
+                    />
+                    <span>Import from Google Drive</span>
+                  </button>
+                </div>
+                <form className="file-details-form" onSubmit={handleUpload}>
+                  <label htmlFor="description">Description (Optional)</label>
+                  <textarea
+                    id="description"
+                    placeholder="Provide a brief summary or notes about these files..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  ></textarea>
+                  <div className="dropdown-row">
+                    <div className="dropdown-wrapper">
+                      <label htmlFor="category">Category</label>
+                      <select
+                        id="category"
+                        value={category}
+                        onChange={(e) => {
+                          setCategory(e.target.value);
+                          setSubCategory('');
+                        }}
+                        required
+                      >
+                        <option value="">Select a category</option>
+                        {defaultCategories.map((cat, idx) => (
+                          <option key={idx} value={cat.name}>{cat.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="dropdown-wrapper">
+                      <label htmlFor="year">Year</label>
+                      <input
+                        type="number"
+                        id="year"
+                        placeholder="e.g., 2024"
+                        value={year}
+                        onChange={e => {
+                          const val = e.target.value;
+                          if (/^\d*$/.test(val)) setYear(val);
+                        }}
+                        min="1900"
+                        max={new Date().getFullYear()}
+                        required
+                      />
+                    </div>
+                  </div>
                   <div className="dropdown-wrapper">
-                    <label htmlFor="category">Category</label>
+                    <label htmlFor="subCategory">Sub Category</label>
                     <select
-                      id="category"
-                      value={category}
-                      onChange={(e) => {
-                        setCategory(e.target.value);
-                        setSubCategory('');
-                      }}
+                      id="subCategory"
+                      value={subCategory}
+                      onChange={e => setSubCategory(e.target.value)}
                       required
+                      disabled={!category}
                     >
-                      <option value="">Select a category</option>
-                      {defaultCategories.map((cat, idx) => (
-                        <option key={idx} value={cat.name}>{cat.name}</option>
+                      <option value="">Select a sub category</option>
+                      {getSubCategories().map((sub, idx) => (
+                        <option key={idx} value={sub}>{sub}</option>
                       ))}
                     </select>
                   </div>
-                  <div className="dropdown-wrapper">
-                    <label htmlFor="year">Year</label>
-                    <input
-                      type="number"
-                      id="year"
-                      placeholder="e.g., 2024"
-                      value={year}
-                      onChange={e => {
-                        const val = e.target.value;
-                        if (/^\d*$/.test(val)) setYear(val);
+                  <div className="form-actions">
+                    <button
+                      className="cancel-button"
+                      type="button"
+                      onClick={() => {
+                        setFiles([]);
+                        setDescription('');
+                        setCategory('');
+                        setYear('');
+                        setSubCategory('');
                       }}
-                      min="1900"
-                      max={new Date().getFullYear()}
-                      required
-                    />
+                    >
+                      Cancel
+                    </button>
+                    <button className="upload-file-button" type="submit" disabled={uploading}>
+                      {uploading ? 'Uploading...' : 'Upload Files'}
+                    </button>
                   </div>
-                </div>
-                <div className="dropdown-wrapper">
-                  <label htmlFor="subCategory">Sub Category</label>
-                  <select
-                    id="subCategory"
-                    value={subCategory}
-                    onChange={e => setSubCategory(e.target.value)}
-                    required
-                    disabled={!category}
-                  >
-                    <option value="">Select a sub category</option>
-                    {getSubCategories().map((sub, idx) => (
-                      <option key={idx} value={sub}>{sub}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-actions">
-                  <button
-                    className="cancel-button"
-                    type="button"
-                    onClick={() => {
-                      setFiles([]);
-                      setDescription('');
-                      setCategory('');
-                      setYear('');
-                      setSubCategory('');
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button className="upload-file-button" type="submit" disabled={uploading}>
-                    {uploading ? 'Uploading...' : 'Upload Files'}
-                  </button>
-                </div>
-              </form>
-              {error && <div className="error-message" style={{marginTop: '16px'}}>{error}</div>}
-              </> : null}
-            </div>
+                </form>
+                {error && <div className="error-message" style={{marginTop: '16px'}}>{error}</div>}
+              </div>
+            )}
             <div className="recent-uploads-card large" style={{ minHeight: 320, padding: '1.5rem 1.2rem' }}>
               <h3>Recent Uploads</h3>
               <div className="recent-uploads-list" style={{ overflowX: 'hidden' }}>
