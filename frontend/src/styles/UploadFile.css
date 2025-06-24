@@ -932,3 +932,51 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 .recent-uploads-card {
   padding: 1.5rem 1.2rem;
 }
+
+.upload-auth-error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-secondary, #f9fafa);
+  color: var(--color-text, #1A1A1A);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px 0 var(--color-neutral, #C5C6C7);
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin: 2rem auto;
+  max-width: 380px;
+  min-width: 320px;
+  min-height: 300px;
+}
+.upload-auth-error-icon {
+  font-size: 3.5rem;
+  color: var(--color-primary, #000000);
+  margin-bottom: 1.2rem;
+}
+.upload-auth-error-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary, #000000);
+}
+.upload-auth-error-message {
+  font-size: 1.1rem;
+  color: var(--color-text, #1A1A1A);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.upload-auth-error-btn {
+  background: var(--color-primary, #00897B);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7em 2em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px 0 var(--color-neutral, #C5C6C7);
+}
+.upload-auth-error-btn:hover {
+  background: var(--color-accent, #FF6F61);
+  color: #fff;
+}
