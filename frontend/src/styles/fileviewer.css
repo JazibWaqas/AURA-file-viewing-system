@@ -467,3 +467,94 @@ html {
   box-sizing: border-box;
 }
 
+.docx-preview {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 2.5rem 2rem;
+  margin: 0 auto;
+  max-width: 900px;
+  min-height: 400px;
+  color: #222;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.docx-preview h1, .docx-preview h2, .docx-preview h3, .docx-preview h4, .docx-preview h5, .docx-preview h6 {
+  font-weight: 700;
+  color: #045584;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.docx-preview h1 { font-size: 2.2rem; }
+.docx-preview h2 { font-size: 1.7rem; }
+.docx-preview h3 { font-size: 1.3rem; }
+
+.docx-preview p {
+  margin: 1.1em 0;
+  color: #222;
+}
+
+.docx-preview ul, .docx-preview ol {
+  margin: 1.1em 0 1.1em 2em;
+  padding-left: 1.5em;
+}
+
+.docx-preview li {
+  margin-bottom: 0.5em;
+}
+
+.docx-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2em 0;
+  background: #f9fafd;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.docx-preview th, .docx-preview td {
+  border: 1px solid #e0e7ef;
+  padding: 0.75em 1em;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.docx-preview th {
+  background: #eaf3fa;
+  color: #045584;
+  font-weight: 600;
+}
+
+.docx-preview tr:nth-child(even) td {
+  background: #f5f8fa;
+}
+
+.docx-preview blockquote {
+  border-left: 4px solid #045584;
+  background: #f4f8fb;
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  color: #444;
+  font-style: italic;
+}
+
+.docx-preview code {
+  background: #f4f4f4;
+  color: #d6336c;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 0.98em;
+}
+
+.docx-preview hr {
+  border: none;
+  border-top: 1px solid #e0e7ef;
+  margin: 2em 0;
+}
+
