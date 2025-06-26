@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header.jsx';
+import Header from '../components/Header';
 import { FiUploadCloud, FiFile, FiEye, FiDownload } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { initializeGoogleDrive, showGoogleDrivePicker, downloadFile } from '../services/googleDriveService';
 import '../styles/UploadFile.css';
 import { useAuth } from '../App';
+import { useIsMobileScreen } from '../services/deviceUtils';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const defaultCategories = [
     {
@@ -75,6 +77,7 @@ export default function UploadFilePage() {
   const [subCategory, setSubCategory] = useState('');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isMobile = useIsMobileScreen();
 
   // Allowed file extensions and MIME types
   const allowedExtensions = [
@@ -242,6 +245,29 @@ export default function UploadFilePage() {
     const cat = defaultCategories.find(c => c.name === category);
     return cat ? cat.subCategories : [];
   };
+
+  if (isMobile) {
+    return (
+      <>
+        <Header />
+        <div style={{
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#d32f2f',
+          fontWeight: 'bold',
+          fontSize: '1.35rem',
+          textAlign: 'center',
+          gap: '1.2rem',
+        }}>
+          <FaExclamationTriangle size={48} style={{ color: '#d32f2f' }} />
+          <span>For full access, please log in from a computer as a registered user.</span>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="app-root">

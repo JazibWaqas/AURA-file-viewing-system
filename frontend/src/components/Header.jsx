@@ -4,12 +4,13 @@ import '../styles/globals.css';
 import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus } from 'react-icons/fa';
 import { auth, signInWithGoogle, signOutUser } from '../services/firebase';
 import auraLogo from '../assets/aura-logo.png';
+import { useIsMobileScreen } from '../services/deviceUtils';
 
 const navLinks = [
-  { to: '/', label: 'Dashboard', icon: <FaHome /> },
-  { to: '/file-index', label: 'File Index', icon: <FaFolderOpen /> },
-  { to: '/file-viewer', label: 'File Viewer', icon: <FaEye /> },
-  { to: '/upload-file', label: 'Upload File', icon: <FaUpload /> },
+  { to: '/', label: 'Dashboard', shortLabel: 'Home', icon: <FaHome /> },
+  { to: '/file-index', label: 'File Index', shortLabel: 'Index', icon: <FaFolderOpen /> },
+  { to: '/file-viewer', label: 'File Viewer', shortLabel: 'View', icon: <FaEye /> },
+  { to: '/upload-file', label: 'Upload File', shortLabel: 'Upload', icon: <FaUpload /> },
 ];
 
 // Simple auth state hook
@@ -25,6 +26,7 @@ function useAuth() {
 const Header = () => {
   const location = useLocation();
   const user = useAuth();
+  const isMobile = useIsMobileScreen();
   return (
     <header className="header">
       <div className="header-content">
@@ -42,20 +44,21 @@ const Header = () => {
                   className={`header-nav-link${location.pathname === link.to ? ' active' : ''}`}
                 >
                   <span className="header-nav-icon">{link.icon}</span>
-                  {link.label}
+                  <span className="header-nav-text-full">{link.label}</span>
+                  <span className="header-nav-text-short">{link.shortLabel}</span>
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
-        {user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 14, color: '#333' }}>{user.displayName || user.email}</span>
+        {!isMobile && (user ? (
+          <div className="header-user-info">
+            <span className="header-user-name">{user.displayName || user.email}</span>
             <button className="header-login-btn" onClick={signOutUser}>Log Out</button>
           </div>
         ) : (
           <button className="header-login-btn" onClick={signInWithGoogle}>Log In</button>
-        )}
+        ))}
       </div>
     </header>
   );
