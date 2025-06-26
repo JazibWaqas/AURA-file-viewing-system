@@ -1,87 +1,56 @@
-/* FileEditPage Styles - A Unified, Cohesive Layout */
+/* FileEditPage Styles - Final Responsive Fix */
 
-/* The main content area for the edit page.
-   It's a flex container to center the main card. */
+/* Main container to center the content card */
 .file-edit-main-content {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Aligns card to the top */
+  align-items: flex-start;
   padding: 32px;
   background: #f0f2f5;
   box-sizing: border-box;
-  min-height: calc(100vh - 64px);
+  width: 100%;
 }
 
-/* The single, unified container for all page content. */
+/* The single, unified container for all page content */
 .edit-card {
   background: #fff;
-  color: #384959;
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); /* A slightly more pronounced shadow for depth */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   padding: 2.5rem 3rem;
   width: 100%;
-  max-width: 1100px; /* A slightly more conservative max-width */
+  max-width: 1100px; /* Responsive max-width */
   display: flex;
   flex-direction: column;
 }
 
+/* Header section within the card */
 .edit-header {
   margin-bottom: 2rem;
   border-bottom: 1px solid #e9ecef;
   padding-bottom: 1.5rem;
 }
 
-.back-button {
-  background: #f3f3f3;
-  color: #111;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.back-button:hover {
-  background: #e0e0e0;
-}
-
-.edit-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #111;
-}
-
-.edit-subtitle {
-  font-size: 1.1rem;
-  margin-bottom: 0; /* Adjusted from 24px */
-  color: #666;
-}
-
 /* Two-column layout container */
 .edit-content-layout {
   display: flex;
+  flex-wrap: wrap; /* Allows columns to stack on smaller screens */
   gap: 3rem;
-  align-items: flex-start;
   width: 100%;
-  flex-wrap: wrap; /* Allow wrapping if needed */
 }
 
-/* Left column for file info and actions - now fluid */
+/* Left column for file info (fluid) */
 .file-info-column {
-  flex: 1 1 340px; /* Can grow, can shrink, with a base width of 340px */
-  min-width: 300px; /* Safeguard to prevent it from becoming too narrow */
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex: 1 1 320px; /* Grow, shrink, with a base of 320px */
+  min-width: 300px; /* Prevent from becoming too narrow */
 }
 
-/* File information block - no longer a separate card */
+/* Right column for the form (fluid) */
+.form-column {
+  flex: 2 1 500px; /* Grow x2, shrink, with a base of 500px */
+  min-width: 300px; /* Prevent form fields from breaking */
+}
+
+/* File info block - now visually integrated */
 .file-info-display {
   display: flex;
   align-items: center;
@@ -89,7 +58,8 @@
   padding: 1.5rem;
   border: 1px solid #e9ecef;
   border-radius: 12px;
-  background-color: #fdfdff; /* A very light background to subtly separate it */
+  background-color: #f8f9fa; /* Subtle background, but no "card" effect */
+  margin-bottom: 1.5rem; /* Space before action buttons */
 }
 
 .file-icon-background {
@@ -123,12 +93,6 @@
 
 .file-details strong {
   color: #111;
-}
-
-/* Right column for the form fields - also fluid */
-.form-column {
-  flex: 2 1 500px; /* Can grow (with more weight), can shrink, with a larger base */
-  min-width: 320px; /* Safeguard to prevent form fields from breaking */
 }
 
 /* Form Styles */
@@ -181,11 +145,24 @@
   flex-direction: column;
 }
 
+/* Action buttons in the left column */
+.actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-button,
+.delete-button {
+  width: 100%; /* Make buttons full-width of the column */
+}
+
+/* Form action buttons (Cancel, Save) */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 1.5rem;
   border-top: 1px solid #e9ecef;
   padding-top: 1.5rem;
 }
@@ -230,47 +207,6 @@
   background: #574fdc;
 }
 
-/* Action buttons in the left column */
-.actions-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.edit-button,
-.delete-button {
-  border: none;
-  border-radius: 6px;
-  padding: 10px 22px;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.2s;
-}
-
-.edit-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.edit-button:disabled {
-  background-color: #e9ecef;
-  color: #aaa;
-  cursor: not-allowed;
-}
-
-.delete-button {
-  background: #ff4d4f;
-  color: #fff;
-}
-
-.delete-button:hover {
-  background: #d9363e;
-}
-
 /* Error and Loading States */
 .error-message,
 .loading-container {
@@ -306,27 +242,8 @@
   to { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
-@media (max-width: 992px) { /* Increased breakpoint for better adaptability */
-  .edit-content-layout {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  .file-info-column {
-    width: 100%;
-    /* Reset flex properties for stacked layout */
-    flex-basis: auto;
-  }
-  .form-column {
-    width: 100%;
-    flex-basis: auto;
-  }
-}
-
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .file-edit-main-content {
-    padding: 16px;
-  }
   .edit-card {
     padding: 1.5rem;
   }
@@ -338,9 +255,7 @@
     flex-direction: column-reverse;
   }
   .save-button,
-  .cancel-button,
-  .delete-button,
-  .edit-button {
+  .cancel-button {
     width: 100%;
   }
 }
