@@ -43,7 +43,7 @@
    Page Header (inherits color)
    ============================= */
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
   text-align: center;
 }
 .page-header h1 {
@@ -535,4 +535,22 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
     min-height: 80px;
     padding: 0.5rem 0.2rem;
   }
+}
+
+.file-index-page {
+  flex: 1;
+  padding: 32px 40px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  text-align: center;
 }

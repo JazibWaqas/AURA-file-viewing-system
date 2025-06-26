@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus } from 'react-icons/fi';
 
 export default function FileIndexPage() {
@@ -18,9 +18,24 @@ export default function FileIndexPage() {
   const [selectedYear, setSelectedYear] = useState('');
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [visibleFilesCount, setVisibleFilesCount] = useState(16);
   const navigate = useNavigate();
+  const location = useLocation();
   const debounceTimeout = useRef(null);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear message after 3 seconds
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        // Also clear the state from navigation history
+        navigate(location.pathname, { replace: true });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [location, navigate]);
 
   // Responsive sidebar
   useEffect(() => {
@@ -157,6 +172,13 @@ export default function FileIndexPage() {
               <h1>File Management</h1>
               <p>Browse and manage all your files in one place</p>
             </div>
+            
+            {successMessage && (
+              <div className="success-message">
+                {successMessage}
+              </div>
+            )}
+
             <div className="search-filter-bar">
               <div className="search-container">
                 <FiSearch className="search-icon" />

@@ -22,6 +22,7 @@ const FileViewer = () => {
   const [activeSheet, setActiveSheet] = useState(null);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const [actionError, setActionError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -151,13 +152,30 @@ const FileViewer = () => {
         setLoading(true);
         const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
-        alert('File deleted successfully!');
-        navigate('/file-index');
+        
+        navigate('/file-index', { state: { message: 'File deleted successfully!' } });
+
       } catch (error) {
         console.error('Error deleting file:', error);
         setError(error.message);
         setLoading(false);
       }
+    }
+  };
+
+  const handleEditClick = () => {
+    if (user?.userData?.status === 'approved') {
+      navigate(`/file-edit/${file._id}`);
+    } else {
+      setActionError('Only approved users may have edit access.');
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (user?.userData?.status === 'approved') {
+      handleDelete();
+    } else {
+      setActionError('Only approved users may have edit access.');
     }
   };
 
@@ -287,12 +305,9 @@ const FileViewer = () => {
               </div>
               {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
               <div className="actions-section">
-                {!authLoading && user?.userData?.status === 'approved' && (
-                  <>
-                    <button className="edit-button" title="Edit file metadata" onClick={() => navigate(`/file-edit/${file._id}`)}><FiEdit /> Edit File Metadata</button>
-                    <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}><FiTrash2 /> Delete File</button>
-                  </>
-                )}
+                <button className="edit-button" title="Edit file metadata" onClick={handleEditClick}><FiEdit /> Edit File Metadata</button>
+                <button className="delete-button" title="Delete this file permanently" onClick={handleDeleteClick}><FiTrash2 /> Delete File</button>
+                {actionError && <div className="error-message">{actionError}</div>}
               </div>
             </div>
             <div className="file-viewer-divider" />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
-import { FiSave, FiArrowLeft, FiFile, FiLoader } from 'react-icons/fi';
+import { FiSave, FiArrowLeft, FiFile, FiLoader, FiTrash2, FiEdit } from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/FileEdit.css';
 
@@ -159,6 +159,22 @@ export default function FileEditPage() {
     navigate(`/file-viewer/${id}`);
   };
 
+  const handleDelete = async () => {
+    if (!file || !file._id) return;
+    if (window.confirm(`Are you sure you want to delete "${file.originalName || file.filename || file.name}"?`)) {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
+        alert('File deleted successfully!');
+        navigate('/file-index');
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="app-root">
@@ -193,129 +209,126 @@ export default function FileEditPage() {
   return (
     <div className="app-root">
       <Header />
-      <main className="main-content" style={{ padding: 0 }}>
-        <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', width: '100%' }}>
-          <div className="edit-content-row" style={{ flex: 1, padding: '32px', overflowX: 'auto', width: '100%' }}>
-            <div className="edit-card large">
-              <div className="edit-header">
-                <button className="back-button" onClick={handleCancel}>
-                  <FiArrowLeft /> Back
-                </button>
-                <h2 className="edit-title">Edit File Metadata</h2>
-                <p className="edit-subtitle">
-                  Update the metadata for your file to keep it properly organized.
-                </p>
-              </div>
-
-              <div className="edit-content-layout">
-                {/* Left Column - File Information Display */}
-                <div className="file-info-column">
-                  <div className="file-info-display">
-                    <div className="file-icon-background">
-                      <FiFile className="file-icon" />
-                    </div>
-                    <div className="file-details">
-                      <h3>{file.originalName || file.filename || file.name || 'Untitled'}</h3>
-                      <p><strong>Size:</strong> {file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</p>
-                      <p><strong>Uploaded By:</strong> {file.uploadedBy || 'Anonymous'}</p>
-                      <p><strong>File Type:</strong> {file.fileType || 'Unknown'}</p>
-                    </div>
-                  </div>
+      <main className="main-content file-edit-main-content">
+        <div className="edit-card large">
+          <div className="edit-header">
+            <button className="back-button" onClick={handleCancel}>
+              <FiArrowLeft /> Back
+            </button>
+            <h2 className="edit-title">Edit File Metadata</h2>
+            <p className="edit-subtitle">
+              Update the metadata for your file to keep it properly organized.
+            </p>
+          </div>
+          <div className="edit-content-layout">
+            {/* Left Column - File Information Display */}
+            <div className="file-info-column">
+              <div className="file-info-display">
+                <div className="file-icon-background">
+                  <FiFile className="file-icon" />
                 </div>
-
-                {/* Right Column - Form Fields */}
-                <div className="form-column">
-                  <form className="file-details-form" onSubmit={handleSave}>
-                    <label htmlFor="fileName">File Name</label>
+                <div className="file-details">
+                  <h3>{file.originalName || file.filename || file.name || 'Untitled'}</h3>
+                  <p><strong>Size:</strong> {file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</p>
+                  <p><strong>Uploaded By:</strong> {file.uploadedBy || 'Anonymous'}</p>
+                  <p><strong>File Type:</strong> {file.fileType || 'Unknown'}</p>
+                </div>
+              </div>
+              <div className="actions-section">
+                <button className="edit-button" title="Edit file metadata" disabled>
+                  <FiEdit /> Edit File Metadata
+                </button>
+                <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}>
+                  <FiTrash2 /> Delete File
+                </button>
+              </div>
+            </div>
+            {/* Right Column - Form Fields */}
+            <div className="form-column">
+              <form className="file-details-form" onSubmit={handleSave}>
+                <label htmlFor="fileName">File Name</label>
+                <input
+                  type="text"
+                  id="fileName"
+                  placeholder="e.g., Income Statement"
+                  value={fileName}
+                  onChange={(e) => setFileName(e.target.value)}
+                  required
+                />
+                <label htmlFor="description">Description (Optional)</label>
+                <textarea
+                  id="description"
+                  placeholder="Provide a brief summary or notes about this file..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                ></textarea>
+                <div className="dropdown-row">
+                  <div className="dropdown-wrapper">
+                    <label htmlFor="category">Category</label>
+                    <select
+                      id="category"
+                      value={category}
+                      onChange={(e) => {
+                        setCategory(e.target.value);
+                        setSubCategory('');
+                      }}
+                      required
+                    >
+                      <option value="">Select a category</option>
+                      {defaultCategories.map((cat, idx) => (
+                        <option key={idx} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="dropdown-wrapper">
+                    <label htmlFor="year">Year</label>
                     <input
-                      type="text"
-                      id="fileName"
-                      placeholder="e.g., Income Statement"
-                      value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}
+                      type="number"
+                      id="year"
+                      placeholder="e.g., 2024"
+                      value={year}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) setYear(val);
+                      }}
+                      min="1900"
+                      max={new Date().getFullYear()}
                       required
                     />
-                    
-                    <label htmlFor="description">Description (Optional)</label>
-                    <textarea
-                      id="description"
-                      placeholder="Provide a brief summary or notes about this file..."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    ></textarea>
-                    
-                    <div className="dropdown-row">
-                      <div className="dropdown-wrapper">
-                        <label htmlFor="category">Category</label>
-                        <select
-                          id="category"
-                          value={category}
-                          onChange={(e) => {
-                            setCategory(e.target.value);
-                            setSubCategory('');
-                          }}
-                          required
-                        >
-                          <option value="">Select a category</option>
-                          {defaultCategories.map((cat, idx) => (
-                            <option key={idx} value={cat.name}>{cat.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="dropdown-wrapper">
-                        <label htmlFor="year">Year</label>
-                        <input
-                          type="number"
-                          id="year"
-                          placeholder="e.g., 2024"
-                          value={year}
-                          onChange={e => {
-                            const val = e.target.value;
-                            if (/^\d*$/.test(val)) setYear(val);
-                          }}
-                          min="1900"
-                          max={new Date().getFullYear()}
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="dropdown-wrapper">
-                      <label htmlFor="subCategory">Sub Category</label>
-                      <select
-                        id="subCategory"
-                        value={subCategory}
-                        onChange={e => setSubCategory(e.target.value)}
-                        required
-                        disabled={!category}
-                      >
-                        <option value="">Select a sub category</option>
-                        {getSubCategories().map((sub, idx) => (
-                          <option key={idx} value={sub}>{sub}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="form-actions">
-                      <button
-                        className="cancel-button"
-                        type="button"
-                        onClick={handleCancel}
-                      >
-                        Cancel
-                      </button>
-                      <button className="save-button" type="submit" disabled={saving}>
-                        <FiSave />
-                        {saving ? 'Saving...' : 'Save Changes'}
-                      </button>
-                    </div>
-                  </form>
+                  </div>
                 </div>
-              </div>
-              
-              {error && <div className="error-message" style={{marginTop: '16px'}}>{error}</div>}
+                <div className="dropdown-wrapper">
+                  <label htmlFor="subCategory">Sub Category</label>
+                  <select
+                    id="subCategory"
+                    value={subCategory}
+                    onChange={e => setSubCategory(e.target.value)}
+                    required
+                    disabled={!category}
+                  >
+                    <option value="">Select a sub category</option>
+                    {getSubCategories().map((sub, idx) => (
+                      <option key={idx} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-actions">
+                  <button
+                    className="cancel-button"
+                    type="button"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                  <button className="save-button" type="submit" disabled={saving}>
+                    <FiSave />
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
+          {error && <div className="error-message">{error}</div>}
         </div>
       </main>
     </div>
