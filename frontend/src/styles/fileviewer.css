@@ -2,15 +2,13 @@
 
 /* --- Layout root for file viewer page --- */
 .file-viewer-flex-root {
-  width: 100vw;
-  min-width: 0;
-  min-height: calc(100vh - 64px);
+  width: 100%;
+  min-height: calc(100vh - 128px); /* Adjusted for header heights */
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
-  /* Inherit background and color from globals.css */
+  align-items: stretch; /* Stretch children to full height */
   box-sizing: border-box;
-  overflow-x: auto;
+  overflow: hidden; /* Prevent extra scrollbars */
   margin: 0;
   gap: 0;
 }
@@ -21,15 +19,16 @@
   max-width: 100vw;
   overflow-x: unset;
   padding-left: 0 !important;
+  padding-top: 0 !important;
   padding-right: 0 !important;
   /* Inherit background and color from globals.css */
 }
 
 .main-content {
-  overflow-y: auto;
+  overflow-y: hidden; /* Main content should not scroll; viewer content will */
   overflow-x: hidden;
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
+  max-width: 100%;
   /* Inherit background and color from globals.css */
 }
 
@@ -58,13 +57,17 @@
   display: flex;
   align-items: center;
   gap: .5rem;
-  padding: 2.75rem 2.7rem;
+  padding: .5rem 1.2rem;
   background: #f8f9fa;
   border: 1px solid #ddd;
   border-radius: 6px;
   color: #444;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  font-size: 1rem;
+  font-weight: 500;
+  height: 3.5rem;
+  min-height: unset;
 }
 
 .back-button:hover {
@@ -82,6 +85,9 @@
 .file-viewer-content {
   background: var(--color-background, #F9F9FF);
   color: var(--color-text, #1A1A1A);
+  flex-grow: 1; /* Allow content to fill remaining space */
+  overflow-y: auto; /* Allow vertical scroll for the preview area */
+  padding: 1.5rem;
 }
 
 .file-details-sidebar {
@@ -186,6 +192,7 @@
     padding: 0.7rem 1rem;
     border-radius: 6px;
     font-size: 0.9rem;
+    
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
@@ -208,7 +215,7 @@
   background: transparent;
   color: var(--color-primary, #00897B);
   border: 1px solid var(--color-primary, #00897B);
-  margin-top: 0.75rem;
+  margin-top: rem;
 }
 
 .edit-button:hover {
@@ -222,7 +229,7 @@
   background: transparent;
   color: var(--color-accent, #FF6F61);
   border: 1px solid var(--color-accent, #FF6F61);
-  margin-top: 0.75rem;
+  margin-top: 0rem;
 }
 
 .delete-button:hover {
@@ -237,6 +244,7 @@
   padding: 1.5rem;
   background: #fff;
   display: flex;
+  
   flex-direction: column;
 }
 
@@ -447,9 +455,7 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 .file-details-sidebar {
   padding: 1.0rem;
 }
-.file-preview {
-  padding: 1.5rem;
-}
+
 .spreadsheet-preview-container {
   margin-bottom: 0rem;
   padding: 0rem;
@@ -465,6 +471,7 @@ html {
   width: 100vw;
   max-width: 100vw;
   box-sizing: border-box;
+  /* background: #a4f85b;  Preview Header color  */
 }
 
 .docx-preview {
@@ -473,7 +480,7 @@ html {
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   padding: 2.5rem 2rem;
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 1000px;
   min-height: 400px;
   color: #222;
   font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
@@ -556,5 +563,96 @@ html {
   border: none;
   border-top: 1px solid #e0e7ef;
   margin: 2em 0;
+}
+
+.file-preview.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  z-index: 9999;
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5vw 2vw;
+}
+
+.file-preview.fullscreen iframe,
+.file-preview.fullscreen .spreadsheet-preview-container,
+.file-preview.fullscreen .docx-preview {
+  width: 90vw !important;
+  height: 85vh !important;
+  max-width: 1200px;
+  max-height: 95vh;
+  min-width: 600px;
+  min-height: 400px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  border-radius: 12px;
+}
+
+.preview-action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  justify-content: flex-end;
+}
+
+.download-btn.small {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #fff;
+  color: #222;
+  border: 1px solid #e0e7ef;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.4rem 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.download-btn.small:hover {
+  background: #e0e7ef;
+  color: #00334d;
+}
+
+.fullscreen-btn.with-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #fff;
+  color: #222;
+  border: 1px solid #e0e7ef;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.4rem 1.1rem;
+  
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.fullscreen-btn.with-label:hover {
+  background: #e0e7ef;
+  color: #00334d;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.header-action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1.25rem;
+}
+
+.header-action-row .download-btn.small,
+.header-action-row .fullscreen-btn.with-label {
+  margin: 0;
 }
 

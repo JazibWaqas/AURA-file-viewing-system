@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -23,6 +23,8 @@ const FileViewer = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [actionError, setActionError] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const previewRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -254,6 +256,27 @@ const FileViewer = () => {
     return null;
   };
 
+  // Fullscreen API handlers
+  const handleToggleFullscreen = () => {
+    const elem = previewRef.current;
+    if (!elem) return;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) setIsFullscreen(false);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
   if (loading) {
     return (
       <div className="app-root">
@@ -290,7 +313,16 @@ const FileViewer = () => {
               <button className="back-button" onClick={() => navigate('/file-index')}><FiArrowLeft /> Back</button>
               <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
             </div>
-            <button className="download-button" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /> Download</button>
+            <div className="header-action-row">
+              <button className="download-btn small" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} title="Download File">
+                <FiDownload />
+              Download
+              </button>
+              <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
+                <FiMaximize style={{marginRight: '0.5em'}} />
+                View in Full-Screen
+              </button>
+            </div>
           </div>
           <div className="file-viewer-flex-root">
             <div className="file-details-sidebar">
@@ -312,7 +344,7 @@ const FileViewer = () => {
             </div>
             <div className="file-viewer-divider" />
             <div className="file-viewer-content">
-              <div className="file-preview">
+              <div className={isFullscreen ? 'file-preview fullscreen' : 'file-preview'} ref={previewRef}>
                 {file.fileType === 'pdf' && file.url && (
                   <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
                 )}
