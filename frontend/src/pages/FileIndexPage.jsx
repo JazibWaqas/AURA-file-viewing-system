@@ -3,7 +3,7 @@ import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu } from 'react-icons/fi';
 
 export default function FileIndexPage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -23,6 +23,7 @@ export default function FileIndexPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const debounceTimeout = useRef(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -165,10 +166,23 @@ export default function FileIndexPage() {
     <div className="app-root">
       <Header />
       <main className="main-content">
-        <div className="file-index-flex-root">
-          <CategorySidebar onSelect={handleCategorySelect} />
-          <div className="file-index-page">
+        <div className={`file-index-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+          <div className="sidebar-container">
+            <CategorySidebar 
+              selectedCategory={selectedCategory} 
+              onSelectCategory={(cat) => handleCategorySelect(cat, selectedSubCategory)} 
+              onClearCategory={() => handleCategorySelect('', '')}
+            />
+          </div>
+          
+          {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
+          <div className="file-index-page-content">
             <div className="page-header">
+              <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                {isSidebarOpen ? <FiX /> : <FiMenu />}
+                <span>Filters</span>
+              </button>
               <h1>File Management</h1>
               <p>Browse and manage all your files in one place</p>
             </div>

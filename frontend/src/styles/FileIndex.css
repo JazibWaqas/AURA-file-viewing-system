@@ -520,6 +520,27 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   .load-more-icon {
     font-size: 1rem;
   }
+  .sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .file-index-layout .category-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Hidden off-screen */
+    width: 280px;
+    height: 100%;
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  }
+  .file-index-layout.sidebar-open .category-sidebar {
+    left: 0; /* Slide in */
+  }
+  .file-index-layout.sidebar-open .sidebar-overlay {
+    display: block; /* Show overlay */
+  }
 }
 @media (max-width: 600px) {
   .file-index-page {
@@ -553,4 +574,70 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   margin-bottom: 1.5rem;
   font-size: 1rem;
   text-align: center;
+}
+
+.file-index-layout {
+  display: flex;
+  position: relative;
+  height: calc(100vh - 120px); /* Adjust based on header/footer height */
+}
+
+.sidebar-container {
+  flex: 0 0 260px;
+  height: 100%;
+  overflow-y: auto; /* Allow sidebar to scroll if it has many categories */
+}
+
+.file-index-page-content {
+  flex-grow: 1;
+  padding: 1rem 2rem;
+  min-width: 0;
+  overflow-y: auto; /* This is the key change to allow content scrolling */
+  height: 100%;
+}
+
+.sidebar-toggle-btn {
+  display: none; /* Hidden on desktop */
+}
+
+.sidebar-overlay {
+  display: none; /* Hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Hidden off-screen */
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+    background: #fff; /* Ensure it has a background */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  }
+
+  .file-index-layout.sidebar-open .sidebar-container {
+    left: 0; /* Slide in */
+  }
+
+  .sidebar-toggle-btn {
+    display: flex; /* Show the button on mobile */
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+  }
+  
+  .file-index-layout.sidebar-open .sidebar-overlay {
+      display: block; /* Show overlay */
+  }
 }
