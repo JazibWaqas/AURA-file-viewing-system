@@ -19,6 +19,10 @@
 .dashboard-page {
   padding: 2rem;
   background-color: #f9fafb;
+  height: calc(100vh - 64px); /* Adjust for header height if needed */
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .dashboard-header {
@@ -345,6 +349,8 @@
   height: 100vh;
   overflow-y: auto;
   background: #f8fafc;
+  min-height: 0;
+  overflow-x: hidden;
 }
 
 /* Custom Scrollbars for all main content areas */
@@ -439,4 +445,10 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 .recent-activity li small {
     color: #6b7280;
     font-size: 0.875rem;
+}
+
+.app-root, .main-content {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
 }

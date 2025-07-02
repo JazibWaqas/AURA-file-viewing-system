@@ -320,10 +320,11 @@ class FileService {
             // Order and paginate. Fetch one extra document to check for a next page.
             query = query.orderBy('createdAt', 'desc').limit(Number(limit) + 1);
 
+            // Use document snapshot for startAfter
             if (startAfter) {
-                const lastDoc = await this.db.collection(this.collection).doc(startAfter).get();
-                if (lastDoc.exists) {
-                    query = query.startAfter(lastDoc);
+                const lastDocSnap = await this.db.collection(this.collection).doc(startAfter).get();
+                if (lastDocSnap.exists) {
+                    query = query.startAfter(lastDocSnap);
                 }
             }
 
@@ -344,7 +345,6 @@ class FileService {
             if (hasNextPage) {
                 files.pop(); // Remove the extra document
             }
-            
             const lastVisible = files.length > 0 ? files[files.length - 1]._id : null;
 
             // Apply search filter in memory if needed (Note: this happens *after* pagination)
