@@ -97,9 +97,8 @@ const Home = () => {
     <div className="dashboard-page">
 
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <p>Welcome back, get a quick overview of your organization's status.</p>
-      </div>
+        <h1>Welcome to the AURA File Viewing System</h1>
+        </div>
       
       <div className="charts-section">
         <IncomeChart />

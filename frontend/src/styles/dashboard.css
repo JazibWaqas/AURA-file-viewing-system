@@ -16,28 +16,22 @@
 }
 
 /* Main dashboard content */
-.dashboard-page {
-  padding: 2rem;
-  background-color: #f9fafb;
-  height: calc(100vh - 64px); /* Adjust for header height if needed */
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+
 
 .dashboard-header {
   margin-bottom: 2rem;
 }
 
 .dashboard-header h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: #111827;
+  color: #000;
+  letter-spacing: 0.5px;
 }
 
 .dashboard-header p {
-  font-size: 1rem;
-  color: #6b7280;
+  font-size: 1.1rem;
+  color: #4a5568;
 }
 
 /* Overview cards at the top */
@@ -48,10 +42,10 @@
 }
 
 .metric-card, .chart-card, .recent-files, .quick-actions, .categories-overview {
-  background-color: #6A89A7;
-  color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px #38495922;
+  background-color: #ffffff !important;
+  color: #222 !important;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(60, 80, 120, 0.07);
 }
 
 .metric-card h4 {
@@ -64,7 +58,7 @@
 .metric-card h3 {
   margin: 12px 0;
   color: #222;
-  font-size: 30px;
+  font-size: 2.2rem;
 }
 
 .metric-card p {
@@ -81,7 +75,7 @@
 }
 
 .chart-card {
-  background-color: #ffffff;
+  background-color: #80f0f0;
   border-radius: 0.75rem;
   padding: 1.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -94,9 +88,9 @@
 }
 
 .chart-card h4 {
-  font-size: 1.125rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #1a202c;
   margin-bottom: 0.25rem;
 }
 
@@ -160,7 +154,8 @@
   padding: 10px 0;
   border-bottom: 1px solid #eee;
   color: #555;
-  font-size: 15px;
+  font-size: 1.1rem;
+  color: #2d3748;
 }
 
 .recent-files li:last-child {
@@ -180,9 +175,11 @@
   padding: 1rem;
   border-radius: 0.5rem;
   text-decoration: none;
-  background-color: #f3f4f6;
-  color: #1f2937;
+  background-color: #f0f4ff;
+  color: #1a202c;
   transition: background-color 0.2s;
+  font-size: 1.1rem;
+  border: 1px solid #e3e8ee;
 }
 
 .action-button:hover {
@@ -190,12 +187,13 @@
 }
 
 .action-button.primary {
-  background-color: #4f46e5;
-  color: white;
+  background-color: #3182ce;
+  color: #fff;
+  border: none;
 }
 
 .action-button.primary:hover {
-    background-color: #4338ca;
+  background-color: #2563eb;
 }
 
 .action-button .icon {
@@ -451,4 +449,428 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   height: 100vh;
   min-height: 0;
   overflow: hidden;
+}
+
+/* FileEditPage Styles - A Unified, Cohesive Layout */
+
+/* The main content area for the edit page.
+   It's a flex container to center the main card. */
+   .file-edit-main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Aligns card to the top */
+    padding: 32px;
+    background: #f0f2f5;
+    box-sizing: border-box;
+    min-height: calc(100vh - 64px);
+  }
+  
+  /* The single, unified container for all page content. */
+  .edit-card {
+    background: #fff;
+    color: #384959;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08); /* A slightly more pronounced shadow for depth */
+    padding: 2.5rem 3rem;
+    width: 100%;
+    max-width: 1100px; /* A slightly more conservative max-width */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .edit-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 1.5rem;
+  }
+  
+  .back-button {
+    background: #f3f3f3;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  
+  .back-button:hover {
+    background: #e0e0e0;
+  }
+  
+  .edit-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #111;
+  }
+  
+  .edit-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 0; /* Adjusted from 24px */
+    color: #666;
+  }
+  
+  /* Two-column layout container */
+  .edit-content-layout {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+    width: 100%;
+    flex-wrap: wrap; /* Allow wrapping if needed */
+  }
+  
+  /* Left column for file info and actions - now fluid */
+  .file-info-column {
+    flex: 1 1 340px; /* Can grow, can shrink, with a base width of 340px */
+    min-width: 300px; /* Safeguard to prevent it from becoming too narrow */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* File information block - no longer a separate card */
+  .file-info-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    background-color: #fdfdff; /* A very light background to subtly separate it */
+  }
+  
+  .file-icon-background {
+    background: #6c63ff;
+    border-radius: 12px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .file-icon {
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+  .file-details h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #111;
+  }
+  
+  .file-details p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .file-details strong {
+    color: #111;
+  }
+  
+  /* Right column for the form fields - also fluid */
+  .form-column {
+    flex: 2 1 500px; /* Can grow (with more weight), can shrink, with a larger base */
+    min-width: 320px; /* Safeguard to prevent form fields from breaking */
+  }
+  
+  /* Form Styles */
+  .file-details-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .file-details-form label {
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: #111;
+  }
+  
+  .file-details-form input,
+  .file-details-form textarea,
+  .file-details-form select {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    background: #fafbfc;
+    margin-bottom: 8px;
+    outline: none;
+    color: #111;
+    transition: border-color 0.2s;
+  }
+  
+  .file-details-form input:focus,
+  .file-details-form textarea:focus,
+  .file-details-form select:focus {
+    border-color: #6c63ff;
+  }
+  
+  .file-details-form textarea {
+    min-height: 60px;
+    resize: vertical;
+  }
+  
+  .dropdown-row {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .dropdown-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    border-top: 1px solid #e9ecef;
+    padding-top: 1.5rem;
+  }
+  
+  .cancel-button, .save-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .cancel-button {
+    background: #f3f3f3;
+    color: #111;
+  }
+  
+  .cancel-button:hover {
+    background: #e0e0e0;
+  }
+  
+  .save-button {
+    background: #6c63ff;
+    color: #fff;
+  }
+  
+  .save-button svg {
+    margin-right: 6px;
+  }
+  
+  .save-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .save-button:hover:not(:disabled) {
+    background: #574fdc;
+  }
+  
+  /* Action buttons in the left column */
+  .actions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .edit-button,
+  .delete-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+  }
+  
+  .edit-button {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .edit-button:disabled {
+    background-color: #e9ecef;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .delete-button {
+    background: #ff4d4f;
+    color: #fff;
+  }
+  
+  .delete-button:hover {
+    background: #d9363e;
+  }
+  
+  /* Error and Loading States */
+  .error-message,
+  .loading-container {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+  }
+  
+  .error-message {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .loading-container,
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 128px);
+  }
+  
+  .spinner-icon {
+    font-size: 3rem;
+    color: #6c63ff;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 992px) { /* Increased breakpoint for better adaptability */
+    .edit-content-layout {
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .file-info-column {
+      width: 100%;
+      /* Reset flex properties for stacked layout */
+      flex-basis: auto;
+    }
+    .form-column {
+      width: 100%;
+      flex-basis: auto;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .file-edit-main-content {
+      padding: 16px;
+    }
+    .edit-card {
+      padding: 1.5rem;
+    }
+    .dropdown-row {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+    .save-button,
+    .cancel-button,
+    .delete-button,
+    .edit-button {
+      width: 100%;
+    }
+  }
+  
+  /* Custom Scrollbars for all main content areas */
+  .edit-card::-webkit-scrollbar,
+  .main-content::-webkit-scrollbar,
+  body::-webkit-scrollbar, html::-webkit-scrollbar {
+    width: 14px;
+    background: #e0e7ef;
+  }
+  .edit-card::-webkit-scrollbar-thumb,
+  .main-content::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+    background: #b0b8c9;
+    border-radius: 8px;
+    border: 3px solid #e0e7ef;
+  }
+  .edit-card::-webkit-scrollbar-thumb:hover,
+  .main-content::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+    background: #4a90e2;
+  }
+  .edit-card, .main-content, body, html {
+    scrollbar-width: thin;
+    scrollbar-color: #b0b8c9 #e0e7ef;
+  }
+  
+  /* Standardize paddings to rem units */
+  .edit-card {
+    padding: 2.5rem 3rem;
+  }
+  .edit-header {
+    margin-bottom: 2rem;
+  }
+  .edit-content-layout {
+    gap: 3rem;
+  }
+  .file-info-display {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Remove any duplicate or conflicting styles with globals.css */
+  
+  .main-content.file-edit-main-content {
+    background: #f0f2f5;
+    box-sizing: border-box;
+  }
+  
+  .edit-button {
+    background: #f3f3f3;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+    margin-bottom: 8px;
+  }
+  
+  .edit-button:disabled {
+    background: #e0e0e0;
+    color: #888;
+    cursor: not-allowed;
+    opacity: 0.7;
+  } 
+
+.metric-card, .chart-card, .recent-files, .quick-actions, .categories-overview {
+  padding: 2rem 1.5rem;
+}
+
+.dashboard-header, .charts-section, .dashboard-overview, .content-section, .bottom-section {
+  
+  padding-bottom: 0.5rem;
 }

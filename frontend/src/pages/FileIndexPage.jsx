@@ -215,7 +215,7 @@ export default function FileIndexPage() {
                 <span>Filters</span>
               </button>
               <h1>File Management</h1>
-              <p>Browse and manage all your files in one place</p>
+              
             </div>
 
             {successMessage && (
