@@ -1,10 +1,15 @@
-const { getFirestore, getBucket, generateId, convertTimestamp, convertToTimestamp } = require('../config/firebase');
+const { db, bucket } = require('../config/firebase');
+
+// Helper Functions
+const generateId = () => db.collection('tmp').doc().id;
+const convertTimestamp = (ts) => ts && ts.toDate ? ts.toDate() : ts;
+const convertToTimestamp = (date) => date; // Firestore admin handles Date objects automatically
 
 class FileService {
     constructor() {
-        this.db = getFirestore();
-        this.bucket = getBucket();
-        this.collection = 'files';
+        this.db = db;
+        this.bucket = bucket;
+        this.collection = 'uploads';
     }
 
     // Create a new file record
@@ -62,8 +67,6 @@ class FileService {
             if (filters.search) {
                 // Note: Firestore doesn't support full-text search natively
                 // This is a simple implementation - consider using Algolia or similar for better search
-                const searchTerm = filters.search.toLowerCase();
-                // We'll filter in memory for now
             }
 
             if (filters.category) {
@@ -84,6 +87,7 @@ class FileService {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 files.push({
+                    _id: doc.id,
                     ...data,
                     createdAt: convertTimestamp(data.createdAt),
                     updatedAt: convertTimestamp(data.updatedAt)
@@ -94,9 +98,9 @@ class FileService {
             if (filters.search) {
                 const searchTerm = filters.search.toLowerCase();
                 return files.filter(file => 
-                    file.originalName.toLowerCase().includes(searchTerm) ||
+                    (file.originalName && file.originalName.toLowerCase().includes(searchTerm)) ||
                     (file.description && file.description.toLowerCase().includes(searchTerm)) ||
-                    file.category.toLowerCase().includes(searchTerm)
+                    (file.category && file.category.toLowerCase().includes(searchTerm))
                 );
             }
 
@@ -118,6 +122,7 @@ class FileService {
 
             const data = doc.data();
             return {
+                _id: doc.id,
                 ...data,
                 createdAt: convertTimestamp(data.createdAt),
                 updatedAt: convertTimestamp(data.updatedAt)
@@ -238,6 +243,50 @@ class FileService {
         }
     }
 
+    // Get file preview data (for CSV/Excel)
+    async getFilePreviewData(filePath, fileType) {
+        const { parse } = require('csv-parse/sync');
+        const XLSX = require('xlsx');
+
+        try {
+            const fileRef = this.bucket.file(filePath);
+            const [exists] = await fileRef.exists();
+            if (!exists) {
+                throw new Error('File not found in storage for preview.');
+            }
+
+            const [fileContent] = await fileRef.download();
+
+            let headers = [];
+            let rows = [];
+
+            if (fileType === 'csv') {
+                const records = parse(fileContent, { columns: true, skip_empty_lines: true });
+                if (records.length > 0) {
+                    headers = Object.keys(records[0]);
+                    rows = records.map(record => headers.map(header => record[header]));
+                }
+            } else if (fileType === 'excel') {
+                const workbook = XLSX.read(fileContent, { type: 'buffer' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+
+                if (sheetData.length > 0) {
+                    headers = sheetData[0];
+                    rows = sheetData.slice(1);
+                }
+            } else {
+                throw new Error('Preview not supported for this file type.');
+            }
+
+            return { headers, rows, totalRows: rows.length };
+        } catch (error) {
+            console.error('Error getting file preview data:', error);
+            throw error;
+        }
+    }
+
     // Get file download URL
     async getFileDownloadUrl(filePath) {
         try {
@@ -249,6 +298,70 @@ class FileService {
             return url;
         } catch (error) {
             console.error('Error getting download URL:', error);
+            throw error;
+        }
+    }
+
+    // Get files with pagination and filtering
+    async getFilesPaginated({ filters = {}, limit = 16, startAfter = null }) {
+        try {
+            let query = this.db.collection(this.collection);
+
+            if (filters.category) {
+                query = query.where('category', '==', filters.category);
+            }
+            if (filters.year) {
+                query = query.where('year', '==', parseInt(filters.year));
+            }
+            if (filters.subCategory) {
+                query = query.where('subCategory', '==', filters.subCategory);
+            }
+
+            // Order and paginate. Fetch one extra document to check for a next page.
+            query = query.orderBy('createdAt', 'desc').limit(Number(limit) + 1);
+
+            if (startAfter) {
+                const lastDoc = await this.db.collection(this.collection).doc(startAfter).get();
+                if (lastDoc.exists) {
+                    query = query.startAfter(lastDoc);
+                }
+            }
+
+            const snapshot = await query.get();
+            const files = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                files.push({
+                    ...data,
+                    _id: doc.id,
+                    createdAt: convertTimestamp(data.createdAt),
+                    updatedAt: convertTimestamp(data.updatedAt)
+                });
+            });
+
+            // Determine if there is a next page
+            const hasNextPage = files.length > limit;
+            if (hasNextPage) {
+                files.pop(); // Remove the extra document
+            }
+            
+            const lastVisible = files.length > 0 ? files[files.length - 1]._id : null;
+
+            // Apply search filter in memory if needed (Note: this happens *after* pagination)
+            if (filters.search) {
+                const searchTerm = filters.search.toLowerCase();
+                const filtered = files.filter(file =>
+                    (file.originalName && file.originalName.toLowerCase().includes(searchTerm)) ||
+                    (file.description && file.description.toLowerCase().includes(searchTerm)) ||
+                    (file.category && file.category.toLowerCase().includes(searchTerm))
+                );
+                // Note: hasNextPage might not be perfectly accurate when in-memory search is used
+                return { files: filtered, lastVisible, hasNextPage };
+            }
+
+            return { files, lastVisible, hasNextPage };
+        } catch (error) {
+            console.error('Error getting paginated files:', error);
             throw error;
         }
     }

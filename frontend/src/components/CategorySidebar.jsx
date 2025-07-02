@@ -1,5 +1,5 @@
 // ... existing imports ...
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/CategorySidebar.css';
 
 export default function CategorySidebar({ onSelect }) {
@@ -17,11 +17,15 @@ export default function CategorySidebar({ onSelect }) {
       });
   }, []);
 
+  const sortedCategories = useMemo(() => {
+    return [...categories].sort((a, b) => a.name.localeCompare(b.name));
+  }, [categories]);
+
   return (
     <div className="category-sidebar-container">
       <h3 className="category-sidebar-title">Categories</h3>
       <ul className="category-list">
-        {[...categories].sort((a, b) => a.name.localeCompare(b.name)).map((cat, idx) => (
+        {sortedCategories.map((cat, idx) => (
           <li key={cat.name}>
             <div
               className={`category-name${expanded === idx ? ' expanded' : ''}`}

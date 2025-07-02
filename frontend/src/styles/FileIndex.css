@@ -1,643 +1,643 @@
 /* =============================
    Layout & Structure
    ============================= */
-.app-content-row {
-  display: flex;
-  width: 100%;
-  min-height: calc(100vh - 64px);
-  /* Inherit background and color from globals.css */
-  transition: all 0.3s;
-}
-.app-content-row.sidebar-open .main-content {
-  margin-left: 0;
-}
-.main-content {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  padding: 32px 24px;
-  overflow: hidden;
-  transition: margin 0.3s;
-  padding-top: 0;
-  box-shadow: none;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100vw;
-  max-width: 100vw;
-  /* Inherit background and color from globals.css */
-}
-
-/* =============================
-   Flex Root for File Index Page
-   ============================= */
-.file-index-flex-root {
-  display: flex;
-  min-height: calc(100vh - 64px);
-  width: 100vw;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  /* Inherit background and color from globals.css */
-}
-
-/* =============================
-   Page Header (inherits color)
-   ============================= */
-.page-header {
-  margin-bottom: 24px;
-  text-align: center;
-}
-.page-header h1 {
-  font-size: 2.5rem;
-  color: #6A89A7;
-  margin-bottom: 0.5rem;
-}
-.page-header p {
-  color: #BDDDFC;
-  font-size: 1.1rem;
-}
-
-/* =============================
-   Search & Filter Bar (card style)
-   ============================= */
-.search-filter-bar {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px #38495922;
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  color: #384959;
-}
-.search-container {
-  position: relative;
-  flex: 1;
-  min-width: 250px;
-}
-.search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-}
-.search-input {
-  background: #fff;
-  color: #222;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-.search-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
-}
-
-/* =============================
-   Filter Buttons & Dropdowns
-   ============================= */
-.filter-container {
-  position: relative;
-}
-.filter-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #ede9fe !important;
-  color: #3b2f7f !important;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.filter-button:hover,
-.filter-button.active {
-  background: #a78bfa !important;
-  color: #1e1b4b !important;
-  border-color: #4a90e2;
-}
-.filter-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  min-width: 200px;
-}
-.filter-option {
-  display: block;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  text-align: left;
-  background: none;
-  border: none;
-  color: #444;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.filter-option:hover {
-  background: #f8f9fa;
-}
-.filter-option.selected {
-  background: #e9ecef;
-  color: #4a90e2;
-}
-.clear-filters-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #ede9fe !important;
-  color: #3b2f7f !important;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.clear-filters-button:hover {
-  background: #a78bfa !important;
-  color: #1e1b4b !important;
-}
-
-/* =============================
-   Files Section (Recent Files)
-   ============================= */
-.files-section {
-  margin-bottom: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-  color: #384959;
-}
-.files-section-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-}
-
-/* =============================
-   Files Scrollable Grid
-   ============================= */
-.files-scroll-grid, .all-files-scroll-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive, up to 4 per row */
-  gap: 1.2rem;
-  min-height: 80px;
-  padding: 1.2rem 0.8rem 1rem 0.8rem;
-  scroll-behavior: smooth;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  overflow: unset !important;
-  color: #384959;
-}
-
-/* =============================
-   File Card
-   ============================= */
-.file-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-  transition: box-shadow 0.2s, transform 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
-  min-width: 0;
-  min-height: 160px;
-  max-width: 260px;
-  width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
-  color: #384959;
-}
-.file-card:hover {
-  box-shadow: 0 4px 12px #38495933;
-  background: #f5faff;
-  color: #384959;
-  transform: translateY(-2px) scale(1.03);
-}
-.file-icon {
-  font-size: 1.5rem;
-  color: #4a90e2;
-  margin-bottom: 0.3rem;
-}
-.file-info {
-  width: 100%;
-  min-width: 0;
-  text-align: center;
-}
-.file-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.05rem;
-  color: #2c3e50;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0 5px;
-}
-.file-info p {
-  margin: 0.1rem 0;
-  font-size: 0.92rem;
-  color: #666;
-  text-align: center;
-}
-.file-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  justify-content: center;
-}
-
-/* =============================
-   File Card Buttons
-   ============================= */
-.file-view-btn, .file-download-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 45%;
-  min-width: 80px;
-  max-width: 100%;
-  padding: 8px 0;
-  background: #ede9fe !important;
-  color: #3b2f7f !important;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.98rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin: 2px 0;
-}
-.file-view-btn:hover, .file-download-btn:hover {
-  background: #a78bfa !important;
-  color: #1e1b4b !important;
-}
-
-/* =============================
-   Miscellaneous States
-   ============================= */
-.loading-indicator, .empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 2rem 0;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-/* =============================
-   All Files Section
-   ============================= */
-.all-files-section {
-  margin-top: 2.5rem;
-  background: transparent;
-  width: 100%;
-  box-sizing: border-box;
-}
-.all-files-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-/* =============================
-   Load More Button
-   ============================= */
-.load-more-container {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  padding: 2rem 0;
-}
-.load-more-button {
-  background: #ede9fe !important;
-  color: #3b2f7f !important;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
-}
-.load-more-button:hover {
-  background: #a78bfa !important;
-  color: #1e1b4b !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
-}
-.load-more-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
-}
-.load-more-icon {
-  font-size: 1.1rem;
-}
-
-/* =============================
-   Retry Button (Error State)
-   ============================= */
-.retry-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #ede9fe !important;
-  color: #3b2f7f !important;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.retry-button:hover {
-  background: #a78bfa !important;
-  color: #1e1b4b !important;
-}
-
-/* =============================
-   Error and Empty States
-   ============================= */
-.error-container {
-  text-align: center;
-  padding: 3rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.error-container h2 {
-  color: #dc3545;
-  margin-bottom: 1rem;
-}
-
-/* =============================
-   Custom Scrollbars
-   ============================= */
-.file-index-page::-webkit-scrollbar,
-.main-content::-webkit-scrollbar,
-body::-webkit-scrollbar, html::-webkit-scrollbar {
-  width: 14px;
-  background: #e0e7ef;
-}
-.file-index-page::-webkit-scrollbar-thumb,
-.main-content::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
-  background: #b0b8c9;
-  border-radius: 8px;
-  border: 3px solid #e0e7ef;
-}
-.file-index-page::-webkit-scrollbar-thumb:hover,
-.main-content::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
-  background: #4a90e2;
-}
-.file-index-page, .main-content, body, html {
-  scrollbar-width: thin;
-  scrollbar-color: #b0b8c9 #e0e7ef;
-}
-
-/* =============================
-   Remove Top Padding/Margin for Content Flush with Header
-   ============================= */
-.file-index-content-wrapper {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-/* =============================
-   Standardize Paddings to rem Units
-   ============================= */
-.file-index-page,
-.file-index-content {
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: unset;
-  padding-left: 0.00000!important;
-  padding-right: 0.0000 !important;
-}
-.files-section {
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  margin-bottom: 2rem;
-}
-.all-files-section {
-  margin-top: 2.5rem;
-}
-.page-header {
-  margin-bottom: 2rem;
-}
-.search-filter-bar {
-  padding: 1rem;
-  margin-bottom: 2rem;
-}
-
-/* =============================
-   Media Queries (Responsive Design)
-   ============================= */
-@media (max-width: 1200px) {
-  .files-scroll-grid, .all-files-scroll-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
+   .app-content-row {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    /* Inherit background and color from globals.css */
+    transition: all 0.3s;
   }
-  .file-card {
-    max-width: 220px;
-    min-height: 140px;
-    padding: 1rem 0.8rem;
+  .app-content-row.sidebar-open .main-content {
+    margin-left: 0;
   }
-}
-@media (max-width: 900px) {
-  .files-scroll-grid, .all-files-scroll-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.8rem;
-    padding: 0.7rem 0.3rem 0.7rem 0.3rem;
-  }
-  .file-card {
-    max-width: 160px;
-    min-height: 100px;
-    padding: 0.7rem 0.4rem;
-  }
-  .file-index-page {
-    padding-top: 2.5rem;
-  }
-}
-@media (max-width: 768px) {
-  .file-index-page {
-    padding: 1rem;
-  }
-  .search-filter-bar {
+  .main-content {
+    flex: 1 1 0;
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
+    padding: 32px 24px;
+    overflow: hidden;
+    transition: margin 0.3s;
+    padding-top: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
+    /* Inherit background and color from globals.css */
+  }
+  
+  /* =============================
+     Flex Root for File Index Page
+     ============================= */
+  .file-index-flex-root {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    /* Inherit background and color from globals.css */
+  }
+  
+  /* =============================
+     Page Header (inherits color)
+     ============================= */
+  .page-header {
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-size: 2.5rem;
+    color: #6A89A7;
+    margin-bottom: 0.5rem;
+  }
+  .page-header p {
+    color: #BDDDFC;
+    font-size: 1.1rem;
+  }
+  
+  /* =============================
+     Search & Filter Bar (card style)
+     ============================= */
+  .search-filter-bar {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px #38495922;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    color: #384959;
   }
   .search-container {
-    width: 100%;
+    position: relative;
+    flex: 1;
+    min-width: 250px;
   }
-  .filter-container {
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+  }
+  .search-input {
+    background: #fff;
+    color: #222;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
     width: 100%;
+    box-sizing: border-box;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+  }
+  
+  /* =============================
+     Filter Buttons & Dropdowns
+     ============================= */
+  .filter-container {
+    position: relative;
   }
   .filter-button {
-    width: 100%;
-    justify-content: center;
-  }
-  .files-scroll-grid {
-    grid-template-columns: 1fr;
-  }
-  .load-more-button {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  .load-more-icon {
-    font-size: 1rem;
-  }
-  .sidebar-toggle-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #ede9fe !important;
+    color: #3b2f7f !important;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
-  .file-index-layout .category-sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px; /* Hidden off-screen */
-    width: 280px;
-    height: 100%;
+  .filter-button:hover,
+  .filter-button.active {
+    background: #a78bfa !important;
+    color: #1e1b4b !important;
+    border-color: #4a90e2;
+  }
+  .filter-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    transition: left 0.3s ease-in-out;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    min-width: 200px;
   }
-  .file-index-layout.sidebar-open .category-sidebar {
-    left: 0; /* Slide in */
+  .filter-option {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.2s ease;
   }
-  .file-index-layout.sidebar-open .sidebar-overlay {
-    display: block; /* Show overlay */
+  .filter-option:hover {
+    background: #f8f9fa;
   }
-}
-@media (max-width: 600px) {
-  .file-index-page {
-    padding: 0.5rem;
+  .filter-option.selected {
+    background: #e9ecef;
+    color: #4a90e2;
   }
-  .files-scroll-grid, .all-files-scroll-grid {
-    grid-template-columns: 1fr;
-    gap: 0.7rem;
-    padding: 0.5rem 0.1rem 0.5rem 0.1rem;
-  }
-  .file-card {
-    max-width: 100%;
-    min-height: 80px;
-    padding: 0.5rem 0.2rem;
-  }
-}
-
-.file-index-page {
-  flex: 1;
-  padding: 32px 40px;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.success-message {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-  text-align: center;
-}
-
-.file-index-layout {
-  display: flex;
-  position: relative;
-  height: calc(100vh - 120px); /* Adjust based on header/footer height */
-}
-
-.sidebar-container {
-  flex: 0 0 260px;
-  height: 100%;
-  overflow-y: auto; /* Allow sidebar to scroll if it has many categories */
-}
-
-.file-index-page-content {
-  flex-grow: 1;
-  padding: 1rem 2rem;
-  min-width: 0;
-  overflow-y: auto; /* This is the key change to allow content scrolling */
-  height: 100%;
-}
-
-.sidebar-toggle-btn {
-  display: none; /* Hidden on desktop */
-}
-
-.sidebar-overlay {
-  display: none; /* Hidden on desktop */
-}
-
-@media (max-width: 768px) {
-  .sidebar-container {
-    position: fixed;
-    top: 0;
-    left: -280px; /* Hidden off-screen */
-    width: 280px;
-    height: 100vh;
-    z-index: 1000;
-    transition: left 0.3s ease-in-out;
-    background: #fff; /* Ensure it has a background */
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-  }
-
-  .file-index-layout.sidebar-open .sidebar-container {
-    left: 0; /* Slide in */
-  }
-
-  .sidebar-toggle-btn {
-    display: flex; /* Show the button on mobile */
+  .clear-filters-button {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #ede9fe !important;
+    color: #3b2f7f !important;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
-
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.4);
-    z-index: 999;
+  .clear-filters-button:hover {
+    background: #a78bfa !important;
+    color: #1e1b4b !important;
   }
   
-  .file-index-layout.sidebar-open .sidebar-overlay {
-      display: block; /* Show overlay */
+  /* =============================
+     Files Section (Recent Files)
+     ============================= */
+  .files-section {
+    margin-bottom: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
+    color: #384959;
   }
-}
+  .files-section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  /* =============================
+     Files Scrollable Grid
+     ============================= */
+  .files-scroll-grid, .all-files-scroll-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Responsive, up to 4 per row */
+    gap: 1.2rem;
+    min-height: 80px;
+    padding: 1.2rem 0.8rem 1rem 0.8rem;
+    scroll-behavior: smooth;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    overflow: unset !important;
+    color: #384959;
+  }
+  
+  /* =============================
+     File Card
+     ============================= */
+  .file-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    min-width: 0;
+    min-height: 160px;
+    max-width: 260px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    color: #384959;
+  }
+  .file-card:hover {
+    box-shadow: 0 4px 12px #38495933;
+    background: #f5faff;
+    color: #384959;
+    transform: translateY(-2px) scale(1.03);
+  }
+  .file-icon {
+    font-size: 1.5rem;
+    color: #4a90e2;
+    margin-bottom: 0.3rem;
+  }
+  .file-info {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
+  .file-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.05rem;
+    color: #2c3e50;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 5px;
+  }
+  .file-info p {
+    margin: 0.1rem 0;
+    font-size: 0.92rem;
+    color: #666;
+    text-align: center;
+  }
+  .file-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    justify-content: center;
+  }
+  
+  /* =============================
+     File Card Buttons
+     ============================= */
+  .file-view-btn, .file-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 45%;
+    min-width: 80px;
+    max-width: 100%;
+    padding: 8px 0;
+    background: #ede9fe !important;
+    color: #3b2f7f !important;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin: 2px 0;
+  }
+  .file-view-btn:hover, .file-download-btn:hover {
+    background: #a78bfa !important;
+    color: #1e1b4b !important;
+  }
+  
+  /* =============================
+     Miscellaneous States
+     ============================= */
+  .loading-indicator, .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  /* =============================
+     All Files Section
+     ============================= */
+  .all-files-section {
+    margin-top: 2.5rem;
+    background: transparent;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .all-files-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  /* =============================
+     Load More Button
+     ============================= */
+  .load-more-container {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+  .load-more-button {
+    background: #ede9fe !important;
+    color: #3b2f7f !important;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+  }
+  .load-more-button:hover {
+    background: #a78bfa !important;
+    color: #1e1b4b !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+  }
+  .load-more-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
+  }
+  .load-more-icon {
+    font-size: 1.1rem;
+  }
+  
+  /* =============================
+     Retry Button (Error State)
+     ============================= */
+  .retry-button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #ede9fe !important;
+    color: #3b2f7f !important;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .retry-button:hover {
+    background: #a78bfa !important;
+    color: #1e1b4b !important;
+  }
+  
+  /* =============================
+     Error and Empty States
+     ============================= */
+  .error-container {
+    text-align: center;
+    padding: 3rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .error-container h2 {
+    color: #dc3545;
+    margin-bottom: 1rem;
+  }
+  
+  /* =============================
+     Custom Scrollbars
+     ============================= */
+  .file-index-page::-webkit-scrollbar,
+  .main-content::-webkit-scrollbar,
+  body::-webkit-scrollbar, html::-webkit-scrollbar {
+    width: 14px;
+    background: #e0e7ef;
+  }
+  .file-index-page::-webkit-scrollbar-thumb,
+  .main-content::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+    background: #b0b8c9;
+    border-radius: 8px;
+    border: 3px solid #e0e7ef;
+  }
+  .file-index-page::-webkit-scrollbar-thumb:hover,
+  .main-content::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+    background: #4a90e2;
+  }
+  .file-index-page, .main-content, body, html {
+    scrollbar-width: thin;
+    scrollbar-color: #b0b8c9 #e0e7ef;
+  }
+  
+  /* =============================
+     Remove Top Padding/Margin for Content Flush with Header
+     ============================= */
+  .file-index-content-wrapper {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  
+  /* =============================
+     Standardize Paddings to rem Units
+     ============================= */
+  .file-index-page,
+  .file-index-content {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: unset;
+    padding-left: 0.00000!important;
+    padding-right: 0.0000 !important;
+  }
+  .files-section {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .all-files-section {
+    margin-top: 2.5rem;
+  }
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  .search-filter-bar {
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* =============================
+     Media Queries (Responsive Design)
+     ============================= */
+  @media (max-width: 1200px) {
+    .files-scroll-grid, .all-files-scroll-grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .file-card {
+      max-width: 220px;
+      min-height: 140px;
+      padding: 1rem 0.8rem;
+    }
+  }
+  @media (max-width: 900px) {
+    .files-scroll-grid, .all-files-scroll-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      padding: 0.7rem 0.3rem 0.7rem 0.3rem;
+    }
+    .file-card {
+      max-width: 160px;
+      min-height: 100px;
+      padding: 0.7rem 0.4rem;
+    }
+    .file-index-page {
+      padding-top: 2.5rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .file-index-page {
+      padding: 1rem;
+    }
+    .search-filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .search-container {
+      width: 100%;
+    }
+    .filter-container {
+      width: 100%;
+    }
+    .filter-button {
+      width: 100%;
+      justify-content: center;
+    }
+    .files-scroll-grid {
+      grid-template-columns: 1fr;
+    }
+    .load-more-button {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+    }
+    .load-more-icon {
+      font-size: 1rem;
+    }
+    .sidebar-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .file-index-layout .category-sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px; /* Hidden off-screen */
+      width: 280px;
+      height: 100%;
+      z-index: 1000;
+      transition: left 0.3s ease-in-out;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    }
+    .file-index-layout.sidebar-open .category-sidebar {
+      left: 0; /* Slide in */
+    }
+    .file-index-layout.sidebar-open .sidebar-overlay {
+      display: block; /* Show overlay */
+    }
+  }
+  @media (max-width: 600px) {
+    .file-index-page {
+      padding: 0.5rem;
+    }
+    .files-scroll-grid, .all-files-scroll-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+      padding: 0.5rem 0.1rem 0.5rem 0.1rem;
+    }
+    .file-card {
+      max-width: 100%;
+      min-height: 80px;
+      padding: 0.5rem 0.2rem;
+    }
+  }
+  
+  .file-index-page {
+    flex: 1;
+    padding: 32px 40px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .success-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .file-index-layout {
+    display: flex;
+    position: relative;
+    height: calc(100vh - 120px); /* Adjust based on header/footer height */
+  }
+  
+  .sidebar-container {
+    flex: 0 0 260px;
+    height: 100%;
+    overflow-y: auto; /* Allow sidebar to scroll if it has many categories */
+  }
+  
+  .file-index-page-content {
+    flex-grow: 1;
+    padding: 1rem 2rem;
+    min-width: 0;
+    overflow-y: auto; /* This is the key change to allow content scrolling */
+    height: 100%;
+  }
+  
+  .sidebar-toggle-btn {
+    display: none; /* Hidden on desktop */
+  }
+  
+  .sidebar-overlay {
+    display: none; /* Hidden on desktop */
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar-container {
+      position: fixed;
+      top: 0;
+      left: -280px; /* Hidden off-screen */
+      width: 280px;
+      height: 100vh;
+      z-index: 1000;
+      transition: left 0.3s ease-in-out;
+      background: #fff; /* Ensure it has a background */
+      box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    }
+  
+    .file-index-layout.sidebar-open .sidebar-container {
+      left: 0; /* Slide in */
+    }
+  
+    .sidebar-toggle-btn {
+      display: flex; /* Show the button on mobile */
+      align-items: center;
+      gap: 0.5rem;
+    }
+  
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+    
+    .file-index-layout.sidebar-open .sidebar-overlay {
+        display: block; /* Show overlay */
+    }
+  }

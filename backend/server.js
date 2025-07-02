@@ -139,6 +139,83 @@ app.post('/api/files/upload', upload.array('files'), async (req, res) => {
   }
 });
 
+// --- Paginated files endpoint ---
+app.get('/api/files/paginated', async (req, res) => {
+  console.log('--- New Paginated Request ---');
+  console.log('Incoming req.query:', req.query);
+
+  try {
+    const { category, subCategory, year, search, limit = 16, startAfter = null } = req.query;
+
+    let query = db.collection('uploads');
+
+    const filters = { search, category, year, subCategory };
+    console.log('Filters object (before cleanup):', filters);
+
+    // Remove empty filters
+    Object.keys(filters).forEach(key => {
+      if (!filters[key]) {
+        delete filters[key];
+      }
+    });
+     console.log('Filters object (after cleanup):', filters);
+
+    if (filters.category) {
+      query = query.where('category', '==', filters.category);
+    }
+    if (filters.subCategory) {
+      query = query.where('subCategory', '==', filters.subCategory);
+    }
+    if (filters.year) {
+      // Ensure year is compared as a number if stored as such
+      query = query.where('year', '==', parseInt(filters.year, 10));
+    }
+    // Note: Firestore requires a composite index for combining where filters with orderBy.
+    // If you add more filters, you may need to create more indexes in the Firebase console.
+    query = query.orderBy('createdAt', 'desc');
+
+    if (startAfter) {
+      const startAfterDoc = await db.collection('uploads').doc(startAfter).get();
+      if(startAfterDoc.exists) {
+        query = query.startAfter(startAfterDoc);
+      }
+    }
+
+    const snapshot = await query.limit(Number(limit)).get();
+
+    let files = snapshot.docs.map(doc => ({
+      _id: doc.id,
+      ...doc.data(),
+      createdAt: toISODate(doc.data().createdAt),
+      updatedAt: toISODate(doc.data().updatedAt),
+    }));
+
+    // In-memory search for now, as full-text search is complex in Firestore
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      files = files.filter(file =>
+        (file.originalName || '').toLowerCase().includes(searchTerm) ||
+        (file.description || '').toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    console.log(`Query returned ${files.length} files.`);
+    
+    const lastVisible = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1].id : null;
+    
+    const hasNextPage = lastVisible ? (await query.startAfter(snapshot.docs[snapshot.docs.length-1]).limit(1).get()).docs.length > 0 : false;
+
+    res.json({
+      files,
+      lastVisible,
+      hasNextPage
+    });
+  } catch (error) {
+    console.error('Error fetching paginated files:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {

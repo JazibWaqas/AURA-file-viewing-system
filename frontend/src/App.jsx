@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import DashboardPage from "./pages/DashboardPage";
-import FileIndexPage from "./pages/FileIndexPage";
-import FileViewerPage from "./pages/FileViewerPage";
-import FileEditPage from "./pages/FileEditPage";
-import UploadFilePage from "./pages/UploadFilePage";
-import PendingApprovalPage from "./pages/PendingApprovalPage";
-import AccessDeniedPage from "./pages/AccessDeniedPage";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, Suspense, lazy } from "react";
 import { auth } from "./services/firebase";
+import PageLoader from "./components/PageLoader";
+
+// Lazy load the page components
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const FileIndexPage = lazy(() => import("./pages/FileIndexPage"));
+const FileViewerPage = lazy(() => import("./pages/FileViewerPage"));
+const FileEditPage = lazy(() => import("./pages/FileEditPage"));
+const UploadFilePage = lazy(() => import("./pages/UploadFilePage"));
+const PendingApprovalPage = lazy(() => import("./pages/PendingApprovalPage"));
+const AccessDeniedPage = lazy(() => import("./pages/AccessDeniedPage"));
 
 const AuthContext = createContext(null);
 export function useAuth() {
@@ -70,19 +73,21 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/file-index" element={<FileIndexPage />} />
-          <Route path="/file-viewer/:id?" element={<FileViewerPage />} />
-          <Route path="/upload-file" element={<UploadFilePage />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/file-index" element={<FileIndexPage />} />
+            <Route path="/file-viewer/:id?" element={<FileViewerPage />} />
+            <Route path="/upload-file" element={<UploadFilePage />} />
 
-          {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/file-edit/:id" element={<FileEditPage />} />
-          </Route>
+            {/* Protected Routes */}
+            <Route element={<PrivateRoute />}>
+              <Route path="/file-edit/:id" element={<FileEditPage />} />
+            </Route>
 
-        </Routes>
+          </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );

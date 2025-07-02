@@ -316,11 +316,11 @@ const FileViewer = () => {
             <div className="header-action-row">
               <button className="download-btn small" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} title="Download File">
                 <FiDownload />
-              Download
+                Download
               </button>
               <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
-                <FiMaximize style={{marginRight: '0.5em'}} />
-                View in Full-Screen
+                {isFullscreen ? <FiMinimize style={{marginRight: '0.5em'}} /> : <FiMaximize style={{marginRight: '0.5em'}} />}
+                {isFullscreen ? 'Exit Full-Screen' : 'View in Full-Screen'}
               </button>
             </div>
           </div>

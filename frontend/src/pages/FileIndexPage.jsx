@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../styles/FileIndex.css';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
@@ -19,24 +19,111 @@ export default function FileIndexPage() {
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [visibleFilesCount, setVisibleFilesCount] = useState(16);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [hasMoreFiles, setHasMoreFiles] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const debounceTimeout = useRef(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Fetch categories and initial files
   useEffect(() => {
-    if (location.state?.message) {
-      setSuccessMessage(location.state.message);
-      // Clear message after 3 seconds
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-        // Also clear the state from navigation history
-        navigate(location.pathname, { replace: true });
-      }, 3000);
-      return () => clearTimeout(timer);
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      try {
+        const res = await fetch('/api/categories');
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const categoriesData = await res.json();
+        const financialStatements = categoriesData.filter(cat => cat === 'Financial Statements');
+        const other = categoriesData.filter(cat => cat === 'Other');
+        const rest = categoriesData.filter(cat => cat !== 'Financial Statements' && cat !== 'Other');
+        setCategories([...financialStatements, ...rest, ...other]);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch paginated files (All Files)
+  const fetchFiles = useCallback(async (reset = false, search = searchTerm) => {
+    if (reset) {
+      setIsLoadingFiles(true);
+      setAllFiles([]);
+      setLastVisible(null);
+    } else {
+      setIsLoadingMore(true);
     }
-  }, [location, navigate]);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        category: selectedCategory,
+        subCategory: selectedSubCategory,
+        year: selectedYear,
+        search: search,
+        limit: 16,
+        ...(lastVisible && !reset ? { startAfter: lastVisible } : {})
+      });
+      const res = await fetch(`/api/files/paginated?${params}`);
+      if (!res.ok) throw new Error('Failed to fetch files');
+      const { files, lastVisible: newLastVisible, hasNextPage } = await res.json();
+      setAllFiles(prev => reset ? files : [...prev, ...files]);
+      setLastVisible(newLastVisible);
+      setHasMoreFiles(hasNextPage);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoadingFiles(false);
+      setIsLoadingMore(false);
+    }
+  }, [selectedCategory, selectedSubCategory, selectedYear, lastVisible]);
+
+  // Fetch recent files (limit 4, same filters)
+  const fetchRecentFiles = useCallback(async (search = searchTerm) => {
+    try {
+      const params = new URLSearchParams({
+        category: selectedCategory,
+        subCategory: selectedSubCategory,
+        year: selectedYear,
+        search: search,
+        limit: 4
+      });
+      const res = await fetch(`/api/files/paginated?${params}`);
+      if (!res.ok) throw new Error('Failed to fetch recent files');
+      const { files } = await res.json();
+      setRecentFiles(files);
+    } catch (err) {
+      setRecentFiles([]);
+    }
+  }, [selectedCategory, selectedSubCategory, selectedYear]);
+
+  // Effect for initial load and filter changes (but not search)
+  useEffect(() => {
+    fetchFiles(true);
+    fetchRecentFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedSubCategory, selectedYear]);
+
+  // Effect for handling search term changes with debounce
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      fetchFiles(true, searchTerm);
+      fetchRecentFiles(searchTerm);
+    }, 500); // 500ms debounce delay
+
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
   // Responsive sidebar
   useEffect(() => {
@@ -45,42 +132,19 @@ export default function FileIndexPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch files and categories
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoadingFiles(true);
-      setError(null);
-      try {
-        const [filesRes, categoriesRes] = await Promise.all([
-          fetch('/api/files'),
-          fetch('/api/categories')
-        ]);
-        if (!filesRes.ok || !categoriesRes.ok) throw new Error('Failed to fetch data');
-        const [filesData, categoriesData] = await Promise.all([
-          filesRes.json(),
-          categoriesRes.json()
-        ]);
-        const sortedFiles = filesData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setAllFiles(sortedFiles);
-        setRecentFiles(sortedFiles.slice(0, 5));
-        // Sort categories: 'Financial Statements' at the top, 'Other' at the end
-        const financialStatements = categoriesData.filter(cat => cat === 'Financial Statements');
-        const other = categoriesData.filter(cat => cat === 'Other');
-        const rest = categoriesData.filter(cat => cat !== 'Financial Statements' && cat !== 'Other');
-        setCategories([...financialStatements, ...rest, ...other]);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoadingFiles(false);
-        setIsLoadingCategories(false);
-      }
-    };
-    fetchData();
-  }, []);
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        navigate(location.pathname, { replace: true });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [location, navigate]);
 
-  // Handlers
-  const handleViewFile = (fileId) => navigate(`/file-viewer/${fileId}`);
-  const handleDownload = async (fileId, fileName) => {
+  const handleViewFile = useCallback((fileId) => navigate(`/file-viewer/${fileId}`), [navigate]);
+  const handleDownload = useCallback(async (fileId, fileName) => {
     try {
       const response = await fetch(`/api/files/${fileId}`);
       if (!response.ok) throw new Error('Failed to download file');
@@ -96,55 +160,27 @@ export default function FileIndexPage() {
     } catch (error) {
       alert('Failed to download file. Please try again.');
     }
-  };
+  }, []);
   const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {}, 300);
+    setSearchTerm(e.target.value);
   };
-  const handleCategorySelect = (cat, sub) => {
+  const handleCategorySelect = useCallback((cat, sub) => {
     setSelectedCategory(cat);
     setSelectedSubCategory(sub);
-  };
-
-  // Filtering
-  const getUniqueYears = () => {
+  }, []);
+  const getUniqueYears = useMemo(() => {
     const years = Array.from(new Set(allFiles.map(file => file.year))).filter(Boolean);
     return years.sort((a, b) => b - a);
-  };
-  const filteredFiles = allFiles.filter(file => {
-    const fileName = file.originalName || file.filename || file.name || '';
-    const fileCategory = file.category || '';
-    const fileSubCategory = file.subCategory || '';
-    const matchesSearch = fileName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || fileCategory === selectedCategory;
-    const matchesSubCategory = !selectedSubCategory || fileSubCategory === selectedSubCategory;
-    const matchesYear = !selectedYear || file.year === parseInt(selectedYear);
-    return matchesSearch && matchesCategory && matchesSubCategory && matchesYear;
-  });
-  const filteredRecentFiles = filteredFiles.slice(0, 4);
-  const visibleFiles = filteredFiles.slice(0, visibleFilesCount);
-  const hasMoreFiles = visibleFilesCount < filteredFiles.length;
-
-  // Reset visible files count when filters change
-  useEffect(() => {
-    setVisibleFilesCount(16);
-  }, [searchTerm, selectedCategory, selectedSubCategory, selectedYear]);
-
-  const handleLoadMore = () => {
-    setVisibleFilesCount(prev => prev + 16);
-  };
-
-  // Dynamic section title
-  const getSectionTitle = () => {
+  }, [allFiles]);
+  const handleLoadMore = useCallback(() => {
+    fetchFiles(false);
+  }, [fetchFiles]);
+  const getSectionTitle = useMemo(() => {
     if (selectedSubCategory) return selectedSubCategory;
     if (selectedCategory) return selectedCategory;
     if (searchTerm) return `Search Results`;
     return 'Recent Files';
-  };
-
-  // Error state
+  }, [selectedCategory, selectedSubCategory, searchTerm]);
   if (error) {
     return (
       <div className="app-root">
@@ -161,38 +197,33 @@ export default function FileIndexPage() {
       </div>
     );
   }
-
   return (
     <div className="app-root">
       <Header />
       <main className="main-content">
         <div className={`file-index-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
           <div className="sidebar-container">
-            <CategorySidebar 
-              selectedCategory={selectedCategory} 
-              onSelectCategory={(cat) => handleCategorySelect(cat, selectedSubCategory)} 
-              onClearCategory={() => handleCategorySelect('', '')}
-            />
+            <CategorySidebar onSelect={handleCategorySelect} />
           </div>
           
           {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
 
           <div className="file-index-page-content">
             <div className="page-header">
-              <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+               <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
                 <span>Filters</span>
               </button>
               <h1>File Management</h1>
               <p>Browse and manage all your files in one place</p>
             </div>
-            
+
             {successMessage && (
               <div className="success-message">
                 {successMessage}
               </div>
             )}
-
+            
             <div className="search-filter-bar">
               <div className="search-container">
                 <FiSearch className="search-icon" />
@@ -226,7 +257,7 @@ export default function FileIndexPage() {
                 </button>
                 {showYearFilter && (
                   <div className="filter-dropdown">
-                    {getUniqueYears().map(year => (
+                    {getUniqueYears.map(year => (
                       <button
                         key={year}
                         className={`filter-option ${selectedYear === year ? 'selected' : ''}`}
@@ -253,20 +284,20 @@ export default function FileIndexPage() {
             </div>
             {/* Filtered/Category Section */}
             <section className="files-section">
-              <h2 className="files-section-title">{getSectionTitle()}</h2>
+              <h2 className="files-section-title">{getSectionTitle}</h2>
               <div className="files-scroll-grid">
                 {isLoadingFiles ? (
                   <div className="loading-indicator">
                     <FiLoader className="spinner-icon" />
                     <p>Loading files...</p>
                   </div>
-                ) : filteredRecentFiles.length === 0 ? (
+                ) : recentFiles.length === 0 ? (
                   <div className="empty-state">
                     <FiFile className="empty-icon" />
                     <p>No files found</p>
                   </div>
                 ) : (
-                  filteredRecentFiles.map((file) => (
+                  recentFiles.map((file) => (
                     <div key={file._id} className="file-card">
                       <div className="file-info">
                         <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
@@ -288,19 +319,19 @@ export default function FileIndexPage() {
             <section className="all-files-section">
               <h2 className="all-files-title">All Files</h2>
               <div className="all-files-scroll-grid">
-                {isLoadingFiles ? (
+                {isLoadingFiles && allFiles.length === 0 ? (
                   <div className="loading-indicator">
                     <FiLoader className="spinner-icon" />
                     <p>Loading files...</p>
                   </div>
-                ) : visibleFiles.length === 0 ? (
+                ) : allFiles.length === 0 ? (
                   <div className="empty-state">
                     <FiFile className="empty-icon" />
                     <p>No files found matching your criteria</p>
                   </div>
                 ) : (
                   <>
-                    {visibleFiles.map((file) => (
+                    {allFiles.map((file) => (
                       <div key={file._id} className="file-card">
                         <div className="file-info">
                           <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
@@ -317,9 +348,9 @@ export default function FileIndexPage() {
                     ))}
                     {hasMoreFiles && (
                       <div className="load-more-container">
-                        <button className="load-more-button" onClick={handleLoadMore}>
+                        <button className="load-more-button" onClick={handleLoadMore} disabled={isLoadingMore}>
                           <FiPlus className="load-more-icon" />
-                          Load More Files ({filteredFiles.length - visibleFilesCount} remaining)
+                          {isLoadingMore ? 'Loading...' : 'Load More'}
                         </button>
                       </div>
                     )}

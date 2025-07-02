@@ -9,12 +9,13 @@ router.post('/upload', upload.single('file'), fileController.uploadFile);
 // File retrieval routes
 router.get('/', fileController.getAllFiles);
 router.get('/filter', fileController.getFilesByCategoryAndDate);
+router.get('/paginated', fileController.getFilesPaginated);
 
 // File operations
-router.get('/:id', fileController.getFile);
 router.get('/:id/view', fileController.viewFile);
 router.get('/:id/preview', fileController.getFilePreview);
 router.get('/:id/details', fileController.getFileDetails);
+router.get('/:id', fileController.getFile);
 router.put('/:id', upload.single('file'), fileController.updateFile);
 router.delete('/:id', fileController.deleteFile);
 

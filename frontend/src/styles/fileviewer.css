@@ -417,7 +417,7 @@
   color: #b3b3b3;
 }
 
-/* Custom Scrollbars for all main content areas */
+/* Custom Scrollbars for all main content areas that I am keeping */
 .file-viewer-content::-webkit-scrollbar,
 .main-content::-webkit-scrollbar,
 body::-webkit-scrollbar, html::-webkit-scrollbar {
