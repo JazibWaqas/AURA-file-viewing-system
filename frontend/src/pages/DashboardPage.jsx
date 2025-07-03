@@ -2,19 +2,38 @@ import React from 'react';
 import Header from '../components/Header.jsx';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, 
-  AreaChart, Area, LineChart, Line, Legend, Dot 
+  AreaChart, Area, LineChart, Line, Legend, Dot, PieChart, Pie, Cell, Label, ComposedChart 
 } from 'recharts';
 import '../styles/dashboard.css';
 
 const graphData = [
-  { year: 2020, income: 85000, expenses: 62000, donations: 95000 },
-  { year: 2021, income: 95000, expenses: 70000, donations: 115000 },
-  { year: 2022, income: 102000, expenses: 72000, donations: 130000 },
-  { year: 2023, income: 110000, expenses: 80000, donations: 155000 },
-  { year: 2024, income: 120000, expenses: 85000, donations: 170000 },
+  { year: 2020, income: 18887133, expenses: 23857572, donations: 95000 },
+  { year: 2021, income: 14478076, expenses: 18199534, donations: 115000 },
+  { year: 2022, income: 21318558, expenses: 20461183, donations: 130000 },
+  { year: 2023, income: 24026879, expenses: 26540307, donations: 155000 },
+  { year: 2024, income: 33063777, expenses: 33247036, donations: 170000 },
+];
+
+const donationsPieData = [
+  { name: 'Donations', value: 7183302 },
+  { name: 'Zakat', value: 4185445 },
+  { name: 'Sponsorship', value: 4247128 },
+  { name: 'Fees', value: 5804200 },
+  { name: 'Other', value: 11714272 },
+];
+
+const PIE_COLORS = [
+  '#FFB300', // Donations - dark amber
+  '#fE35B1', // Zakat - deep purple
+  '#388E3C', // Sponsorship - dark green
+  '#1976D2', // Fees - strong blue
+  '#F4511E', // Other - deep orange
 ];
 
 function formatNumber(num) {
+  if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
   return num.toLocaleString('en-US');
 }
 
@@ -32,65 +51,92 @@ const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
   };
   
 
-function IncomeChart() {
-    return (
-      <div className="chart-card">
-        <h4>Total Income</h4>
-        <p>Annual income trend over the past 5 years</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="year" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip content={<CustomTooltip title="Income" />} />
-            <Area type="monotone" dataKey="income" stroke="#8884d8" fillOpacity={1} fill="url(#colorIncome)" />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  }
-  
-  function ExpenseChart() {
-    return (
-      <div className="chart-card">
-        <h4>Total Expense</h4>
-        <p>Annual expenses breakdown for transparency</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <XAxis dataKey="year" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip content={<CustomTooltip title="Expense" />} />
-            <Line type="monotone" dataKey="expenses" stroke="#82ca9d" strokeWidth={2} activeDot={{ r: 8 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  }
-  
-  function DonationsChart() {
-    return (
-      <div className="chart-card">
-        <h4>Total Donations</h4>
-        <p>Community support growth over time</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <XAxis dataKey="year" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip content={<CustomTooltip title="Donations" />} />
-            <Bar dataKey="donations" fill="#ffc658" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  }
+function CombinedIncomeExpenseChart() {
+  return (
+    <div className="chart-card">
+      <h4>Income vs Expense</h4>
+      <p>Annual comparison of income and expenses</p>
+      <ResponsiveContainer width="100%" height={340}>
+        <BarChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barGap={12}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="year" />
+          <YAxis tickFormatter={formatNumber} />
+          <Tooltip formatter={formatNumber} />
+          <Legend verticalAlign="top" align="right" />
+          <Bar dataKey="income" name="Income" fill="#2082a6" radius={[6, 6, 0, 0]} maxBarSize={36} />
+          <Bar dataKey="expenses" name="Expenses" fill="#01cbae" radius={[6, 6, 0, 0]} maxBarSize={36} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function renderPieLabel({ name, value, cx, cy, midAngle, innerRadius, outerRadius, percent, index }) {
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 24;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text
+      x={x}
+      y={y}
+      className="pie-label"
+      textAnchor={x > cx ? 'start' : 'end'}
+      dominantBaseline="central"
+    >
+      {`${name}: ${formatNumber(value)}`}
+    </text>
+  );
+}
+
+function DonationsChart() {
+  return (
+    <div className="chart-card">
+      <h4 className="donations-title">Donations Breakdown</h4>
+      <p className="donations-desc">Distribution of donation sources</p>
+      <ResponsiveContainer width="100%" height={340}>
+        <PieChart margin={{ top: 16, right: 16, left: 16, bottom: 16 }}>
+          <Pie
+            data={donationsPieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={110}
+            innerRadius={50}
+            paddingAngle={0}
+          >
+            {donationsPieData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+            ))}
+            <Label
+              value="Total"
+              position="center"
+              className="pie-label-center"
+            />
+          </Pie>
+          <Tooltip
+            formatter={(value, name) => [formatNumber(value), name]}
+            wrapperClassName="pie-tooltip"
+          />
+          <Legend
+            verticalAlign="bottom"
+            align="center"
+            iconType="circle"
+            formatter={(value, entry, index) => {
+              const data = donationsPieData.find(d => d.name === value);
+              return (
+                <span style={{ color: PIE_COLORS[index % PIE_COLORS.length], fontWeight: 500, fontSize: '0.95rem' }}>
+                  {value}: {formatNumber(data ? data.value : 0)}
+                </span>
+              );
+            }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
   
 const Home = () => {
   return (
@@ -101,8 +147,7 @@ const Home = () => {
         </div>
       
       <div className="charts-section">
-        <IncomeChart />
-        <ExpenseChart />
+        <CombinedIncomeExpenseChart />
         <DonationsChart />
       </div>
 

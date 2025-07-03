@@ -15,11 +15,7 @@
   /* Inherit background and color from globals.css */
 }
 
-/* Main dashboard content */
-.dashboard-page {
-  padding: 2rem;
-  background-color: #f9fafb;
-}
+/* Main dashboard content -----------*/ 
 
 .dashboard-header {
   margin-bottom: 2rem;
@@ -349,7 +345,7 @@
 .dashboard-main-content {
   height: 100vh;
   overflow-y: auto;
-  background: #f8fafc;
+  background: #060606;
 }
 
 /* Custom Scrollbars for all main content areas */
@@ -874,4 +870,42 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 .dashboard-header, .charts-section, .dashboard-overview, .content-section, .bottom-section {
   
   padding-bottom: 0.5rem;
+}
+
+.donations-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0;
+}
+.donations-desc {
+  font-weight: 500;
+  color: #555;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+.pie-label {
+  font-weight: bold;
+  font-size: 1.05rem;
+  paint-order: stroke fill;
+  stroke: #fff;
+  stroke-width: 2px;
+  filter: drop-shadow(0 1px 2px #fff);
+}
+.pie-label-center {
+  font-size: 1.15rem;
+  font-weight: 700;
+  fill: #222;
+}
+.pie-tooltip {
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(60, 80, 120, 0.07);
+  color: #222;
+  padding: 0.75rem 1.25rem;
+}
+.pie-legend {
+  font-size: 0.95rem;
+  font-weight: 500;
 }
