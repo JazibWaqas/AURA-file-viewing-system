@@ -10,6 +10,7 @@ html, body {
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scroll */
   overflow-y: auto; /* Allow vertical scroll only when needed */
+  color: #000;
 }
 
 #root {
@@ -45,7 +46,7 @@ html, body {
 .main-content {
   flex: 1 1 auto;
   padding: 32px 40px;
-  background: #f0f2f5;
+  background: #fcfcfc;
   min-height: calc(100vh - 64px);
   overflow-x: hidden; /* Prevent horizontal scroll */
   overflow-y: auto;
@@ -331,3 +332,6 @@ html, body {
 /* =============================
    Responsive Styles
    ============================= */
+* {
+  color: #000 !important;
+}

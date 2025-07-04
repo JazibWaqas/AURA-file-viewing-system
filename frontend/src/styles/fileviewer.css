@@ -672,3 +672,7 @@ html {
    Responsive Styles
    ============================= */
 
+* {
+  color: #000 !important;
+}
+

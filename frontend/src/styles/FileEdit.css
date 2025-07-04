@@ -2,6 +2,11 @@
    File Edit Layout & Structure
    ============================= */
 
+/* Add at the top of the file */
+* {
+  color: #000 !important;
+}
+
 /* Main container to center the content card */
 .file-edit-main-content {
   display: flex;
