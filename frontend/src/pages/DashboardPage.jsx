@@ -6,6 +6,7 @@ import {
 } from 'recharts';
 import '../styles/dashboard.css';
 import auraLogo from '../assets/aura-logo.png';
+import { useInView } from '../hooks/useInView';
 
 const graphData = [
   { year: 2020, income: 18887133, expenses: 23857572, donations: 95000 },
@@ -53,8 +54,12 @@ const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
   
 
 function CombinedIncomeExpenseChart() {
+  const [ref, inView] = useInView({ threshold: 0.2 });
   return (
-    <div className="chart-card">
+    <div
+      ref={ref}
+      className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
+    >
       <h4>Income vs Expense</h4>
       <p>Annual comparison of income and expenses</p>
       <ResponsiveContainer width="100%" height={340}>
@@ -91,8 +96,12 @@ function renderPieLabel({ name, value, cx, cy, midAngle, innerRadius, outerRadiu
 }
 
 function DonationsChart() {
+  const [ref, inView] = useInView({ threshold: 0.2 });
   return (
-    <div className="chart-card">
+    <div
+      ref={ref}
+      className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
+    >
       <h4 className="donations-title">Donations Breakdown</h4>
       <p className="donations-desc">Distribution of donation sources</p>
       <ResponsiveContainer width="100%" height={340}>
