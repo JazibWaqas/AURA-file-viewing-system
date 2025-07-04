@@ -989,7 +989,3 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 /* =============================
    Responsive Styles
    ============================= */
-
-* {
-  color: #000 !important;
-}

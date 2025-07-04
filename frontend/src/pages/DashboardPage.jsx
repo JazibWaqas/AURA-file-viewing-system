@@ -5,6 +5,7 @@ import {
   AreaChart, Area, LineChart, Line, Legend, Dot, PieChart, Pie, Cell, Label, ComposedChart 
 } from 'recharts';
 import '../styles/dashboard.css';
+import auraLogo from '../assets/aura-logo.png';
 
 const graphData = [
   { year: 2020, income: 18887133, expenses: 23857572, donations: 95000 },
@@ -142,9 +143,21 @@ const Home = () => {
   return (
     <div className="dashboard-page">
 
-      <div className="dashboard-header">
-        <h1>Welcome to the AURA File Viewing System</h1>
+      {/* About/Intro Section */}
+      <section className="dashboard-intro-section">
+        <div className="dashboard-intro-flex">
+          <img src={auraLogo} alt="AURA Logo" className="dashboard-intro-logo" />
+          <div className="dashboard-intro-text">
+            <h2>Welcome to <span className="aura-highlight">AURA</span>'s File Management System</h2>
+            <p>At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, 
+              and trust. This platform is designed to give you open access to our files 
+              and records, from reports and policies to activity updates. So you can stay informed about our work and impact.
+              All files are publicly available for your convenience and confidence, reflecting 
+              our ongoing commitment to accountability and community engagement.</p>
+          </div>
         </div>
+      </section>
+
       
       <div className="charts-section">
         <CombinedIncomeExpenseChart />
