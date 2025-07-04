@@ -1,5 +1,8 @@
 /* FileViewer.css */
 
+/* =============================
+   File Viewer Layout & Structure
+   ============================= */
 /* --- Layout root for file viewer page --- */
 .file-viewer-flex-root {
   width: 100%;
@@ -655,4 +658,17 @@ html {
 .header-action-row .fullscreen-btn.with-label {
   margin: 0;
 }
+
+/* =============================
+   File Viewer Header
+   ============================= */
+/* =============================
+   File Viewer Content & Sidebar
+   ============================= */
+/* =============================
+   File Viewer Actions
+   ============================= */
+/* =============================
+   Responsive Styles
+   ============================= */
 

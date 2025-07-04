@@ -1,3 +1,6 @@
+/* =============================
+   Category Sidebar Layout & Structure
+   ============================= */
 /* --- Sidebar container inherits global background --- */
 .category-sidebar-container {
   min-width: 220px;
@@ -76,6 +79,9 @@
   font-weight: 600;
 }
 
+/* =============================
+   Category Sidebar List & Items
+   ============================= */
 /* Custom scrollbar for category sidebar */
 .category-sidebar-container::-webkit-scrollbar {
   width: 8px;

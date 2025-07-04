@@ -1,4 +1,6 @@
-/* Base styles */
+/* =============================
+   Base Styles (html, body, root)
+   ============================= */
 html, body {
   height: 100%;
   margin: 0;
@@ -16,6 +18,9 @@ html, body {
   overflow-y: auto;
 }
 
+/* =============================
+   Header Styles
+   ============================= */
 /* Layout components */
 .app-root {
   display: flex;
@@ -40,7 +45,7 @@ html, body {
 .main-content {
   flex: 1 1 auto;
   padding: 32px 40px;
-  background: #F7F7F8;   /* Main background color of all pages */
+  background: #f0f2f5;
   min-height: calc(100vh - 64px);
   overflow-x: hidden; /* Prevent horizontal scroll */
   overflow-y: auto;
@@ -52,7 +57,7 @@ html, body {
 .header {
   position: relative;
   width: 100%;
-  background: #ffffff;
+  background: #fff;
   z-index: 1100;
   padding: 10px 20px;
   box-sizing: border-box;
@@ -83,7 +88,7 @@ html, body {
 }
 
 .header-title {
-  color: #070707;
+  color: #000;
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
@@ -135,7 +140,7 @@ html, body {
 .header-nav-link {
   display: flex;
   align-items: center;
-  color: #737f93fe;
+  color: #333;
   font-size: 1rem;
   font-weight: 500;
   font-family: Arial, sans-serif;
@@ -199,152 +204,6 @@ html, body {
 .header-user-name {
   font-size: 14px;
   color: #333;
-}
-
-/* Sidebar styles */
-.sidebar {
-  width: 240px;
-  min-width: 240px;
-  height: calc(100vh - 64px);
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.02);
-  padding-top: 1rem;
-  position: relative; /* Not fixed by default */
-  left: -260px;
-  top: 0;
-  transition: left 0.3s;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar nav {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.sidebar .close-btn {
-  display: block;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #888;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  cursor: pointer;
-}
-
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar nav li {
-  margin-bottom: 1rem;
-}
-
-.sidebar nav a {
-  display: flex;
-  align-items: center;
-  color: #333;
-  text-decoration: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
-  font-size: 1rem;
-}
-
-.sidebar nav a.active,
-.sidebar nav a:hover {
-  background: #ede9fe;
-  color: #284bd9;
-}
-
-.sidebar nav a span {
-  margin-right: 0.75rem;
-  font-size: 1.2em;
-}
-
-/* Sidebar user profile styles */
-.sidebar-user-profile {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.75rem 1.5rem;
-  margin-top: auto;
-  color: #333;
-  text-decoration: none;
-  font-size: 1rem;
-}
-
-.sidebar-user-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2em;
-  color: #333;
-}
-
-.sidebar-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sidebar-user-name {
-  font-weight: normal;
-  color: #333;
-  font-size: 1rem;
-}
-
-.sidebar-user-email {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 899px) {
-  .sidebar {
-    position: fixed;
-    top: 64px;
-    left: -260px;
-    height: calc(100vh - 64px);
-    transition: left 0.3s;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-  }
-  .sidebar.open {
-    left: 0;
-  }
-  .sidebar .close-btn {
-    display: block;
-  }
-}
-
-@media (min-width: 900px) {
-  .sidebar {
-    left: -260px;
-    position: relative;
-    top: 0;
-    height: calc(100vh - 64px);
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    border-right: 1px solid #e5e7eb;
-    z-index: 1000;
-    transition: left 0.3s;
-  }
-  .sidebar.open {
-    left: 0;
-  }
-  .sidebar .close-btn {
-    display: none;
-  }
 }
 
 /* Responsive Header Styles */
@@ -460,3 +319,15 @@ html, body {
   min-width: 0;
   overflow-x: hidden;
 }
+
+/* =============================
+   Sidebar (Category Sidebar Only, if any)
+   ============================= */
+
+/* =============================
+   Layout Components
+   ============================= */
+
+/* =============================
+   Responsive Styles
+   ============================= */

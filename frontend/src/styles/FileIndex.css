@@ -1,5 +1,5 @@
 /* =============================
-   Layout & Structure (Main page flex, scroll, sidebar)
+   File Index Layout & Structure
    ============================= */
 .app-content-row { /* Main flex row for sidebar + content */
   display: flex;
@@ -400,8 +400,6 @@
   margin-bottom: 1rem;
 }
 
-
-
 /* =============================
    Remove Top Padding/Margin for Content Flush with Header
    ============================= */
@@ -451,7 +449,7 @@
     gap: 1rem;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* Adjust layout for mobile */
   .file-index-page {
     padding: 1rem;
   }
@@ -487,7 +485,7 @@
   .file-index-layout .category-sidebar {
     position: fixed;
     top: 0;
-    left: -280px;
+    left: -280px; /* Hidden off-screen */
     width: 280px;
     height: 100%;
     z-index: 1000;
@@ -495,10 +493,10 @@
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
   }
   .file-index-layout.sidebar-open .category-sidebar {
-    left: 0;
+    left: 0; /* Slide in */
   }
   .file-index-layout.sidebar-open .sidebar-overlay {
-    display: block;
+    display: block; /* Show overlay */
   }
 }
 @media (max-width: 600px) {
@@ -565,19 +563,17 @@
     background: #fff; /* Ensure it has a background */
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
   }
-  .file-index-page-content {
-    flex-grow: 1;
-    padding: 1rem 2rem;
-    padding-left: 0rem;
-    min-width: 0;
-    overflow-y: auto; /* This is the key change to allow content scrolling */
-    height: 100%;
+
+  .file-index-layout.sidebar-open .sidebar-container {
+    left: 0; /* Slide in */
   }
+
   .sidebar-toggle-btn {
     display: flex; /* Show the button on mobile */
     align-items: center;
     gap: 0.5rem;
   }
+
   .sidebar-overlay {
     position: fixed;
     top: 0;
@@ -587,7 +583,24 @@
     background: rgba(0,0,0,0.4);
     z-index: 999;
   }
+  
   .file-index-layout.sidebar-open .sidebar-overlay {
       display: block; /* Show overlay */
   }
 }
+
+/* =============================
+   Category Sidebar (if any)
+   ============================= */
+
+/* =============================
+   File Card & Grid
+   ============================= */
+
+/* =============================
+   File Index Actions & Buttons
+   ============================= */
+
+/* =============================
+   Responsive Styles
+   ============================= */

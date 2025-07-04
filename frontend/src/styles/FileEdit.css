@@ -1,4 +1,6 @@
-/* FileEditPage Styles - Final Responsive Fix */
+/* =============================
+   File Edit Layout & Structure
+   ============================= */
 
 /* Main container to center the content card */
 .file-edit-main-content {
@@ -326,4 +328,16 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   color: #888;
   cursor: not-allowed;
   opacity: 0.7;
-} 
+}
+
+/* =============================
+   File Edit Card & Form
+   ============================= */
+
+/* =============================
+   File Edit Actions
+   ============================= */
+
+/* =============================
+   Responsive Styles
+   ============================= */ 

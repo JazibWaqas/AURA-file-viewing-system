@@ -1,3 +1,6 @@
+/* =============================
+   Upload Page Layout & Structure
+   ============================= */
 /* --- Layout root for upload page --- */
 .upload-content-row {
   display: flex;
@@ -315,6 +318,9 @@ strong,
   color: #554ee2;
 }
 
+/* =============================
+   Upload Modal
+   ============================= */
 /* Modal styles */
 .upload-modal-overlay {
   position: fixed;
@@ -392,7 +398,6 @@ strong,
 .recent-uploads-empty {
   color: #111;
 }
-
 
 .drop-zone {
   border: 2px dashed #6c63ff;
@@ -980,3 +985,7 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent, #FF6F61);
   color: #fff;
 }
+
+/* =============================
+   Responsive Styles
+   ============================= */
