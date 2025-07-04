@@ -6,8 +6,6 @@
   min-width: 220px;
   max-width: 260px;
   /* Inherit background and color from globals.css */
-  border-right: 2.5px solid #384959;
-  box-shadow: 2px 0 12px #38495933;
   display: block;
   padding: 0;
   margin: 0;
@@ -17,18 +15,30 @@
   align-self: flex-start;
   z-index: 10;
   height: calc(100vh - 0px);
-  background: #f5f7fa;
+  background: linear-gradient(180deg,#2c5364  0%, #203a43 60%, #0f2027 100%);
   overflow-y: auto;
+  color: #000;
+  border-radius: 24px 24px 32px 32px;
+  box-shadow: 0 4px 24px rgba(44, 83, 100, 0.12);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.category-sidebar-container::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }
 
 .category-sidebar-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #6A89A7;
-  background: #384959;
-  padding: 1rem 1.25rem 0.75rem 2.25rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  /* padding: 1.2rem 1.25rem 1rem 1.25rem; */
+  padding-top: 0rem;
+  margin-bottom: 1rem;
   letter-spacing: 0.5px;
+  border-radius: 8px 8px 0 0;
 }
 
 .category-list {
@@ -43,15 +53,15 @@
   padding: 0.75rem 1.25rem;
   border-radius: 6px;
   transition: background 0.2s, color 0.2s;
-  color: #384959;
+  color: #ffff;
   margin-bottom: 0.2rem;
 }
 
 .category-name.expanded,
 .category-name:hover {
-  background: #BDDDFC;
-  color: #6A89A7;
-  font-weight: 600;
+  background: #E3F0FB;
+  color: #000;
+  font-weight: 700;
 }
 
 .subcategory-list {
@@ -63,7 +73,7 @@
 .subcategory-btn {
   background: none;
   border: none;
-  color: #384959;
+  color: #fff;
   text-align: left;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -74,8 +84,8 @@
 }
 
 .subcategory-btn:hover {
-  background: #BDDDFC;
-  color: #6A89A7;
+  background: #F2F4F8;
+  color: #000;
   font-weight: 600;
 }
 
