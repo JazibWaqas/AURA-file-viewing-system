@@ -950,6 +950,7 @@ html {
   height: auto;
   max-height: 140%;
 }
+
 .file-scroll-inner::-webkit-scrollbar {
   display: none;
 }

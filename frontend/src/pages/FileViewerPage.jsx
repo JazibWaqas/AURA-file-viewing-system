@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -29,6 +29,7 @@ const FileViewer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const scrollRef = useRef(null);
 
   // Debug: Log user object on every render
   console.log('FileViewer render - user object:', user);
@@ -297,6 +298,12 @@ const FileViewer = () => {
 
   const scrollBoxFiles = getScrollBoxFiles();
 
+  const scrollByAmount = (amount) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
   // Handle search input
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -502,33 +509,37 @@ const FileViewer = () => {
         </div>
 
         {/* Horizontal scroll box for files */}
-        <div className="file-viewer-horizontal-scroll file-viewer-horizontal-scroll-large">
+        <div className="file-viewer-horizontal-scroll file-viewer-horizontal-scroll-large custom-scroll-hide">
           <div className="file-viewer-scroll-title">
             {isSearching ? `Search Results (${scrollBoxFiles.length})` : 'Recently Viewed Files'}
           </div>
-          {scrollBoxFiles.length > 0 ? (
-            scrollBoxFiles.map(f => (
-              <div
-                key={f._id}
-                className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
-                onClick={() => navigate(`/file-viewer/${f._id}`)}
-              >
-                <div className="file-info">
-                  <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
-                  <p>Category: {f.category || 'Uncategorized'}</p>
-                  <p>Year: {f.year || 'N/A'}</p>
+          <button className="scroll-arrow left" onClick={() => scrollByAmount(-220)}><FiChevronLeft /></button>
+          <div className="file-scroll-inner" ref={scrollRef}>
+            {scrollBoxFiles.length > 0 ? (
+              scrollBoxFiles.map(f => (
+                <div
+                  key={f._id}
+                  className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
+                  onClick={() => navigate(`/file-viewer/${f._id}`)}
+                >
+                  <div className="file-info">
+                    <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
+                    <p>Category: {f.category || 'Uncategorized'}</p>
+                    <p>Year: {f.year || 'N/A'}</p>
+                  </div>
+                  <div className="file-actions">
+                    <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
+                    <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
+                  </div>
                 </div>
-                <div className="file-actions">
-                  <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
-                  <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
-                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                {isSearching ? 'No files found matching your search.' : 'No recently viewed files.'}
               </div>
-            ))
-          ) : (
-            <div className="empty-state">
-              {isSearching ? 'No files found matching your search.' : 'No recently viewed files.'}
-            </div>
-          )}
+            )}
+          </div>
+          <button className="scroll-arrow right" onClick={() => scrollByAmount(220)}><FiChevronRight /></button>
         </div>
 
         {/* Centered preview with overlayed actions */}
