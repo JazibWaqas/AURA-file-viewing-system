@@ -365,6 +365,140 @@ class FileService {
             throw error;
         }
     }
+
+    // Add a file to recently viewed for a user
+    async addToRecentlyViewed(fileId, userId) {
+        try {
+            // Verify the file exists
+            const file = await this.getFileById(fileId);
+            if (!file) {
+                throw new Error(`File with ID ${fileId} not found`);
+            }
+            
+            // Check for existing entry
+            const existingSnapshot = await this.db.collection('recentlyViewed')
+                .where('userId', '==', userId)
+                .where('fileId', '==', fileId)
+                .get();
+            
+            if (existingSnapshot.size > 0) {
+                // Update existing entry
+                const doc = existingSnapshot.docs[0];
+                await doc.ref.update({
+                    viewedAt: convertToTimestamp(new Date())
+                });
+            } else {
+                // Add new entry
+                const newEntry = {
+                    userId: userId,
+                    fileId: fileId,
+                    viewedAt: convertToTimestamp(new Date())
+                };
+                
+                await this.db.collection('recentlyViewed').add(newEntry);
+            }
+            
+            // Clean up old entries (keep only the most recent 10 per user)
+            const allEntriesSnapshot = await this.db.collection('recentlyViewed')
+                .where('userId', '==', userId)
+                .get();
+            
+            if (allEntriesSnapshot.size > 10) {
+                const entries = [];
+                allEntriesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    entries.push({
+                        id: doc.id,
+                        viewedAt: convertTimestamp(data.viewedAt)
+                    });
+                });
+                
+                // Sort by viewedAt and keep only the 10 most recent
+                const sortedEntries = entries
+                    .sort((a, b) => new Date(b.viewedAt) - new Date(a.viewedAt))
+                    .slice(10);
+                
+                // Delete the older entries
+                const deletePromises = sortedEntries.map(entry => 
+                    this.db.collection('recentlyViewed').doc(entry.id).delete()
+                );
+                
+                await Promise.all(deletePromises);
+            }
+            
+        } catch (error) {
+            console.error('Error adding to recently viewed:', error);
+            throw error;
+        }
+    }
+
+    // Get recently viewed files for a user
+    async getRecentlyViewedFiles(userId, limit = 4) {
+        try {
+            // Use a simpler query that doesn't require a composite index
+            const snapshot = await this.db.collection('recentlyViewed')
+                .where('userId', '==', userId)
+                .get();
+            
+            if (snapshot.empty) {
+                return [];
+            }
+            
+            // Get all entries and sort them in memory
+            const entries = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                entries.push({
+                    id: doc.id,
+                    ...data,
+                    viewedAt: convertTimestamp(data.viewedAt)
+                });
+            });
+            
+            // Sort by viewedAt (most recent first) and limit
+            const sortedEntries = entries
+                .sort((a, b) => b.viewedAt - a.viewedAt)
+                .slice(0, limit);
+            
+            // Get the actual file data for each recently viewed entry
+            const filePromises = sortedEntries.map(async (entry) => {
+                try {
+                    const file = await this.getFileById(entry.fileId);
+                    return file ? { ...file, viewedAt: entry.viewedAt } : null;
+                } catch (error) {
+                    console.warn(`File ${entry.fileId} not found, skipping from recently viewed`);
+                    return null;
+                }
+            });
+            
+            const files = await Promise.all(filePromises);
+            const validFiles = files.filter(file => file !== null);
+            
+            return validFiles;
+        } catch (error) {
+            console.error('Error getting recently viewed files:', error);
+            throw error;
+        }
+    }
+
+    // Clear recently viewed files for a user
+    async clearRecentlyViewedFiles(userId) {
+        try {
+            const recentlyViewedRef = this.db.collection('recentlyViewed');
+            
+            const snapshot = await recentlyViewedRef
+                .where('userId', '==', userId)
+                .get();
+
+            const deletePromises = snapshot.docs.map(doc => doc.ref.delete());
+            await Promise.all(deletePromises);
+
+            return { message: 'Recently viewed files cleared' };
+        } catch (error) {
+            console.error('Error clearing recently viewed files:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = new FileService(); 

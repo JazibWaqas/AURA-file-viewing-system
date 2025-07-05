@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -29,52 +29,101 @@ const FileViewer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
-  const scrollRef = useRef(null);
 
-  // Load recently viewed files from localStorage
+  // Debug: Log user object on every render
+  console.log('FileViewer render - user object:', user);
+  console.log('FileViewer render - authLoading:', authLoading);
+  console.log('FileViewer render - user?.userData?.uid:', user?.userData?.uid);
+  console.log('FileViewer render - user?.firebaseUser?.uid:', user?.firebaseUser?.uid);
+  console.log('FileViewer render - user?.userData:', user?.userData);
+  console.log('FileViewer render - user?.firebaseUser:', user?.firebaseUser);
+
+  // Load recently viewed files from database
   useEffect(() => {
-    const recent = localStorage.getItem('recentlyViewedFiles');
-    if (recent) {
+    console.log('useEffect for recently viewed files triggered with user UID:', user?.firebaseUser?.uid);
+    
+    const fetchRecentlyViewed = async () => {
+      console.log('Complete user object:', user);
+      console.log('User firebaseUser:', user?.firebaseUser);
+      console.log('User userData:', user?.userData);
+      console.log('Fetching recently viewed files for user:', user?.firebaseUser?.uid);
+      
+      if (!user?.firebaseUser?.uid) {
+        console.log('No user UID found, setting empty array');
+        setRecentlyViewedFiles([]);
+        return;
+      }
+      
       try {
-        const parsedRecent = JSON.parse(recent);
-        setRecentlyViewedFiles(parsedRecent);
-        console.log('Loaded recently viewed files:', parsedRecent);
+        console.log('Making API call to fetch recently viewed files...');
+        const res = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
+        console.log('API response status:', res.status);
+        
+        if (res.ok) {
+          const data = await res.json();
+          console.log('API response data:', data);
+          setRecentlyViewedFiles(data);
+          console.log('Loaded recently viewed files from database:', data);
+        } else {
+          const errorText = await res.text();
+          console.error('Failed to fetch recently viewed files. Status:', res.status, 'Error:', errorText);
+          setRecentlyViewedFiles([]);
+        }
       } catch (err) {
-        console.error('Error parsing recently viewed files:', err);
+        console.error('Error fetching recently viewed files:', err);
         setRecentlyViewedFiles([]);
       }
-    } else {
-      console.log('No recently viewed files found in localStorage');
-      setRecentlyViewedFiles([]);
-    }
-  }, []);
-
-  // Add file to recently viewed when selected
-  const addToRecentlyViewed = (fileData) => {
-    if (!fileData) return;
-    
-    const recent = JSON.parse(localStorage.getItem('recentlyViewedFiles') || '[]');
-    const existingIndex = recent.findIndex(f => f._id === fileData._id);
-    
-    if (existingIndex > -1) {
-      recent.splice(existingIndex, 1);
-    }
-    
-    const newRecentFile = {
-      _id: fileData._id,
-      originalName: fileData.originalName || fileData.filename || fileData.name,
-      category: fileData.category,
-      year: fileData.year,
-      fileType: fileData.fileType
     };
     
-    recent.unshift(newRecentFile);
+    fetchRecentlyViewed();
+  }, [user?.firebaseUser?.uid]);
+
+  // Add file to recently viewed in database
+  const addToRecentlyViewed = async (fileData) => {
+    console.log('Adding file to recently viewed:', fileData?._id, 'for user:', user?.firebaseUser?.uid);
     
-    // Keep only last 4 files (changed from 10 to 4 as requested)
-    const updatedRecent = recent.slice(0, 4);
-    localStorage.setItem('recentlyViewedFiles', JSON.stringify(updatedRecent));
-    setRecentlyViewedFiles(updatedRecent);
-    console.log('Updated recently viewed files:', updatedRecent);
+    if (!fileData || !user?.firebaseUser?.uid) {
+      console.log('Missing fileData or user UID, skipping add to recently viewed');
+      return;
+    }
+    
+    try {
+      console.log('Making API call to add to recently viewed...');
+      const res = await fetch('/api/files/recently-viewed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileId: fileData._id,
+          userId: user.firebaseUser.uid
+        })
+      });
+      
+      console.log('Add to recently viewed API response status:', res.status);
+      
+      if (res.ok) {
+        console.log('Successfully added to recently viewed, refreshing list...');
+        // Refresh the recently viewed files list
+        const refreshRes = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
+        console.log('Refresh API response status:', refreshRes.status);
+        
+        if (refreshRes.ok) {
+          const data = await refreshRes.json();
+          console.log('Refresh API response data:', data);
+          setRecentlyViewedFiles(data);
+          console.log('Updated recently viewed files:', data);
+        } else {
+          const errorText = await refreshRes.text();
+          console.error('Failed to refresh recently viewed files. Status:', refreshRes.status, 'Error:', errorText);
+        }
+      } else {
+        const errorText = await res.text();
+        console.error('Failed to add file to recently viewed. Status:', res.status, 'Error:', errorText);
+      }
+    } catch (err) {
+      console.error('Error adding to recently viewed:', err);
+    }
   };
 
   useEffect(() => {
@@ -219,30 +268,34 @@ const FileViewer = () => {
       console.log('Search results:', searchResults);
       return searchResults;
     }
+    
     // Show recently viewed files when not searching
-    const recentFiles = recentlyViewedFiles.map(recentFile => {
-      const fullFile = allFiles.find(f => f._id === recentFile._id);
-      return fullFile || recentFile;
-    });
-    console.log('Recently viewed files for display:', recentFiles);
+    console.log('Recently viewed files for display:', recentlyViewedFiles);
+    console.log('User authentication status:', !!user?.firebaseUser?.uid);
     
     // If no recently viewed files, show the 4 most recent files from allFiles
-    if (recentFiles.length === 0 && allFiles.length > 0) {
+    if (recentlyViewedFiles.length === 0 && allFiles.length > 0) {
       const fallbackFiles = allFiles.slice(0, 4);
-      console.log('Using fallback files:', fallbackFiles);
+      console.log('Using fallback files (no recently viewed or user not authenticated):', fallbackFiles);
       return fallbackFiles;
     }
     
-    return recentFiles;
+    // If we have recently viewed files but less than 4, pad with recent files
+    if (recentlyViewedFiles.length > 0 && recentlyViewedFiles.length < 4) {
+      const usedIds = new Set(recentlyViewedFiles.map(f => f._id));
+      const additionalFiles = allFiles
+        .filter(f => !usedIds.has(f._id))
+        .slice(0, 4 - recentlyViewedFiles.length);
+      
+      const paddedFiles = [...recentlyViewedFiles, ...additionalFiles];
+      console.log('Padded recently viewed files to 4:', paddedFiles);
+      return paddedFiles;
+    }
+    
+    return recentlyViewedFiles;
   };
 
   const scrollBoxFiles = getScrollBoxFiles();
-
-  const scrollByAmount = (amount) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
-    }
-  };
 
   // Handle search input
   const handleSearchChange = (e) => {
@@ -449,37 +502,33 @@ const FileViewer = () => {
         </div>
 
         {/* Horizontal scroll box for files */}
-        <div className="file-viewer-horizontal-scroll file-viewer-horizontal-scroll-large custom-scroll-hide">
+        <div className="file-viewer-horizontal-scroll file-viewer-horizontal-scroll-large">
           <div className="file-viewer-scroll-title">
             {isSearching ? `Search Results (${scrollBoxFiles.length})` : 'Recently Viewed Files'}
           </div>
-          <button className="scroll-arrow left" onClick={() => scrollByAmount(-220)}><FiChevronLeft /></button>
-          <div className="file-scroll-inner" ref={scrollRef}>
-            {scrollBoxFiles.length > 0 ? (
-              scrollBoxFiles.map(f => (
-                <div
-                  key={f._id}
-                  className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
-                  onClick={() => navigate(`/file-viewer/${f._id}`)}
-                >
-                  <div className="file-info">
-                    <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
-                    <p>Category: {f.category || 'Uncategorized'}</p>
-                    <p>Year: {f.year || 'N/A'}</p>
-                  </div>
-                  <div className="file-actions">
-                    <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
-                    <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
-                  </div>
+          {scrollBoxFiles.length > 0 ? (
+            scrollBoxFiles.map(f => (
+              <div
+                key={f._id}
+                className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
+                onClick={() => navigate(`/file-viewer/${f._id}`)}
+              >
+                <div className="file-info">
+                  <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
+                  <p>Category: {f.category || 'Uncategorized'}</p>
+                  <p>Year: {f.year || 'N/A'}</p>
                 </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                {isSearching ? 'No files found matching your search.' : 'No recently viewed files.'}
+                <div className="file-actions">
+                  <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
+                  <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
+                </div>
               </div>
-            )}
-          </div>
-          <button className="scroll-arrow right" onClick={() => scrollByAmount(220)}><FiChevronRight /></button>
+            ))
+          ) : (
+            <div className="empty-state">
+              {isSearching ? 'No files found matching your search.' : 'No recently viewed files.'}
+            </div>
+          )}
         </div>
 
         {/* Centered preview with overlayed actions */}
