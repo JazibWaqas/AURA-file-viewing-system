@@ -7,6 +7,15 @@ import {
 import '../styles/dashboard.css';
 import auraLogo from '../assets/aura-logo.png';
 import { useInView } from '../hooks/useInView';
+import parcoLogo from '../assets/Parco.png';
+import icareLogo from '../assets/Icare.png';
+import habibMetroLogo from '../assets/HabibMetro.jpg';
+import infaqLogo from '../assets/Infaq.jpg';
+import toyotaLogo from '../assets/Toyota.jpg';
+import psoLogo from '../assets/Pso.jpg';
+import soortyLogo from '../assets/Soorty.jpg';
+import ngoLogo from '../assets/ngo.jpg';
+import bvaLogo from '../assets/Bva.jpg';
 
 const graphData = [
   { year: 2020, income: 18887133, expenses: 23857572, donations: 95000 },
@@ -149,23 +158,44 @@ function DonationsChart() {
 }
   
 const Home = () => {
+  const sponsorLogos = [
+    { src: parcoLogo, alt: 'PARCO' },
+    { src: icareLogo, alt: 'iCARE' },
+    { src: habibMetroLogo, alt: 'HabibMetro' },
+    { src: infaqLogo, alt: 'INFAQ' },
+    { src: toyotaLogo, alt: 'TOYOTA' },
+    { src: psoLogo, alt: 'PSO' },
+    { src: soortyLogo, alt: 'Soorty' },
+    { src: ngoLogo, alt: 'NGO' },
+    { src: bvaLogo, alt: 'BVA' },
+  ];
   return (
     <div className="dashboard-page">
-
-      {/* About/Intro Section */}
-      <section className="dashboard-intro-section">
-        <div className="dashboard-intro-flex">
-          <img src={auraLogo} alt="AURA Logo" className="dashboard-intro-logo" />
-          <div className="dashboard-intro-text">
-            <h2>Welcome to <span className="aura-highlight">AURA</span>'s File Management System</h2>
-            <p>At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, 
-              and trust. This platform is designed to give you open access to our files 
-              and records, from reports and policies to activity updates. So you can stay informed about our work and impact.
-              All files are publicly available for your convenience and confidence, reflecting 
-              our ongoing commitment to accountability and community engagement.</p>
+      <div className="relative flex flex-col md:flex-row items-start gap-8">
+        <section className="dashboard-intro-section flex-1 z-10">
+          <div className="dashboard-intro-flex">
+            <img src={auraLogo} alt="AURA Logo" className="dashboard-intro-logo" />
+            <div className="dashboard-intro-text">
+              <h2>Welcome to <span className="aura-highlight">AURA</span>'s File Management System</h2>
+              <p>At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, 
+                and trust. This platform is designed to give you open access to our files 
+                and records, from reports and policies to activity updates. So you can stay informed about our work and impact.
+                All files are publicly available for your convenience and confidence, reflecting 
+                our ongoing commitment to accountability and community engagement.</p>
+            </div>
+          </div>
+        </section>
+        <div className="flex flex-col items-center justify-center md:ml-8 mt-8 md:mt-0 w-full md:w-auto">
+          <div className="sponsor-heading">Our Sponsors</div>
+          <div className="sponsor-logo-grid">
+            {sponsorLogos.map((logo, idx) => (
+              <div key={idx} className="sponsor-logo-circle sponsor-logo-anim" style={{ animationDelay: `${0.1 + idx * 0.12}s` }}>
+                <img src={logo.src} alt={logo.alt} className="sponsor-logo-img" />
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
       
       <div className="charts-section">

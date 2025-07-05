@@ -216,8 +216,8 @@
   /* =============================
      File Card
      ============================= */
-  .file-card { /* The actual file card */
-    background: #fff;
+  .file-card { /* The actual file card  ---- COLOR CHANGING OF CARDS*/
+    background: #fdfbfa;
     border-radius: 12px;
     padding: 1.2rem 1rem;
     display: flex;
@@ -308,7 +308,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 2rem 0;
-    background: #f8f9fa;
+    background: #3f6d9b;
     border-radius: 8px;
   }
   
@@ -319,12 +319,13 @@
     margin-top: 2.5rem;
     background: transparent;
     width: 100%;
+    
     box-sizing: border-box;
   }
   .all-files-title { /* Title for All Files */
     font-size: 2.2rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: #fff;
     margin-bottom: 1.5rem;
     text-align: center;
   }
