@@ -685,6 +685,7 @@ html {
   z-index: 2;
 }
 
+/* Remove duplicate .file-viewer-search-input and ensure correct padding */
 .file-viewer-search-input {
   width: 100%;
   padding: 0.8rem 1rem 0.8rem 2.5rem;
@@ -695,6 +696,7 @@ html {
   color: #222;
   box-shadow: 0 1px 4px rgba(44,83,100,0.06);
   transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 220px;
 }
 
 .file-viewer-search-input:focus {
@@ -778,16 +780,6 @@ html {
 .file-viewer-dropdown:disabled {
   background: #f3f3f3;
   color: #aaa;
-}
-.file-viewer-search-input {
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
-  border: 1px solid #c3d0e6;
-  font-size: 1rem;
-  background: #fff;
-  color: #222;
-  min-width: 220px;
-  box-shadow: 0 1px 4px rgba(44,83,100,0.06);
 }
 
 .file-viewer-horizontal-scroll,
@@ -944,5 +936,73 @@ html {
     right: 8px;
     gap: 0.3rem;
   }
+}
+
+/* Hide scrollbars for custom scroll */
+.file-scroll-inner {
+  overflow-x: auto;
+  overflow-y: hidden !important;
+  display: flex;
+  gap: 1.2rem;
+  padding: 0.5rem 2.5rem;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  height: auto;
+  max-height: 140%;
+}
+.file-scroll-inner::-webkit-scrollbar {
+  display: none;
+}
+
+/* Floating animation for cards */
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+.file-viewer-scroll-card {
+  /* animation: floatCard 2.8s ease-in-out infinite; */
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.file-viewer-scroll-card:active, .file-viewer-scroll-card:focus {
+  /* animation: none; */
+  transform: scale(1.06) translateY(-6px);
+  box-shadow: 0 8px 24px rgba(51,128,190,0.18);
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(255,255,255,0.85);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(60,80,120,0.12);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #3380be;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.scroll-arrow.left {
+  left: 0.5rem;
+}
+.scroll-arrow.right {
+  right: 0.5rem;
+}
+.scroll-arrow:hover {
+  background: #3380be;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(51,128,190,0.18);
+}
+.file-viewer-horizontal-scroll {
+  position: relative;
+  padding: 2.5rem 0 1.5rem 0;
+  overflow-y: hidden !important;
 }
 
