@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -14,6 +14,7 @@ const FileViewer = () => {
   const { id } = useParams();
   const [file, setFile] = useState(null);
   const [allFiles, setAllFiles] = useState([]);
+  const [recentlyViewedFiles, setRecentlyViewedFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [previewData, setPreviewData] = useState(null);
@@ -25,109 +26,231 @@ const FileViewer = () => {
   const [actionError, setActionError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const previewRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFileId, setSelectedFileId] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Load recently viewed files from localStorage
+  useEffect(() => {
+    const recent = localStorage.getItem('recentlyViewedFiles');
+    if (recent) {
+      try {
+        const parsedRecent = JSON.parse(recent);
+        setRecentlyViewedFiles(parsedRecent);
+        console.log('Loaded recently viewed files:', parsedRecent);
+      } catch (err) {
+        console.error('Error parsing recently viewed files:', err);
+        setRecentlyViewedFiles([]);
+      }
+    } else {
+      console.log('No recently viewed files found in localStorage');
+      setRecentlyViewedFiles([]);
+    }
+  }, []);
+
+  // Add file to recently viewed when selected
+  const addToRecentlyViewed = (fileData) => {
+    if (!fileData) return;
+    
+    const recent = JSON.parse(localStorage.getItem('recentlyViewedFiles') || '[]');
+    const existingIndex = recent.findIndex(f => f._id === fileData._id);
+    
+    if (existingIndex > -1) {
+      recent.splice(existingIndex, 1);
+    }
+    
+    const newRecentFile = {
+      _id: fileData._id,
+      originalName: fileData.originalName || fileData.filename || fileData.name,
+      category: fileData.category,
+      year: fileData.year,
+      fileType: fileData.fileType
+    };
+    
+    recent.unshift(newRecentFile);
+    
+    // Keep only last 4 files (changed from 10 to 4 as requested)
+    const updatedRecent = recent.slice(0, 4);
+    localStorage.setItem('recentlyViewedFiles', JSON.stringify(updatedRecent));
+    setRecentlyViewedFiles(updatedRecent);
+    console.log('Updated recently viewed files:', updatedRecent);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFiles = async () => {
+      try {
+        const res = await fetch('/api/files');
+        if (!res.ok) throw new Error('Failed to fetch files');
+        const data = await res.json();
+        setAllFiles(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      } catch (err) {
+        setAllFiles([]);
+      } finally {
+        // If no file is selected, stop loading after files are loaded
+        if (!id) setLoading(false);
+      }
+    };
+    fetchFiles();
+  }, []);
+
+  // Always sync selectedFileId with URL param or default to null
+  useEffect(() => {
+    if (id && allFiles.some(f => f._id === id)) {
+      setSelectedFileId(id);
+    } else if (!id) {
+      setSelectedFileId(null);
+    }
+  }, [id, allFiles]);
+
+  // Always exit fullscreen when navigating to a new file or on mount
+  useEffect(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+    setIsFullscreen(false);
+  }, [selectedFileId]);
+
+  // When selectedFileId changes, fetch and show that file
+  useEffect(() => {
+    if (!selectedFileId) {
+      setFile(null);
+      setLoading(false); // Stop loading if no file is selected
+      return;
+    }
+    const fetchFile = async () => {
       setLoading(true);
       setError(null);
       setPreviewError(null);
       setPreviewData(null);
       try {
-        if (id) {
-          const detailsRes = await fetch(`/api/files/${id}/details`);
-          if (!detailsRes.ok) throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
-
-          const fileDetails = await detailsRes.json();
-          setFile(fileDetails);
-
-          if (fileDetails.fileType === 'pdf') {
-            const viewResponse = await fetch(`/api/files/${id}/view`);
-            if (viewResponse.ok) {
-              const blob = await viewResponse.blob();
-              fileDetails.url = URL.createObjectURL(blob);
-              setFile(fileDetails);
-            }
-          } else if (fileDetails.fileType === 'csv') {
-            const previewResponse = await fetch(`/api/files/${id}/preview`);
-            if (previewResponse.ok) {
-              const previewData = await previewResponse.json();
-              setPreviewData(previewData);
-              if (!previewData.headers || previewData.headers.length === 0) {
-                setPreviewError('No data found in this file.');
-              }
-            } else {
-              setPreviewError('Failed to load preview data.');
-            }
-          } else if (fileDetails.fileType === 'excel' || fileDetails.fileType === 'xlsx') {
-            try {
-              setPreviewData(null);
-              setPreviewError(null);
-              setLoading(true);
-              const viewResponse = await fetch(`/api/files/${id}/view`);
-              if (viewResponse.ok) {
-                const arrayBuffer = await viewResponse.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-
-                const sheetData = workbook.SheetNames.map((sheetName) => {
-                  const sheet = workbook.Sheets[sheetName];
-                  const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                  return { name: sheetName, data };
-                });
-
-                setExcelSheets(sheetData);
-                setActiveSheet(sheetData[0]);
-              } else {
-                setPreviewError('Failed to load Excel file.');
-              }
-            } catch (err) {
-              console.error('Error processing Excel file:', err);
-              setPreviewError('Error processing Excel file.');
-            } finally {
-              setLoading(false);
-            }
-          } else if (fileDetails.fileType === 'docx' || fileDetails.fileType === 'doc') {
-            try {
-              setPreviewData(null);
-              setPreviewError(null);
-              const viewResponse = await fetch(`/api/files/${id}/view`);
-              if (viewResponse.ok) {
-                const arrayBuffer = await viewResponse.arrayBuffer();
-                const result = await mammoth.convertToHtml({ arrayBuffer });
-                setPreviewData(result.value);
-              } else {
-                setPreviewError('Failed to load document preview.');
-              }
-            } catch (err) {
-              setPreviewError('Error loading document preview.');
-            } finally {
-              setLoading(false);
-            }
+        const detailsRes = await fetch(`/api/files/${selectedFileId}/details`);
+        if (!detailsRes.ok) throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
+        const fileDetails = await detailsRes.json();
+        setFile(fileDetails);
+        
+        // Add to recently viewed
+        addToRecentlyViewed(fileDetails);
+        
+        if (fileDetails.fileType === 'pdf') {
+          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+          if (viewResponse.ok) {
+            const blob = await viewResponse.blob();
+            fileDetails.url = URL.createObjectURL(blob);
+            setFile(fileDetails);
           }
-        } else {
-          const res = await fetch('/api/files');
-          if (!res.ok) throw new Error('Failed to fetch files');
-          const data = await res.json();
-          setAllFiles(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+        } else if (fileDetails.fileType === 'csv') {
+          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`);
+          if (previewResponse.ok) {
+            const previewData = await previewResponse.json();
+            setPreviewData(previewData);
+            if (!previewData.headers || previewData.headers.length === 0) {
+              setPreviewError('No data found in this file.');
+            }
+          } else {
+            setPreviewError('Failed to load preview data.');
+          }
+        } else if (fileDetails.fileType === 'excel' || fileDetails.fileType === 'xlsx') {
+          try {
+            setPreviewData(null);
+            setPreviewError(null);
+            setLoading(true);
+            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            if (viewResponse.ok) {
+              const arrayBuffer = await viewResponse.arrayBuffer();
+              const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+              const sheetData = workbook.SheetNames.map((sheetName) => {
+                const sheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                return { name: sheetName, data };
+              });
+              setExcelSheets(sheetData);
+              setActiveSheet(sheetData[0]);
+            } else {
+              setPreviewError('Failed to load Excel file.');
+            }
+          } catch (err) {
+            setPreviewError('Error processing Excel file.');
+          } finally {
+            setLoading(false);
+          }
+        } else if (fileDetails.fileType === 'docx' || fileDetails.fileType === 'doc') {
+          try {
+            setPreviewData(null);
+            setPreviewError(null);
+            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            if (viewResponse.ok) {
+              const arrayBuffer = await viewResponse.arrayBuffer();
+              const result = await mammoth.convertToHtml({ arrayBuffer });
+              setPreviewData(result.value);
+            } else {
+              setPreviewError('Failed to load document preview.');
+            }
+          } catch (err) {
+            setPreviewError('Error loading document preview.');
+          } finally {
+            setLoading(false);
+          }
         }
       } catch (err) {
-        console.error('Failed to fetch data:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
-
+    fetchFile();
+    // Clean up object URLs
     return () => {
       if (file?.url) URL.revokeObjectURL(file.url);
     };
-  }, [id]);
+  }, [selectedFileId]);
 
-  const handleFileClick = (fileId) => {
-    navigate(`/file-viewer/${fileId}`);
+  // Filter files for scroll box based on search or show recently viewed
+  const getScrollBoxFiles = () => {
+    if (isSearching && searchTerm.trim()) {
+      const searchResults = allFiles.filter(f => {
+        const matchesSearch = (
+          (f.originalName || f.filename || f.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (f.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (f.year || '').toString().includes(searchTerm)
+        );
+        return matchesSearch;
+      });
+      console.log('Search results:', searchResults);
+      return searchResults;
+    }
+    // Show recently viewed files when not searching
+    const recentFiles = recentlyViewedFiles.map(recentFile => {
+      const fullFile = allFiles.find(f => f._id === recentFile._id);
+      return fullFile || recentFile;
+    });
+    console.log('Recently viewed files for display:', recentFiles);
+    
+    // If no recently viewed files, show the 4 most recent files from allFiles
+    if (recentFiles.length === 0 && allFiles.length > 0) {
+      const fallbackFiles = allFiles.slice(0, 4);
+      console.log('Using fallback files:', fallbackFiles);
+      return fallbackFiles;
+    }
+    
+    return recentFiles;
   };
 
+  const scrollBoxFiles = getScrollBoxFiles();
+
+  // Handle search input
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setIsSearching(value.trim().length > 0);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+    setIsSearching(false);
+  };
+
+  // Handlers
   const handleDownload = async (fileId, fileName) => {
     try {
       const response = await fetch(`/api/files/${fileId}`);
@@ -142,29 +265,9 @@ const FileViewer = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error downloading file:', error);
       alert('Failed to download file. Please try again.');
     }
   };
-
-  const handleDelete = async () => {
-    if (!file || !file._id) return;
-    if (window.confirm(`Are you sure you want to delete "${file.originalName || file.filename || file.name}"?`)) {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
-        
-        navigate('/file-index', { state: { message: 'File deleted successfully!' } });
-
-      } catch (error) {
-        console.error('Error deleting file:', error);
-        setError(error.message);
-        setLoading(false);
-      }
-    }
-  };
-
   const handleEditClick = () => {
     if (user?.userData?.status === 'approved') {
       navigate(`/file-edit/${file._id}`);
@@ -172,7 +275,20 @@ const FileViewer = () => {
       setActionError('Only approved users may have edit access.');
     }
   };
-
+  const handleDelete = async () => {
+    if (!file || !file._id) return;
+    if (window.confirm(`Are you sure you want to delete "${file.originalName || file.filename || file.name}"?`)) {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
+        navigate('/file-index', { state: { message: 'File deleted successfully!' } });
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    }
+  };
   const handleDeleteClick = () => {
     if (user?.userData?.status === 'approved') {
       handleDelete();
@@ -180,14 +296,32 @@ const FileViewer = () => {
       setActionError('Only approved users may have edit access.');
     }
   };
+  const handleToggleFullscreen = () => {
+    const elem = previewRef.current;
+    if (!elem) return;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) setIsFullscreen(false);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
 
+  // Helper to render spreadsheet previews
   const renderSpreadsheet = () => {
     if (previewError) return <div className="spreadsheet-error">{previewError}</div>;
-    if (file.fileType === 'excel' || file.fileType === 'xlsx') {
+    if (file?.fileType === 'excel' || file?.fileType === 'xlsx') {
       if (!activeSheet?.data?.length) return <div className="spreadsheet-error">No data found in this sheet.</div>;
       const headers = activeSheet.data[0];
       const tableData = activeSheet.data.slice(1);
-
       return (
         <div className="spreadsheet-preview-container handsontable-container">
           {excelSheets.length > 1 && (
@@ -196,18 +330,15 @@ const FileViewer = () => {
               <select
                 id="sheetSelect"
                 value={activeSheet.name}
-                onChange={(e) =>
-                  setActiveSheet(excelSheets.find((s) => s.name === e.target.value))
-                }
+                onChange={e => setActiveSheet(excelSheets.find(s => s.name === e.target.value))}
                 className="sheet-select-dropdown"
               >
-                {excelSheets.map((sheet) => (
+                {excelSheets.map(sheet => (
                   <option key={sheet.name} value={sheet.name}>{sheet.name}</option>
                 ))}
               </select>
             </div>
           )}
-
           <HotTable
             data={tableData}
             colHeaders={headers}
@@ -224,8 +355,7 @@ const FileViewer = () => {
         </div>
       );
     }
-
-    if (file.fileType === 'csv' && previewData?.headers) {
+    if (file?.fileType === 'csv' && previewData?.headers) {
       return (
         <div className="spreadsheet-preview-container">
           <table className="spreadsheet-table">
@@ -245,10 +375,10 @@ const FileViewer = () => {
         </div>
       );
     }
-
     return null;
   };
 
+  // Helper to render docx previews
   const renderDocx = () => {
     if (loading) return <div className="docx-loading"><FiLoader className="spinner-icon" /> Loading document preview...</div>;
     if (previewError) return <div className="docx-error">{previewError}</div>;
@@ -256,27 +386,7 @@ const FileViewer = () => {
     return null;
   };
 
-  // Fullscreen API handlers
-  const handleToggleFullscreen = () => {
-    const elem = previewRef.current;
-    if (!elem) return;
-    if (!document.fullscreenElement) {
-      elem.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
-
-  useEffect(() => {
-    const onFullscreenChange = () => {
-      if (!document.fullscreenElement) setIsFullscreen(false);
-    };
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
-  }, []);
-
+  // Render logic
   if (loading) {
     return (
       <div className="app-root">
@@ -287,7 +397,6 @@ const FileViewer = () => {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="app-root">
@@ -302,105 +411,125 @@ const FileViewer = () => {
       </div>
     );
   }
-
-  if (id && file) {
-    return (
-      <div className="app-root">
-        <Header />
-        <main className="main-content">
-          <div className="file-viewer-header file-viewer-page">
-            <div className="file-viewer-header-left">
-              <button className="back-button" onClick={() => navigate('/file-index')}><FiArrowLeft /> Back</button>
-              <h1>{file.originalName || file.filename || file.name || 'Untitled'}</h1>
-            </div>
-            <div className="header-action-row">
-              <button className="download-btn small" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)} title="Download File">
-                <FiDownload />
-                Download
-              </button>
-              <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
-                {isFullscreen ? <FiMinimize style={{marginRight: '0.5em'}} /> : <FiMaximize style={{marginRight: '0.5em'}} />}
-                {isFullscreen ? 'Exit Full-Screen' : 'View in Full-Screen'}
-              </button>
-            </div>
+  return (
+    <div className="app-root">
+      <Header />
+      <main className="main-content file-viewer-main-redesign">
+        <div className="file-viewer-header file-viewer-page">
+          <div className="file-viewer-header-left">
+            <button className="back-button" onClick={() => navigate('/file-index')}><FiArrowLeft /> Back</button>
+            <h1>{file?.originalName || file?.filename || file?.name || 'Untitled'}</h1>
           </div>
-          <div className="file-viewer-flex-root">
-            <div className="file-details-sidebar">
-              <div className="details-section">
-                <h3>File Information</h3>
-                <ul>
-                  <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
-                  <li><FiFolder /><span>SubCategory:</span><strong>{file.subCategory || 'N/A'}</strong></li>
-                  <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
-                  <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
-                </ul>
+        </div>
+        
+        {/* Centered Search Bar */}
+        <div className="file-viewer-search-container">
+          <div className="file-viewer-search-wrapper">
+            <FiSearch className="file-viewer-search-icon" />
+            <input
+              className="file-viewer-search-input"
+              type="text"
+              placeholder="Search files to view..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            {searchTerm && (
+              <button className="file-viewer-clear-search" onClick={clearSearch}>
+                <FiX />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Horizontal scroll box for files */}
+        <div className="file-viewer-horizontal-scroll file-viewer-horizontal-scroll-large">
+          <div className="file-viewer-scroll-title">
+            {isSearching ? `Search Results (${scrollBoxFiles.length})` : 'Recently Viewed Files'}
+          </div>
+          {scrollBoxFiles.length > 0 ? (
+            scrollBoxFiles.map(f => (
+              <div
+                key={f._id}
+                className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
+                onClick={() => navigate(`/file-viewer/${f._id}`)}
+              >
+                <div className="file-info">
+                  <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
+                  <p>Category: {f.category || 'Uncategorized'}</p>
+                  <p>Year: {f.year || 'N/A'}</p>
+                </div>
+                <div className="file-actions">
+                  <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
+                  <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
+                </div>
               </div>
-              {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
-              <div className="actions-section">
-                <button className="edit-button" title="Edit file metadata" onClick={handleEditClick}><FiEdit /> Edit File Metadata</button>
-                <button className="delete-button" title="Delete this file permanently" onClick={handleDeleteClick}><FiTrash2 /> Delete File</button>
-                {actionError && <div className="error-message">{actionError}</div>}
-              </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              {isSearching ? 'No files found matching your search.' : 'No recently viewed files.'}
             </div>
-            <div className="file-viewer-divider" />
-            <div className="file-viewer-content">
-              <div className={isFullscreen ? 'file-preview fullscreen' : 'file-preview'} ref={previewRef}>
-                {file.fileType === 'pdf' && file.url && (
+          )}
+        </div>
+
+        {/* Centered preview with overlayed actions */}
+        <div className="file-viewer-preview-center file-viewer-preview-center-large">
+          <div className={isFullscreen ? 'file-preview fullscreen' : 'file-preview file-preview-large'} ref={previewRef}>
+            {/* Overlayed actions */}
+            {file && (
+              <div className="file-viewer-preview-overlay">
+                <button className="download-btn small" onClick={() => handleDownload(file?._id, file?.originalName || file?.filename || file?.name)} title="Download File">
+                  <FiDownload />
+                </button>
+                <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
+                  {isFullscreen ? <FiMinimize /> : <FiMaximize />}
+                </button>
+              </div>
+            )}
+            {/* Preview content */}
+            {file ? (
+              <>
+                {file?.fileType === 'pdf' && file?.url && (
                   <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
                 )}
-                {(file.fileType === 'csv' || file.fileType === 'excel' || file.fileType === 'xlsx') && (
+                {(file?.fileType === 'csv' || file?.fileType === 'excel' || file?.fileType === 'xlsx') && (
                   <div className="spreadsheet-preview-wrapper">{renderSpreadsheet()}</div>
                 )}
-                {(file.fileType === 'docx' || file.fileType === 'doc') && (
-                  <div className="docx-preview-wrapper">{renderDocx()}</div>
+                {(file?.fileType === 'docx' || file?.fileType === 'doc') && (
+                  <div className="docx-preview-wrapper" style={{width: '100%', maxWidth: '100%', maxHeight: '100%', overflow: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>{renderDocx()}</div>
                 )}
-                {!['pdf', 'csv', 'excel', 'xlsx', 'docx', 'doc'].includes(file.fileType) && (
+                {!['pdf', 'csv', 'excel', 'xlsx', 'docx', 'doc'].includes(file?.fileType) && (
                   <div className="unsupported-preview">
                     <FiFile className="unsupported-file-icon" />
                     <p>Preview not available for this file type.</p>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Fallback: file list page
-  return (
-    <div className="app-root">
-      <Header />
-      <main className="main-content">
-        <div className="file-index-page">
-          <div className="page-header">
-            <h1>File Viewer</h1>
-            <p>Select a file to view its details.</p>
-          </div>
-          <div className="all-files-scroll-grid">
-            {allFiles.length > 0 ? (
-              allFiles.map((f) => (
-                <div key={f._id} className="file-card">
-                  <div className="file-info">
-                    <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
-                    <p>Category: {f.category || 'Uncategorized'}</p>
-                    <p>Year: {f.year || 'N/A'}</p>
-                  </div>
-                  <div className="file-actions">
-                    <button className="file-view-btn" onClick={() => handleFileClick(f._id)}>View</button>
-                    <button className="file-download-btn" onClick={() => handleDownload(f._id, f.originalName || f.filename || f.name)}>Download</button>
-                  </div>
-                </div>
-              ))
+              </>
             ) : (
-              <div className="empty-state">
-                <FiFile className="empty-icon" />
-                <p>No files found.</p>
-              </div>
+              <div className="empty-state">No file selected.</div>
             )}
           </div>
         </div>
+
+        {/* Metadata card below preview */}
+        {file && (
+          <div className="file-viewer-metadata-card">
+            <div className="details-section">
+              <h3>File Information</h3>
+              <ul>
+                <li><FiFolder /><span>Category:</span><strong>{file.category || 'Uncategorized'}</strong></li>
+                <li><FiFolder /><span>SubCategory:</span><strong>{file.subCategory || 'N/A'}</strong></li>
+                <li><FiCalendar /><span>Year:</span><strong>{file.year || 'N/A'}</strong></li>
+                <li><FiInfo /><span>Size:</span><strong>{file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</strong></li>
+              </ul>
+            </div>
+            {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
+            <div className="actions-section">
+              <button className="edit-button" title="Edit file metadata" onClick={handleEditClick}><FiEdit /> Edit File Metadata</button>
+              <button className="delete-button" title="Delete this file permanently" onClick={handleDeleteClick}><FiTrash2 /> Delete File</button>
+              {actionError && <div className="error-message">{actionError}</div>}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

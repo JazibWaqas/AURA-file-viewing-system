@@ -660,15 +660,289 @@ html {
 }
 
 /* =============================
-   File Viewer Header
+   File Viewer Search Container
    ============================= */
+.file-viewer-search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.file-viewer-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.file-viewer-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #666;
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+.file-viewer-search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.5rem;
+  border: 1px solid #c3d0e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 1px 4px rgba(44,83,100,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.file-viewer-search-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.file-viewer-clear-search {
+  position: absolute;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.file-viewer-clear-search:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
 /* =============================
-   File Viewer Content & Sidebar
+   File Viewer Scroll Title
    ============================= */
+.file-viewer-scroll-title {
+  position: absolute;
+  top: -1.5rem;
+  left: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.file-viewer-horizontal-scroll,
+.file-viewer-horizontal-scroll-large {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  gap: 2rem;
+  min-height: 236px;
+  padding: 2rem 0 0.5rem 0;
+  align-items: center;
+  max-width: 92vw;
+  margin: 0 auto 2.5rem auto;
+  width: 100%;
+}
+
 /* =============================
    File Viewer Actions
    ============================= */
 /* =============================
    Responsive Styles
    ============================= */
+
+/* --- Add for FileViewerPage redesign --- */
+.file-viewer-dropdown-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.file-viewer-dropdown {
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #c3d0e6;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+  min-width: 180px;
+  box-shadow: 0 1px 4px rgba(44,83,100,0.06);
+}
+.file-viewer-dropdown:disabled {
+  background: #f3f3f3;
+  color: #aaa;
+}
+.file-viewer-search-input {
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #c3d0e6;
+  font-size: 1rem;
+  background: #fff;
+  color: #222;
+  min-width: 220px;
+  box-shadow: 0 1px 4px rgba(44,83,100,0.06);
+}
+
+.file-viewer-horizontal-scroll,
+.file-viewer-horizontal-scroll-large {
+  display: flex;
+  overflow-x: auto;
+  gap: 2rem;
+  min-height: 236px;
+  padding: 2rem 0 0.5rem 0;
+  align-items: center;
+  max-width: 92vw;
+  margin: 0 auto 2.5rem auto;
+  width: 100%;
+}
+.file-viewer-scroll-card {
+  min-width: 280px;
+  max-width: 340px;
+  flex: 0 0 300px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s, box-shadow 0.2s;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.file-viewer-scroll-card.selected {
+  border: 2px solid #4a90e2;
+  box-shadow: 0 4px 16px #4a90e233;
+}
+
+.file-viewer-preview-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+.file-viewer-preview-center-large {
+  max-width: 90vw;
+  margin: 0 auto 2.5rem auto;
+}
+.file-viewer-preview-overlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 0.7rem;
+  z-index: 10;
+}
+.file-preview {
+  position: relative;
+  margin: 0 auto;
+  max-width: 90vw;
+  width: 100%;
+  min-height: 480px;
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.file-preview-large {
+  min-width: 600px;
+  min-height: 480px;
+  max-width: 90vw;
+  max-height: 70vh;
+}
+
+.file-viewer-metadata-card {
+  margin: 0 auto 2.5rem auto;
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.file-viewer-metadata-card > .details-section,
+.file-viewer-metadata-card > .description-section,
+.file-viewer-metadata-card > .actions-section {
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .file-viewer-scroll-card {
+    min-width: 220px;
+    max-width: 260px;
+    flex: 0 0 220px;
+    height: 180px;
+  }
+  .file-viewer-horizontal-scroll,
+  .file-viewer-horizontal-scroll-large {
+    min-height: 180px;
+  }
+  .file-preview-large {
+    min-width: 320px;
+    min-height: 320px;
+  }
+}
+@media (max-width: 900px) {
+  .file-viewer-horizontal-scroll {
+    gap: 1rem;
+  }
+  .file-viewer-scroll-card {
+    min-width: 170px;
+    max-width: 200px;
+    flex: 0 0 170px;
+    height: 120px;
+  }
+  .file-viewer-preview-center, .file-viewer-metadata-card {
+    max-width: 98vw;
+    padding: 0 0.5rem;
+  }
+  .file-preview-large {
+    min-width: 200px;
+    min-height: 200px;
+  }
+}
+@media (max-width: 600px) {
+  .file-viewer-dropdown-row {
+    flex-direction: column;
+    gap: 0.7rem;
+    align-items: stretch;
+  }
+  .file-viewer-horizontal-scroll {
+    gap: 0.5rem;
+    padding: 0.7rem 0 1.2rem 0;
+    min-height: 100px;
+  }
+  .file-viewer-scroll-card {
+    min-width: 120px;
+    max-width: 150px;
+    flex: 0 0 120px;
+    height: 80px;
+  }
+  .file-viewer-preview-center, .file-viewer-metadata-card {
+    max-width: 100vw;
+    padding: 0 0.2rem;
+  }
+  .file-preview {
+    padding: 1rem 0.2rem;
+  }
+  .file-preview-large {
+    min-width: 100px;
+    min-height: 100px;
+  }
+  .file-viewer-preview-overlay {
+    top: 8px;
+    right: 8px;
+    gap: 0.3rem;
+  }
+}
 
