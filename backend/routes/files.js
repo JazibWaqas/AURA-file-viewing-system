@@ -3,9 +3,6 @@ const router = express.Router();
 const fileController = require('../controllers/fileController');
 const { upload, handleMulterError } = require('../middleware/upload');
 
-// File upload routes
-router.post('/upload', upload.single('file'), fileController.uploadFile);
-
 // File retrieval routes
 router.get('/', fileController.getAllFiles);
 router.get('/filter', fileController.getFilesByCategoryAndDate);

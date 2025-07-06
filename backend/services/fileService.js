@@ -184,62 +184,35 @@ class FileService {
     // Upload file to Firebase Storage
     async uploadFileToStorage(file, fileName) {
         try {
-            console.log('Starting file upload to Firebase Storage...');
-            console.log('File details:', {
-                originalName: file.originalname,
-                mimetype: file.mimetype,
-                size: file.size,
-                bufferLength: file.buffer ? file.buffer.length : 'No buffer'
-            });
-
             const filePath = `uploads/${Date.now()}_${fileName}`;
-            console.log('File path:', filePath);
             
             const fileRef = this.bucket.file(filePath);
-            console.log('Bucket name:', this.bucket.name);
             
-            // Upload the buffer directly to Firebase Storage
-            console.log('Uploading file buffer to Firebase Storage...');
-            await fileRef.save(file.buffer, {
-                metadata: {
-                    contentType: file.mimetype,
+            // Upload the file buffer
+            await new Promise((resolve, reject) => {
+                const stream = fileRef.createWriteStream({
                     metadata: {
-                        originalName: file.originalname
+                        contentType: file.mimetype
                     }
-                }
+                });
+                
+                stream.on('error', reject);
+                stream.on('finish', resolve);
+                stream.end(file.buffer);
             });
 
-            console.log('File uploaded successfully, making it public...');
-            // Make the file publicly readable
+            // Make the file publicly accessible
             await fileRef.makePublic();
             
-            // Get the public URL
             const publicUrl = `https://storage.googleapis.com/${this.bucket.name}/${filePath}`;
-            console.log('Public URL:', publicUrl);
             
             return {
                 path: filePath,
-                url: publicUrl,
-                size: file.size
+                url: publicUrl
             };
         } catch (error) {
             console.error('Error uploading file to storage:', error);
-            console.error('Error details:', {
-                message: error.message,
-                code: error.code,
-                status: error.status
-            });
-            
-            // Provide more specific error messages
-            if (error.code === 'ENOTFOUND' || error.message.includes('bucket')) {
-                throw new Error(`Firebase Storage bucket not found. Please check your Firebase project configuration. Bucket: ${this.bucket.name}`);
-            } else if (error.code === 'PERMISSION_DENIED') {
-                throw new Error('Permission denied. Please check your Firebase Storage security rules. Go to Firebase Console > Storage > Rules and update them to allow file uploads.');
-            } else if (error.code === 'UNAUTHENTICATED') {
-                throw new Error('Authentication failed. Please check your Firebase service account credentials.');
-            } else {
-                throw new Error(`Upload failed: ${error.message}`);
-            }
+            throw error;
         }
     }
 

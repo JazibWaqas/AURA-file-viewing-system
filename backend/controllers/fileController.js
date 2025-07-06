@@ -41,33 +41,45 @@ exports.uploadBulkFiles = async (req, res) => {
 // Upload a file
 exports.uploadFile = async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No files uploaded' });
         }
-        // Upload file to Firebase Storage
-        const fileMeta = await fileService.uploadFileToStorage(req.file, req.file.originalname);
-        // Save metadata to Firestore
-        const fileData = {
-            filename: fileMeta.path.split('/').pop(),
-            originalName: req.file.originalname,
-            fileType: isExcelMimeType(req.file.mimetype) ? 'excel' :
-                      isCsvMimeType(req.file.mimetype) ? 'csv' :
-                      isDocxMimeType(req.file.mimetype) ? 'docx' : 'pdf',
-            category: req.body.category,
-            subCategory: req.body.subCategory,
-            year: parseInt(req.body.year),
-            month: parseInt(req.body.month),
-            path: fileMeta.path,
-            size: req.file.size,
-            description: req.body.description || '',
-            uploadedBy: req.body.uploadedBy || 'anonymous',
-            status: 'Draft',
-            url: fileMeta.url
-        };
-        const savedFile = await fileService.createFile(fileData);
-        res.status(201).json({ message: 'File uploaded successfully', file: savedFile });
+        
+        const uploadedFiles = [];
+        
+        for (const file of req.files) {
+            // Upload file to Firebase Storage
+            const fileMeta = await fileService.uploadFileToStorage(file, file.originalname);
+            
+            // Save metadata to Firestore
+            const fileData = {
+                filename: fileMeta.path.split('/').pop(),
+                originalName: file.originalname,
+                fileType: isExcelMimeType(file.mimetype) ? 'excel' :
+                          isCsvMimeType(file.mimetype) ? 'csv' :
+                          isDocxMimeType(file.mimetype) ? 'docx' : 'pdf',
+                category: req.body.category,
+                subCategory: req.body.subCategory,
+                year: parseInt(req.body.year),
+                month: parseInt(req.body.month),
+                path: fileMeta.path,
+                size: file.size,
+                description: req.body.description || '',
+                uploadedBy: req.body.uploadedBy || 'anonymous',
+                status: 'Draft',
+                url: fileMeta.url
+            };
+            
+            const savedFile = await fileService.createFile(fileData);
+            uploadedFiles.push(savedFile);
+        }
+        
+        res.status(201).json({ 
+            message: `${uploadedFiles.length} file(s) uploaded successfully`, 
+            files: uploadedFiles 
+        });
     } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error('Error uploading files:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -136,19 +148,9 @@ exports.getFile = async (req, res) => {
 // View a file (for in-browser viewing)
 exports.viewFile = async (req, res) => {
     try {
-        console.log('viewFile called with file ID:', req.params.id);
-        
         const file = await fileService.getFileById(req.params.id);
-        console.log('Retrieved file from database:', file ? {
-            _id: file._id,
-            originalName: file.originalName,
-            filename: file.filename,
-            path: file.path,
-            fileType: file.fileType
-        } : 'null');
         
         if (!file) {
-            console.log('File not found in database');
             return res.status(404).json({ message: 'File not found' });
         }
         
@@ -158,21 +160,16 @@ exports.viewFile = async (req, res) => {
             // For legacy files, construct the path from filename
             // Assuming files are stored directly with their filename in the bucket
             filePath = file.filename;
-            console.log('Constructed path from filename:', filePath);
         }
         
         if (!filePath) {
-            console.log('File found but path is missing and cannot be constructed');
             return res.status(404).json({ message: 'File path is missing' });
         }
-
-        console.log(`Attempting to stream file from bucket path: ${filePath}`);
 
         const fileRef = fileService.bucket.file(filePath);
         const [exists] = await fileRef.exists();
 
         if (!exists) {
-            console.error(`File not found in Firebase Storage at path: ${filePath}`);
             return res.status(404).json({ message: 'File not found in storage' });
         }
 
@@ -182,7 +179,6 @@ exports.viewFile = async (req, res) => {
         else if (file.fileType === 'csv') contentType = 'text/csv';
         else if (file.fileType === 'docx' || file.fileType === 'doc') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
         
-        console.log('Setting content type:', contentType);
         res.setHeader('Content-Type', contentType);
 
         const readStream = fileRef.createReadStream();
@@ -364,7 +360,6 @@ exports.clearRecentlyViewedFiles = async (req, res) => {
 exports.debugFile = async (req, res) => {
     try {
         const fileId = req.params.id;
-        console.log('Debug file called with ID:', fileId);
         
         // Get raw document data
         const doc = await fileService.db.collection('uploads').doc(fileId).get();
@@ -374,11 +369,9 @@ exports.debugFile = async (req, res) => {
         }
         
         const rawData = doc.data();
-        console.log('Raw file data from database:', rawData);
         
         // Also try to get it through the service
         const serviceFile = await fileService.getFileById(fileId);
-        console.log('File data through service:', serviceFile);
         
         res.json({
             rawData,
