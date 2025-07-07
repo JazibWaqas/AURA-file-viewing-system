@@ -243,12 +243,20 @@
 }
 
 .file-preview {
-  flex: 1;
-  padding: 1.5rem;
-  background: #fff;
+  position: relative;
+  margin: 0 auto;
+  max-width: 90vw;
+  width: 100%;
+  min-height: 480px;
+  max-height: 70vh;
+  background: linear-gradient(90deg, #85d8ce 0%, #085078,#2f3132 100%);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  padding: 2.5rem 2rem;
   display: flex;
-  
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .pdf-viewer {
@@ -321,23 +329,36 @@
 }
 
 /* Spreadsheet Preview Styles */
+.spreadsheet-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+
 .spreadsheet-preview-container {
   width: 100%;
   max-width: 100%;
-  flex: 1;
+  height: calc(100vh - 250px);
+  min-height: 500px;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: #f4f6fa;
+  padding: 0;
   overflow-x: auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-  margin-bottom: 1.5rem;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-
-.spreadsheet-preview-container.handsontable-container {
-  padding: 0;
 }
 
 .handsontable-container .ht_master table {
@@ -478,18 +499,24 @@ html {
 }
 
 .docx-preview {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  padding: 2.5rem 2rem;
-  margin: 0 auto;
-  max-width: 1000px;
-  min-height: 400px;
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - 250px);
+  min-height: 500px;
+  border: none;
+  display: block;
+  border: none;
+  box-sizing: border-box;
+  background: #f4f6fa;
+  box-sizing: border-box;
+  background: #f4f6fa;
   color: #222;
   font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
   font-size: 1.08rem;
+  padding: 0;
   line-height: 1.7;
   overflow-x: auto;
+  padding: 0;
 }
 
 .docx-preview h1, .docx-preview h2, .docx-preview h3, .docx-preview h4, .docx-preview h5, .docx-preview h6 {
@@ -745,16 +772,12 @@ html {
 
 .file-viewer-horizontal-scroll,
 .file-viewer-horizontal-scroll-large {
-  position: relative;
   display: flex;
-  overflow-x: auto;
-  gap: 2rem;
-  min-height: 236px;
-  padding: 2rem 0 0.5rem 0;
   align-items: center;
-  max-width: 92vw;
-  margin: 0 auto 2.5rem auto;
-  width: 100%;
+  position: relative;
+  padding: 2.5rem 0 1.5rem 0;
+  overflow-y: hidden !important;
+  gap: 1.5rem;
 }
 
 /* =============================
@@ -835,22 +858,6 @@ html {
   display: flex;
   gap: 0.7rem;
   z-index: 10;
-}
-.file-preview {
-  position: relative;
-  margin: 0 auto;
-  max-width: 90vw;
-  width: 100%;
-  min-height: 480px;
-  max-height: 70vh;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
-  padding: 2.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .file-preview-large {
   min-width: 600px;
@@ -941,6 +948,9 @@ html {
     right: 8px;
     gap: 0.3rem;
   }
+  .docx-preview {
+    padding: 1rem 0.5rem;
+  }
 }
 
 /* Hide scrollbars for custom scroll */
@@ -1006,6 +1016,7 @@ html {
   color: #fff;
   box-shadow: 0 4px 16px rgba(51,128,190,0.18);
 }
+
 .file-viewer-horizontal-scroll {
   position: relative;
   padding: 2.5rem 0 1.5rem 0;

@@ -407,6 +407,7 @@ const FileViewer = () => {
             </div>
           )}
           <HotTable
+            key={`${file?._id || ''}-${activeSheet?.name || ''}`}
             data={tableData}
             colHeaders={headers}
             rowHeaders={true}
@@ -565,112 +566,14 @@ const FileViewer = () => {
                 {(file?.fileType === 'csv' || file?.fileType === 'excel' || file?.fileType === 'xlsx') && (
                   <div
                     className={`spreadsheet-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`}
-                    style={{
-                      width: isFullscreen ? '100vw' : '100%',
-                      height: isFullscreen ? '100vh' : 'auto',
-                      maxWidth: isFullscreen ? '100vw' : '100%',
-                      maxHeight: isFullscreen ? '100vh' : 'none',
-                      minWidth: 0,
-                      minHeight: 0,
-                      padding: 0,
-                      margin: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'stretch',
-                      justifyContent: 'stretch',
-                      flex: 1
-                    }}
                   >
-                    <style>{`
-                      .spreadsheet-preview-container, .spreadsheet-preview-container.handsontable-container {
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        min-width: 0 !important;
-                        height: 100% !important;
-                        max-height: 100% !important;
-                        min-height: 0 !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        flex: 1 1 0%;
-                        background: #fff;
-                        box-shadow: none;
-                        border-radius: 0;
-                        display: flex;
-                        flex-direction: column;
-                      }
-                      .handsontable-container .ht_master, .handsontable-container table {
-                        width: 100% !important;
-                        min-width: 0 !important;
-                        max-width: 100% !important;
-                        height: 100% !important;
-                        max-height: 100% !important;
-                        min-height: 0 !important;
-                      }
-                      .spreadsheet-preview-wrapper.fullscreen, .spreadsheet-preview-container.fullscreen, .handsontable-container.fullscreen {
-                        width: 100vw !important;
-                        height: 100vh !important;
-                        max-width: 100vw !important;
-                        max-height: 100vh !important;
-                        min-width: 0 !important;
-                        min-height: 0 !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        border-radius: 0 !important;
-                        box-shadow: none !important;
-                      }
-                    `}</style>
                     {renderSpreadsheet()}
                   </div>
                 )}
                 {(file?.fileType === 'docx' || file?.fileType === 'doc') && (
                   <div
                     className={`docx-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`}
-                    style={{
-                      width: isFullscreen ? '100vw' : '100%',
-                      height: isFullscreen ? '100vh' : 'auto',
-                      maxWidth: isFullscreen ? '100vw' : '100%',
-                      maxHeight: isFullscreen ? '100vh' : 'none',
-                      minWidth: 0,
-                      minHeight: 0,
-                      overflow: 'auto',
-                      display: 'flex',
-                      justifyContent: 'stretch',
-                      alignItems: 'stretch',
-                      padding: 0,
-                      margin: 0,
-                      flex: 1
-                    }}
                   >
-                    <style>{`
-                      .docx-preview-wrapper, .docx-preview {
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        min-width: 0 !important;
-                        height: 100% !important;
-                        max-height: 100% !important;
-                        min-height: 0 !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        border-radius: 0 !important;
-                        box-shadow: none !important;
-                        background: #fff !important;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: stretch;
-                      }
-                      .docx-preview-wrapper.fullscreen, .docx-preview.fullscreen {
-                        width: 100vw !important;
-                        height: 100vh !important;
-                        max-width: 100vw !important;
-                        max-height: 100vh !important;
-                        min-width: 0 !important;
-                        min-height: 0 !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        border-radius: 0 !important;
-                        box-shadow: none !important;
-                      }
-                    `}</style>
                     {renderDocx()}
                   </div>
                 )}
