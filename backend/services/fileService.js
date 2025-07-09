@@ -1,8 +1,6 @@
 const { db, bucket } = require('../config/firebase');
 const admin = require('firebase-admin');
-const algoliasearch = require('algoliasearch');
-const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_ADMIN_KEY);
-const algoliaIndex = client.initIndex(process.env.ALGOLIA_INDEX_NAME);
+const { algoliaIndex } = require('../config/algolia');
 
 // Helper Functions
 const generateId = () => db.collection('tmp').doc().id;
