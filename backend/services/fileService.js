@@ -1,9 +1,27 @@
 const { db, bucket } = require('../config/firebase');
+const admin = require('firebase-admin');
+const algoliasearch = require('algoliasearch');
+const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_ADMIN_KEY);
+const algoliaIndex = client.initIndex(process.env.ALGOLIA_INDEX_NAME);
 
 // Helper Functions
 const generateId = () => db.collection('tmp').doc().id;
 const convertTimestamp = (ts) => ts && ts.toDate ? ts.toDate() : ts;
 const convertToTimestamp = (date) => date; // Firestore admin handles Date objects automatically
+
+async function searchFilesWithAlgolia(searchTerm, limit = 16, page = 0) {
+  const algoliaResult = await algoliaIndex.search(searchTerm, {
+    hitsPerPage: limit,
+    page: page,
+  });
+  // Return Algolia hits directly, plus pagination info
+  return {
+    files: algoliaResult.hits,
+    page: algoliaResult.page,
+    nbPages: algoliaResult.nbPages,
+    hasNextPage: algoliaResult.page < algoliaResult.nbPages - 1
+  };
+}
 
 class FileService {
     constructor() {
@@ -525,4 +543,6 @@ class FileService {
     }
 }
 
-module.exports = new FileService(); 
+const fileServiceInstance = new FileService();
+fileServiceInstance.searchFilesWithAlgolia = searchFilesWithAlgolia;
+module.exports = fileServiceInstance; 

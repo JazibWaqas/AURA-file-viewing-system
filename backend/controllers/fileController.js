@@ -7,10 +7,10 @@ const fileService = FileService;
 
 const isExcelMimeType = (mimetype) => {
     const excelTypes = [
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-        'application/vnd.ms-excel', // .xls
-        'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
-        'application/vnd.ms-excel.sheet.binary.macroEnabled.12' // .xlsb
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-excel.sheet.macroEnabled.12',
+        'application/vnd.ms-excel.sheet.binary.macroEnabled.12'
     ];
     return excelTypes.includes(mimetype);
 };
@@ -31,10 +31,8 @@ const isDocxMimeType = (mimetype) => {
     return mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || mimetype === 'application/msword';
 };
 
-//upload lots of files
 // Upload multiple files (bulk upload)
 exports.uploadBulkFiles = async (req, res) => {
-    // This function needs to be adapted for fileService if used
     res.status(501).json({ message: 'Bulk upload not implemented with file service yet.' });
 };
 
@@ -44,14 +42,12 @@ exports.uploadFile = async (req, res) => {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'No files uploaded' });
         }
-        
+
         const uploadedFiles = [];
-        
+
         for (const file of req.files) {
-            // Upload file to Firebase Storage
             const fileMeta = await fileService.uploadFileToStorage(file, file.originalname);
-            
-            // Save metadata to Firestore
+
             const fileData = {
                 filename: fileMeta.path.split('/').pop(),
                 originalName: file.originalname,
@@ -69,14 +65,14 @@ exports.uploadFile = async (req, res) => {
                 status: 'Draft',
                 url: fileMeta.url
             };
-            
+
             const savedFile = await fileService.createFile(fileData);
             uploadedFiles.push(savedFile);
         }
-        
-        res.status(201).json({ 
-            message: `${uploadedFiles.length} file(s) uploaded successfully`, 
-            files: uploadedFiles 
+
+        res.status(201).json({
+            message: `${uploadedFiles.length} file(s) uploaded successfully`,
+            files: uploadedFiles
         });
     } catch (error) {
         console.error('Error uploading files:', error);
@@ -84,7 +80,7 @@ exports.uploadFile = async (req, res) => {
     }
 };
 
-// Get all files (non-paginated, for legacy support)
+// Get all files (non-paginated)
 exports.getAllFiles = async (req, res) => {
     try {
         const { search, category, year, subCategory } = req.query;
@@ -97,7 +93,7 @@ exports.getAllFiles = async (req, res) => {
     }
 };
 
-// Get files by category and date (legacy)
+// Get files by category and date
 exports.getFilesByCategoryAndDate = async (req, res) => {
     try {
         const { category, year, month } = req.query;
@@ -116,25 +112,22 @@ exports.getFile = async (req, res) => {
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
-        
-        // Handle files that don't have a path field (legacy files)
+
         let filePath = file.path;
         if (!filePath && file.filename) {
-            // For legacy files, construct the path from filename
             filePath = file.filename;
         }
-        
+
         if (!filePath) {
             return res.status(404).json({ message: 'File path is missing' });
         }
-        
-        // Download from Firebase Storage
+
         const fileRef = fileService.bucket.file(filePath);
         const [exists] = await fileRef.exists();
         if (!exists) {
             return res.status(404).json({ message: 'File not found in storage' });
         }
-        
+
         res.setHeader('Content-Disposition', `attachment; filename="${file.originalName || file.filename}"`);
         res.setHeader('Content-Type', file.fileType === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
             file.fileType === 'csv' ? 'text/csv' : 'application/pdf');
@@ -145,30 +138,25 @@ exports.getFile = async (req, res) => {
     }
 };
 
-// View a file (for in-browser viewing)
+// View a file
 exports.viewFile = async (req, res) => {
     try {
         const file = await fileService.getFileById(req.params.id);
-        
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
-        
-        // Handle files that don't have a path field (legacy files)
+
         let filePath = file.path;
         if (!filePath && file.filename) {
-            // For legacy files, construct the path from filename
-            // Assuming files are stored directly with their filename in the bucket
             filePath = file.filename;
         }
-        
+
         if (!filePath) {
             return res.status(404).json({ message: 'File path is missing' });
         }
 
         const fileRef = fileService.bucket.file(filePath);
         const [exists] = await fileRef.exists();
-
         if (!exists) {
             return res.status(404).json({ message: 'File not found in storage' });
         }
@@ -178,7 +166,7 @@ exports.viewFile = async (req, res) => {
         else if (file.fileType === 'excel' || file.fileType === 'xlsx') contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         else if (file.fileType === 'csv') contentType = 'text/csv';
         else if (file.fileType === 'docx' || file.fileType === 'doc') contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        
+
         res.setHeader('Content-Type', contentType);
 
         const readStream = fileRef.createReadStream();
@@ -187,14 +175,13 @@ exports.viewFile = async (req, res) => {
             res.status(500).send('Error streaming file.');
         });
         readStream.pipe(res);
-
     } catch (error) {
         console.error('Error in viewFile controller:', error);
         res.status(500).json({ message: error.message });
     }
 };
 
-// Get file details (metadata)
+// Get file details
 exports.getFileDetails = async (req, res) => {
     try {
         const file = await fileService.getFileById(req.params.id);
@@ -208,7 +195,7 @@ exports.getFileDetails = async (req, res) => {
     }
 };
 
-// Update file details
+// Update file
 exports.updateFile = async (req, res) => {
     try {
         const fileId = req.params.id;
@@ -216,8 +203,7 @@ exports.updateFile = async (req, res) => {
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
-        
-        // Map frontend field names to database field names
+
         const updates = {
             originalName: req.body.fileName || file.originalName,
             description: req.body.description || file.description,
@@ -227,13 +213,14 @@ exports.updateFile = async (req, res) => {
         };
 
         if (req.file) {
-             if(file.path) {
+            if (file.path) {
                 try {
                     await fileService.bucket.file(file.path).delete();
-                } catch(e) {
+                } catch (e) {
                     console.warn("Old file could not be deleted, might not exist.", e.message);
                 }
             }
+
             const fileMeta = await fileService.uploadFileToStorage(req.file, req.file.originalname);
             updates.filename = fileMeta.path.split('/').pop();
             updates.originalName = req.file.originalname;
@@ -244,7 +231,7 @@ exports.updateFile = async (req, res) => {
             updates.size = req.file.size;
             updates.url = fileMeta.url;
         }
-        
+
         const updatedFile = await fileService.updateFile(fileId, updates);
         res.json(updatedFile);
     } catch (error) {
@@ -253,7 +240,7 @@ exports.updateFile = async (req, res) => {
     }
 };
 
-// Delete a file
+// Delete file
 exports.deleteFile = async (req, res) => {
     try {
         await fileService.deleteFile(req.params.id);
@@ -263,14 +250,16 @@ exports.deleteFile = async (req, res) => {
     }
 };
 
-// Get file preview (for CSV/Excel)
+// ✅ Fixed: Get file preview (with legacy support)
 exports.getFilePreview = async (req, res) => {
     try {
         const file = await fileService.getFileById(req.params.id);
+
         let filePath = file?.path;
         if (!filePath && file?.filename) {
             filePath = file.filename; // fallback for legacy files
         }
+
         if (!file || !filePath) {
             return res.status(404).json({ message: 'File not found or path is missing' });
         }
@@ -284,39 +273,47 @@ exports.getFilePreview = async (req, res) => {
     }
 };
 
-// Get paginated files
+// Get paginated files (includes Algolia search)
 exports.getFilesPaginated = async (req, res) => {
     try {
-        const { search, category, year, subCategory, limit = 16, startAfter = null } = req.query;
+        const { search, category, year, subCategory, limit = 16, startAfter = null, page = 0 } = req.query;
         const filters = { search, category, year, subCategory };
 
-        // Remove empty filters
         Object.keys(filters).forEach(key => (filters[key] === '' || filters[key] === null || filters[key] === undefined) && delete filters[key]);
 
-        const result = await fileService.getFilesPaginated({ filters, limit, startAfter });
-        res.json(result);
+        if (search) {
+            const algoliaResult = await fileService.searchFilesWithAlgolia(search, Number(limit), Number(page));
+            res.json({
+                files: algoliaResult.files,
+                page: algoliaResult.page,
+                nbPages: algoliaResult.nbPages,
+                hasNextPage: algoliaResult.hasNextPage,
+                lastVisible: null
+            });
+        } else {
+            const result = await fileService.getFilesPaginated({ filters, limit, startAfter });
+            res.json(result);
+        }
     } catch (error) {
         console.error('Error fetching paginated files:', error);
         res.status(500).json({ message: error.message });
     }
 };
 
-// Add file to recently viewed
+// Add to recently viewed
 exports.addToRecentlyViewed = async (req, res) => {
     try {
         const { fileId, userId } = req.body;
-        
+
         if (!fileId || !userId) {
             return res.status(400).json({ message: 'File ID and User ID are required' });
         }
 
-        // Verify file exists
         const file = await fileService.getFileById(fileId);
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        // Add to recently viewed in database
         await fileService.addToRecentlyViewed(fileId, userId);
         res.json({ message: 'Added to recently viewed' });
     } catch (error) {
@@ -325,12 +322,12 @@ exports.addToRecentlyViewed = async (req, res) => {
     }
 };
 
-// Get recently viewed files for a user
+// Get recently viewed files
 exports.getRecentlyViewedFiles = async (req, res) => {
     try {
         const { userId } = req.params;
         const { limit = 4 } = req.query;
-        
+
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
         }
@@ -343,11 +340,11 @@ exports.getRecentlyViewedFiles = async (req, res) => {
     }
 };
 
-// Clear recently viewed files for a user
+// Clear recently viewed
 exports.clearRecentlyViewedFiles = async (req, res) => {
     try {
         const { userId } = req.params;
-        
+
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
         }
@@ -360,23 +357,19 @@ exports.clearRecentlyViewedFiles = async (req, res) => {
     }
 };
 
-// Debug endpoint to inspect file data
+// Debug
 exports.debugFile = async (req, res) => {
     try {
         const fileId = req.params.id;
-        
-        // Get raw document data
+
         const doc = await fileService.db.collection('uploads').doc(fileId).get();
-        
         if (!doc.exists) {
             return res.status(404).json({ message: 'File not found in database' });
         }
-        
+
         const rawData = doc.data();
-        
-        // Also try to get it through the service
         const serviceFile = await fileService.getFileById(fileId);
-        
+
         res.json({
             rawData,
             serviceData: serviceFile,
@@ -386,7 +379,6 @@ exports.debugFile = async (req, res) => {
             fileType: rawData.fileType,
             collection: fileService.collection
         });
-        
     } catch (error) {
         console.error('Error in debugFile:', error);
         res.status(500).json({ message: error.message });

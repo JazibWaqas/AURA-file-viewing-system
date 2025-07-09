@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "algoliasearch": "^4.25.2",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "csv-parse": "^5.6.0",
