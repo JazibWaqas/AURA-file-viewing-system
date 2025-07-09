@@ -423,25 +423,36 @@ const FileViewer = () => {
         </div>
       );
     }
-    if (file?.fileType === 'csv' && previewData?.headers) {
-      return (
-        <div className="spreadsheet-preview-container">
-          <table className="spreadsheet-table">
-            <thead>
-              <tr>{previewData.headers.map((header, idx) => <th key={idx}>{header}</th>)}</tr>
-            </thead>
-            <tbody>
-              {previewData.rows?.length ? (
-                previewData.rows.map((row, rIdx) => (
-                  <tr key={rIdx}>{row.map((cell, cIdx) => <td key={cIdx}>{cell}</td>)}</tr>
-                ))
-              ) : (
-                <tr><td colSpan={previewData.headers.length}>No data found.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      );
+    if (file?.fileType === 'csv') {
+      if (loading) return <div className="spreadsheet-loading"><FiLoader className="spinner-icon" /> Loading CSV preview...</div>;
+      if (previewError) return <div className="spreadsheet-error">{previewError}</div>;
+      if (previewData?.headers) {
+        return (
+          <div className="spreadsheet-preview-container spreadsheet-preview-scrollable">
+            <table className="spreadsheet-table">
+              <thead>
+                <tr>{previewData.headers.map((header, idx) => <th key={idx}>{header}</th>)}</tr>
+              </thead>
+              <tbody>
+                {previewData.rows?.length ? (
+                  previewData.rows.map((row, rIdx) => (
+                    <tr key={rIdx}>{row.map((cell, cIdx) => <td key={cIdx}>{cell}</td>)}</tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={previewData.headers.length}>No data found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      return null;
+    }
+    if (file?.fileType === 'docx' || file?.fileType === 'doc') {
+      if (loading) return <div className="docx-loading"><FiLoader className="spinner-icon" /> Loading document preview...</div>;
+      if (previewError) return <div className="docx-error">{previewError}</div>;
+      if (previewData) return <div className="docx-preview" dangerouslySetInnerHTML={{ __html: previewData }} />;
+      return null;
     }
     return null;
   };
@@ -546,15 +557,20 @@ const FileViewer = () => {
         {/* Centered preview with overlayed actions */}
         <div className="file-viewer-preview-center file-viewer-preview-center-large">
           <div className={isFullscreen ? 'file-preview fullscreen' : 'file-preview file-preview-large'} ref={previewRef}>
-            {/* Overlayed actions */}
+            {/* Overlayed file name and actions */}
             {file && (
               <div className="file-viewer-preview-overlay">
-                <button className="download-btn small" onClick={() => handleDownload(file?._id, file?.originalName || file?.filename || file?.name)} title="Download File">
-                  <FiDownload />
-                </button>
-                <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
-                  {isFullscreen ? <FiMinimize /> : <FiMaximize />}
-                </button>
+                <div className="file-viewer-preview-title">
+                  {file?.originalName || file?.filename || file?.name || 'Untitled'}
+                </div>
+                <div className="file-viewer-preview-actions">
+                  <button className="download-btn small" onClick={() => handleDownload(file?._id, file?.originalName || file?.filename || file?.name)} title="Download File">
+                    <FiDownload />
+                  </button>
+                  <button className="fullscreen-btn with-label" onClick={handleToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'View in Full-Screen'}>
+                    {isFullscreen ? <FiMinimize /> : <FiMaximize />}
+                  </button>
+                </div>
               </div>
             )}
             {/* Preview content */}

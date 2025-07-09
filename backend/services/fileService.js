@@ -234,10 +234,56 @@ class FileService {
             let rows = [];
 
             if (fileType === 'csv') {
-                const records = parse(fileContent, { columns: true, skip_empty_lines: true });
-                if (records.length > 0) {
-                    headers = Object.keys(records[0]);
-                    rows = records.map(record => headers.map(header => record[header]));
+                // Try to parse with headers first
+                let records;
+                try {
+                    records = parse(fileContent, { columns: true, skip_empty_lines: true });
+                } catch (e) {
+                    // Fallback: parse without headers
+                    try {
+                        records = parse(fileContent, { columns: false, skip_empty_lines: true });
+                    } catch (parseErr) {
+                        // Try to parse as JSON if CSV fails
+                        try {
+                            const jsonData = JSON.parse(fileContent.toString('utf8'));
+                            if (Array.isArray(jsonData) && jsonData.length > 0 && typeof jsonData[0] === 'object') {
+                                headers = Object.keys(jsonData[0]);
+                                rows = jsonData.map(row => headers.map(h => row[h]));
+                                return { headers, rows, totalRows: rows.length };
+                            } else {
+                                throw new Error('Malformed CSV and not a valid JSON array of objects.');
+                            }
+                        } catch (jsonErr) {
+                            throw new Error('Malformed CSV and not valid JSON: ' + jsonErr.message);
+                        }
+                    }
+                }
+
+                if (Array.isArray(records) && records.length > 0) {
+                    if (Array.isArray(records[0])) {
+                        // No headers, just rows
+                        headers = records[0].map((_, i) => `Column ${i + 1}`);
+                        rows = records;
+                    } else if (typeof records[0] === 'object') {
+                        // With headers
+                        headers = Object.keys(records[0]);
+                        rows = records.map(record => headers.map(header => record[header]));
+                    }
+                } else {
+                    throw new Error('No data found in this CSV file.');
+                }
+            } else if (fileType === 'json') {
+                // Parse as JSON array of objects
+                try {
+                    const jsonData = JSON.parse(fileContent.toString('utf8'));
+                    if (Array.isArray(jsonData) && jsonData.length > 0 && typeof jsonData[0] === 'object') {
+                        headers = Object.keys(jsonData[0]);
+                        rows = jsonData.map(row => headers.map(h => row[h]));
+                    } else {
+                        throw new Error('JSON file must be an array of objects.');
+                    }
+                } catch (jsonErr) {
+                    throw new Error('Malformed JSON file: ' + jsonErr.message);
                 }
             } else if (fileType === 'excel') {
                 const workbook = XLSX.read(fileContent, { type: 'buffer' });
@@ -251,6 +297,11 @@ class FileService {
                 }
             } else {
                 throw new Error('Preview not supported for this file type.');
+            }
+
+            // Final check: if headers or rows are empty, throw a clear error
+            if (!headers || headers.length === 0 || !rows || rows.length === 0) {
+                throw new Error('No data found in this file.');
             }
 
             return { headers, rows, totalRows: rows.length };

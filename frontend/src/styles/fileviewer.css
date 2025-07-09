@@ -215,10 +215,11 @@
 }
 
 .edit-button {
-  background: transparent;
-  color: var(--color-primary, #00897B);
-  border: 1px solid var(--color-primary, #00897B);
-  margin-top: rem;
+  
+  background: var(--color-primary, #00897B);
+  color: white;
+  border-color: var(--color-primary, #00897B);
+  
 }
 
 .edit-button:hover {
@@ -229,18 +230,18 @@
 }
 
 .delete-button {
-  background: transparent;
-  color: var(--color-accent, #FF6F61);
-  border: 1px solid var(--color-accent, #FF6F61);
-  margin-top: 0rem;
+  background: var(--color-primary, #ed552f);
+  color: white;
+  border-color: var(--color-primary, #ed552f);
 }
 
 .delete-button:hover {
-  background: var(--color-accent, #FF6F61);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
+
 
 .file-preview {
   position: relative;
@@ -853,15 +854,41 @@ html {
 }
 .file-viewer-preview-overlay {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 0;
+  left: 0;
+  width: 100%;
   display: flex;
-  gap: 0.7rem;
-  z-index: 10;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  z-index: 2;
+  padding: 0 20px;
+  background:linear-gradient(90deg, #85d8ce 0%, #085078,#2f3132 100%);;
+  pointer-events: none;
+}
+.file-viewer-preview-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  pointer-events: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
+}
+.file-viewer-preview-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  pointer-events: auto;
+}
+.file-preview, .file-preview-large, .fullscreen {
+  position: relative;
 }
 .file-preview-large {
   min-width: 600px;
-  min-height: 480px;
+  min-height: 580px;
   max-width: 90vw;
   max-height: 70vh;
 }
@@ -1021,5 +1048,40 @@ html {
   position: relative;
   padding: 2.5rem 0 1.5rem 0;
   overflow-y: hidden !important;
+}
+
+.spreadsheet-preview-scrollable {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.spreadsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.spreadsheet-table th, .spreadsheet-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 15px;
+}
+.spreadsheet-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+.spreadsheet-table tr:nth-child(even) td {
+  background: #fafbfc;
+}
+.spreadsheet-error, .spreadsheet-loading {
+  padding: 32px;
+  text-align: center;
+  color: #b71c1c;
+  font-size: 16px;
+}
+.spreadsheet-loading {
+  color: #1976d2;
 }
 

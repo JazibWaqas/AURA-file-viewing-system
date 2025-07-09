@@ -267,11 +267,15 @@ exports.deleteFile = async (req, res) => {
 exports.getFilePreview = async (req, res) => {
     try {
         const file = await fileService.getFileById(req.params.id);
-        if (!file || !file.path) {
+        let filePath = file?.path;
+        if (!filePath && file?.filename) {
+            filePath = file.filename; // fallback for legacy files
+        }
+        if (!file || !filePath) {
             return res.status(404).json({ message: 'File not found or path is missing' });
         }
 
-        const data = await fileService.getFilePreviewData(file.path, file.fileType);
+        const data = await fileService.getFilePreviewData(filePath, file.fileType);
         res.json({ ...data, fileName: file.originalName });
 
     } catch (error) {
