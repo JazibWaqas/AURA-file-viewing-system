@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../styles/FileIndex.css';
+import ShinyText from '../components/ShinyText';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -179,7 +180,7 @@ export default function FileIndexPage() {
     if (selectedSubCategory) return selectedSubCategory;
     if (selectedCategory) return selectedCategory;
     if (searchTerm) return `Search Results`;
-    return 'Recent Files';
+    return 'Recently Uploaded Files';
   }, [selectedCategory, selectedSubCategory, searchTerm]);
   if (error) {
     return (
@@ -205,17 +206,17 @@ export default function FileIndexPage() {
           <div className="sidebar-container">
             <CategorySidebar onSelect={handleCategorySelect} />
           </div>
-          
+
           {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
 
           <div className="file-index-page-content">
             <div className="page-header">
-               <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
                 <span>Filters</span>
               </button>
               <h1>File Management</h1>
-              
+
             </div>
 
             {successMessage && (
@@ -223,20 +224,20 @@ export default function FileIndexPage() {
                 {successMessage}
               </div>
             )}
-            
+
             <div className="search-filter-bar">
               <div className="search-container">
                 <FiSearch className="search-icon" />
-                <input 
-                  type="text" 
-                  placeholder="Search files..." 
+                <input
+                  type="text"
+                  placeholder="Search files..."
                   className="search-input"
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
               </div>
               <div className="filter-container">
-                <button 
+                <button
                   className={`filter-button ${selectedCategory ? 'active' : ''}`}
                   onClick={() => {
                     setSelectedCategory('');
@@ -248,7 +249,7 @@ export default function FileIndexPage() {
                 </button>
               </div>
               <div className="filter-container">
-                <button 
+                <button
                   className={`filter-button ${selectedYear ? 'active' : ''}`}
                   onClick={() => setShowYearFilter(!showYearFilter)}
                 >
@@ -270,7 +271,7 @@ export default function FileIndexPage() {
                 )}
               </div>
               {(selectedCategory || selectedYear) && (
-                <button 
+                <button
                   className="clear-filters-button"
                   onClick={() => {
                     setSelectedCategory('');
@@ -284,7 +285,8 @@ export default function FileIndexPage() {
             </div>
             {/* Filtered/Category Section */}
             <section className="files-section">
-              <h2 className="files-section-title">{getSectionTitle}</h2>
+            <ShinyText text={getSectionTitle} className="files-section-title" />
+
               <div className="files-scroll-grid">
                 {isLoadingFiles ? (
                   <div className="loading-indicator">
@@ -300,9 +302,15 @@ export default function FileIndexPage() {
                   recentFiles.map((file) => (
                     <div key={file._id} className="file-card">
                       <div className="file-info">
-                        <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
-                          {file.originalName || file.filename || file.name || 'Untitled'}
-                        </h4>
+                        <h3 className="file-name">
+                        <span className="file-name-inner">
+  <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+  <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+</span>
+
+                        </h3>
+
+
                         <p>Category: {file.category || 'Uncategorized'}</p>
                         <p>Year: {file.year || 'N/A'}</p>
                       </div>
@@ -317,7 +325,7 @@ export default function FileIndexPage() {
             </section>
             {/* All Files Section */}
             <section className="all-files-section">
-              <h2 className="all-files-title">All Files</h2>
+              <ShinyText text="All Files" className="all-files-title" />
               <div className="all-files-scroll-grid">
                 {isLoadingFiles && allFiles.length === 0 ? (
                   <div className="loading-indicator">
@@ -334,9 +342,14 @@ export default function FileIndexPage() {
                     {allFiles.map((file) => (
                       <div key={file._id} className="file-card">
                         <div className="file-info">
-                          <h4 title={file.originalName || file.filename || file.name || 'Untitled'}>
-                            {file.originalName || file.filename || file.name || 'Untitled'}
-                          </h4>
+                          <h3 className="file-name">
+                          <span className="file-name-inner">
+  <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+  <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+</span>
+
+                          </h3>
+
                           <p>Category: {file.category || 'Uncategorized'}</p>
                           <p>Year: {file.year || 'N/A'}</p>
                         </div>
