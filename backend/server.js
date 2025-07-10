@@ -7,6 +7,7 @@ const { db, bucket } = require('./config/firebase');
 const XLSX = require('xlsx');
 const userRoutes = require('./routes/users');
 const fileRoutes = require('./routes/files');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Load environment variables
 dotenv.config();
@@ -131,6 +132,7 @@ app.get('/health', async (req, res) => {
 
 // Use modular routes for all other file operations
 app.use('/api/files', fileRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header.jsx';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, 
-  AreaChart, Area, LineChart, Line, Legend, Dot, PieChart, Pie, Cell, Label, ComposedChart 
+  PieChart, Pie, Cell, Label, Legend 
 } from 'recharts';
 import '../styles/dashboard.css';
 import auraLogo from '../assets/aura-logo.png';
@@ -17,22 +17,6 @@ import soortyLogo from '../assets/Soorty.jpg';
 import ngoLogo from '../assets/ngo.jpg';
 import bvaLogo from '../assets/Bva.jpg';
 
-const graphData = [
-  { year: 2020, income: 18887133, expenses: 23857572, donations: 95000 },
-  { year: 2021, income: 14478076, expenses: 18199534, donations: 115000 },
-  { year: 2022, income: 21318558, expenses: 20461183, donations: 130000 },
-  { year: 2023, income: 24026879, expenses: 26540307, donations: 155000 },
-  { year: 2024, income: 33063777, expenses: 33247036, donations: 170000 },
-];
-
-const donationsPieData = [
-  { name: 'Donations', value: 7183302 },
-  { name: 'Zakat', value: 4185445 },
-  { name: 'Sponsorship', value: 4247128 },
-  { name: 'Fees', value: 5804200 },
-  { name: 'Other', value: 11714272 },
-];
-
 const PIE_COLORS = [
   '#FFB300', // Donations - dark amber
   '#fE35B1', // Zakat - deep purple
@@ -45,24 +29,22 @@ function formatNumber(num) {
   if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
   if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
   if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-  return num.toLocaleString('en-US');
+  return num ? num.toLocaleString('en-US') : '0';
 }
 
 const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="custom-tooltip">
-          <p className="label">{`${label}`}</p>
-          <p className="intro">{`${title}: ${formatNumber(payload[0].value)}`}</p>
-        </div>
-      );
-    }
-  
-    return null;
-  };
-  
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p className="label">{`${label}`}</p>
+        <p className="intro">{`${title}: ${formatNumber(payload[0].value)}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
-function CombinedIncomeExpenseChart() {
+function CombinedIncomeExpenseChart({ data }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
   return (
     <div
@@ -72,51 +54,40 @@ function CombinedIncomeExpenseChart() {
       <h4>Income vs Expense</h4>
       <p>Annual comparison of income and expenses</p>
       <ResponsiveContainer width="100%" height={340}>
-        <BarChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barGap={12}>
+        <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barGap={12}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis tickFormatter={formatNumber} />
           <Tooltip formatter={formatNumber} />
           <Legend verticalAlign="top" align="right" />
-          <Bar dataKey="income" name="Income" fill="#2082a6" radius={[6, 6, 0, 0]} maxBarSize={36} />
-          <Bar dataKey="expenses" name="Expenses" fill="#01cbae" radius={[6, 6, 0, 0]} maxBarSize={36} />
+          <Bar dataKey="totalRevenue" name="Income" fill="#2082a6" radius={[6, 6, 0, 0]} maxBarSize={36} />
+          <Bar dataKey="totalExpenses" name="Expenses" fill="#01cbae" radius={[6, 6, 0, 0]} maxBarSize={36} />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-function renderPieLabel({ name, value, cx, cy, midAngle, innerRadius, outerRadius, percent, index }) {
-  const RADIAN = Math.PI / 180;
-  const radius = outerRadius + 24;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  return (
-    <text
-      x={x}
-      y={y}
-      className="pie-label"
-      textAnchor={x > cx ? 'start' : 'end'}
-      dominantBaseline="central"
-    >
-      {`${name}: ${formatNumber(value)}`}
-    </text>
-  );
-}
-
-function DonationsChart() {
+function DonationsChart({ data, year }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
+  const pieData = [
+    { name: 'Donations', value: data.donations || 0 },
+    { name: 'Zakat', value: data.zakat || 0 },
+    { name: 'Sponsorship', value: data.sponsorship || 0 },
+    { name: 'Fees', value: data.fees || 0 },
+    { name: 'Other', value: data.other || 0 },
+  ];
   return (
     <div
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <h4 className="donations-title">Donations Breakdown</h4>
+      <h4 className="donations-title">Donations Breakdown ({year})</h4>
       <p className="donations-desc">Distribution of donation sources</p>
       <ResponsiveContainer width="100%" height={340}>
         <PieChart margin={{ top: 16, right: 16, left: 16, bottom: 16 }}>
           <Pie
-            data={donationsPieData}
+            data={pieData}
             dataKey="value"
             nameKey="name"
             cx="50%"
@@ -125,7 +96,7 @@ function DonationsChart() {
             innerRadius={50}
             paddingAngle={0}
           >
-            {donationsPieData.map((entry, index) => (
+            {pieData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
             ))}
             <Label
@@ -143,10 +114,10 @@ function DonationsChart() {
             align="center"
             iconType="circle"
             formatter={(value, entry, index) => {
-              const data = donationsPieData.find(d => d.name === value);
+              const d = pieData.find(d => d.name === value);
               return (
                 <span style={{ color: PIE_COLORS[index % PIE_COLORS.length], fontWeight: 500, fontSize: '0.95rem' }}>
-                  {value}: {formatNumber(data ? data.value : 0)}
+                  {value}: {formatNumber(d ? d.value : 0)}
                 </span>
               );
             }}
@@ -156,19 +127,45 @@ function DonationsChart() {
     </div>
   );
 }
-  
+
+const sponsorLogos = [
+  { src: parcoLogo, alt: 'PARCO' },
+  { src: icareLogo, alt: 'iCARE' },
+  { src: habibMetroLogo, alt: 'HabibMetro' },
+  { src: infaqLogo, alt: 'INFAQ' },
+  { src: toyotaLogo, alt: 'TOYOTA' },
+  { src: psoLogo, alt: 'PSO' },
+  { src: soortyLogo, alt: 'Soorty' },
+  { src: ngoLogo, alt: 'NGO' },
+  { src: bvaLogo, alt: 'BVA' },
+];
+
 const Home = () => {
-  const sponsorLogos = [
-    { src: parcoLogo, alt: 'PARCO' },
-    { src: icareLogo, alt: 'iCARE' },
-    { src: habibMetroLogo, alt: 'HabibMetro' },
-    { src: infaqLogo, alt: 'INFAQ' },
-    { src: toyotaLogo, alt: 'TOYOTA' },
-    { src: psoLogo, alt: 'PSO' },
-    { src: soortyLogo, alt: 'Soorty' },
-    { src: ngoLogo, alt: 'NGO' },
-    { src: bvaLogo, alt: 'BVA' },
-  ];
+  const [yearlyData, setYearlyData] = useState([]);
+  const [fundingData, setFundingData] = useState({});
+  const [latestYear, setLatestYear] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      // Fetch yearly summary
+      const yearlyRes = await fetch('/api/dashboard/yearly-summary');
+      const yearly = await yearlyRes.json();
+      setYearlyData(yearly);
+      // Find latest year
+      const years = yearly.map(y => y.year);
+      const maxYear = Math.max(...years);
+      setLatestYear(maxYear);
+      // Fetch funding sources for latest year
+      const fundingRes = await fetch(`/api/dashboard/funding-sources?year=${maxYear}`);
+      const fundingArr = await fundingRes.json();
+      setFundingData(fundingArr[0] || {});
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="dashboard-page">
       <div className="relative flex flex-col md:flex-row items-start gap-8">
@@ -197,10 +194,9 @@ const Home = () => {
         </div>
       </div>
 
-      
       <div className="charts-section">
-        <CombinedIncomeExpenseChart />
-        <DonationsChart />
+        {loading ? <div>Loading...</div> : <CombinedIncomeExpenseChart data={yearlyData} />}
+        {loading ? <div>Loading...</div> : <DonationsChart data={fundingData} year={latestYear} />}
       </div>
 
       <div className="bottom-section">
