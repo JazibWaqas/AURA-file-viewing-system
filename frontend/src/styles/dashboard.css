@@ -1392,3 +1392,108 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
     transform: translateY(0) scale(1) rotate(0deg) skewY(0deg);
   }
 }
+
+/* Modal styles for Add Data functionality */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(60, 80, 120, 0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  min-width: 320px;
+  max-width: 95vw;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #286dc8;
+  text-align: center;
+}
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.modal-form label {
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 0.2rem;
+}
+.modal-form input[type="number"],
+.modal-form input[type="text"] {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  background: #fafbfc;
+  color: #111;
+  transition: border-color 0.2s;
+}
+.modal-form input:focus {
+  border-color: #6c63ff;
+}
+.modal-error {
+  color: #d9363e;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.98rem;
+  text-align: center;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+.modal-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #f3f3f3;
+  color: #111;
+  transition: background 0.2s;
+}
+.modal-actions button[type="submit"] {
+  background: #286dc8;
+  color: #fff;
+}
+.modal-actions button:disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+.add-data-btn {
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 1rem;
+}
+.add-data-btn:hover {
+  background: #2563eb;
+}

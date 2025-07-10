@@ -17,13 +17,27 @@ import soortyLogo from '../assets/Soorty.jpg';
 import ngoLogo from '../assets/ngo.jpg';
 import bvaLogo from '../assets/Bva.jpg';
 
+// const PIE_COLORS = [
+//   '#FFB300', // Donations - dark amber
+//   '#fE35B1', // Zakat - deep purple
+//   '#388E3C', // Sponsorship - dark green
+//   '#1976D2', // Fees - strong blue
+//   '#F4511E', // Other - deep orange
+// ];
+
 const PIE_COLORS = [
-  '#FFB300', // Donations - dark amber
-  '#fE35B1', // Zakat - deep purple
-  '#388E3C', // Sponsorship - dark green
-  '#1976D2', // Fees - strong blue
-  '#F4511E', // Other - deep orange
+  '#3F51B5', // Indigo – elegant, readable, and professional
+  '#C2185B', // Deep Crimson – rich and dramatic, not too loud
+  '#1A237E', // Dark Navy Blue – subtle but visible
+  '#673AB7', // Deep Purple – luxurious and modern
+  '#263238', // Charcoal Black – moody and grounded
 ];
+
+  
+
+
+
+
 
 function formatNumber(num) {
   if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
@@ -44,14 +58,140 @@ const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
   return null;
 };
 
-function CombinedIncomeExpenseChart({ data }) {
+function AddBarDataModal({ open, onClose, onSubmit }) {
+  const [year, setYear] = useState('');
+  const [income, setIncome] = useState('');
+  const [expense, setExpense] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!year || !income || !expense) {
+      setError('All fields are required.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await onSubmit({ year, totalRevenue: Number(income), totalExpenses: Number(expense) });
+      setYear('');
+      setIncome('');
+      setExpense('');
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Failed to submit data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Add Yearly Income & Expense</h3>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <label>Year</label>
+          <input type="number" value={year} onChange={e => setYear(e.target.value)} min="2000" max="2100" required />
+          <label>Year's Income</label>
+          <input type="number" value={income} onChange={e => setIncome(e.target.value)} min="0" required />
+          <label>Year's Expense</label>
+          <input type="number" value={expense} onChange={e => setExpense(e.target.value)} min="0" required />
+          {error && <div className="modal-error">{error}</div>}
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} disabled={loading}>Cancel</button>
+            <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function AddPieDataModal({ open, onClose, onSubmit }) {
+  const [year, setYear] = useState('');
+  const [donations, setDonations] = useState('');
+  const [zakat, setZakat] = useState('');
+  const [sponsorship, setSponsorship] = useState('');
+  const [fees, setFees] = useState('');
+  const [other, setOther] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!year || !donations || !zakat || !sponsorship || !fees || !other) {
+      setError('All fields are required.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await onSubmit({
+        year,
+        donations: Number(donations),
+        zakat: Number(zakat),
+        sponsorship: Number(sponsorship),
+        fees: Number(fees),
+        other: Number(other)
+      });
+      setYear('');
+      setDonations('');
+      setZakat('');
+      setSponsorship('');
+      setFees('');
+      setOther('');
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Failed to submit data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Add Funding Sources Data</h3>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <label>Year</label>
+          <input type="number" value={year} onChange={e => setYear(e.target.value)} min="2000" max="2100" required />
+          <label>Total Donations</label>
+          <input type="number" value={donations} onChange={e => setDonations(e.target.value)} min="0" required />
+          <label>Total Zakat</label>
+          <input type="number" value={zakat} onChange={e => setZakat(e.target.value)} min="0" required />
+          <label>Total Sponsorship</label>
+          <input type="number" value={sponsorship} onChange={e => setSponsorship(e.target.value)} min="0" required />
+          <label>Total Fees</label>
+          <input type="number" value={fees} onChange={e => setFees(e.target.value)} min="0" required />
+          <label>Total Other</label>
+          <input type="number" value={other} onChange={e => setOther(e.target.value)} min="0" required />
+          {error && <div className="modal-error">{error}</div>}
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} disabled={loading}>Cancel</button>
+            <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function CombinedIncomeExpenseChart({ data, onAddData }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
   return (
     <div
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <h4>Income vs Expense</h4>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h4>Income vs Expense</h4>
+        {onAddData && (
+          <button className="add-data-btn" onClick={onAddData}>Add Data</button>
+        )}
+      </div>
       <p>Annual comparison of income and expenses</p>
       <ResponsiveContainer width="100%" height={340}>
         <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barGap={12}>
@@ -68,7 +208,7 @@ function CombinedIncomeExpenseChart({ data }) {
   );
 }
 
-function DonationsChart({ data, year }) {
+function DonationsChart({ data, year, onAddData }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const pieData = [
     { name: 'Donations', value: data.donations || 0 },
@@ -82,7 +222,12 @@ function DonationsChart({ data, year }) {
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <h4 className="donations-title">Donations Breakdown ({year})</h4>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h4 className="donations-title">Donations Breakdown ({year})</h4>
+        {onAddData && (
+          <button className="add-data-btn" onClick={onAddData}>Add Data</button>
+        )}
+      </div>
       <p className="donations-desc">Distribution of donation sources</p>
       <ResponsiveContainer width="100%" height={340}>
         <PieChart margin={{ top: 16, right: 16, left: 16, bottom: 16 }}>
@@ -145,26 +290,70 @@ const Home = () => {
   const [fundingData, setFundingData] = useState({});
   const [latestYear, setLatestYear] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showBarModal, setShowBarModal] = useState(false);
+  const [showPieModal, setShowPieModal] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      // Fetch yearly summary
+      // Fetch yearly summary for bar chart
       const yearlyRes = await fetch('/api/dashboard/yearly-summary');
       const yearly = await yearlyRes.json();
       setYearlyData(yearly);
-      // Find latest year
-      const years = yearly.map(y => y.year);
-      const maxYear = Math.max(...years);
-      setLatestYear(maxYear);
-      // Fetch funding sources for latest year
-      const fundingRes = await fetch(`/api/dashboard/funding-sources?year=${maxYear}`);
+      // Fetch all funding sources and pick the latest year for pie chart
+      const fundingRes = await fetch('/api/dashboard/funding-sources');
       const fundingArr = await fundingRes.json();
-      setFundingData(fundingArr[0] || {});
+      if (fundingArr.length > 0) {
+        const latest = fundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));
+        setFundingData(latest);
+        setLatestYear(Number(latest.year));
+      } else {
+        setFundingData({});
+        setLatestYear('');
+      }
       setLoading(false);
     }
     fetchData();
   }, []);
+
+  const handleAddBarData = async (formData) => {
+    const res = await fetch('/api/dashboard/yearly-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    if (!res.ok) throw new Error('Failed to add data');
+    // Refresh data
+    const yearlyRes = await fetch('/api/dashboard/yearly-summary');
+    const yearly = await yearlyRes.json();
+    setYearlyData(yearly);
+    // Update latest year if needed
+    const years = yearly.map(y => y.year);
+    const maxYear = Math.max(...years);
+    setLatestYear(maxYear);
+  };
+
+  // Add handler for submitting pie data
+  const handleAddPieData = async (formData) => {
+    const res = await fetch('/api/dashboard/funding-sources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    if (!res.ok) throw new Error('Failed to add data');
+    // Always fetch all funding sources and pick the latest year
+    const allFundingRes = await fetch('/api/dashboard/funding-sources');
+    const allFundingArr = await allFundingRes.json();
+    if (allFundingArr.length > 0) {
+      // Find the entry with the highest year
+      const latest = allFundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));
+      setFundingData(latest);
+      setLatestYear(Number(latest.year));
+    } else {
+      setFundingData({});
+      setLatestYear('');
+    }
+  };
 
   return (
     <div className="dashboard-page">
@@ -195,8 +384,14 @@ const Home = () => {
       </div>
 
       <div className="charts-section">
-        {loading ? <div>Loading...</div> : <CombinedIncomeExpenseChart data={yearlyData} />}
-        {loading ? <div>Loading...</div> : <DonationsChart data={fundingData} year={latestYear} />}
+        {loading ? <div>Loading...</div> : <>
+          <CombinedIncomeExpenseChart data={yearlyData} onAddData={() => setShowBarModal(true)} />
+          <AddBarDataModal open={showBarModal} onClose={() => setShowBarModal(false)} onSubmit={handleAddBarData} />
+        </>}
+        {loading ? <div>Loading...</div> : <>
+          <DonationsChart data={fundingData} year={latestYear} onAddData={() => setShowPieModal(true)} />
+          <AddPieDataModal open={showPieModal} onClose={() => setShowPieModal(false)} onSubmit={handleAddPieData} />
+        </>}
       </div>
 
       <div className="bottom-section">
