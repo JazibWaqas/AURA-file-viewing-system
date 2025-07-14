@@ -10,4 +10,12 @@ router.get('/yearly-summary', dashboardController.getYearlySummaries);
 router.post('/funding-sources', dashboardController.addFundingSources);
 router.get('/funding-sources', dashboardController.getFundingSources);
 
+// Storage statistics routes
+router.get('/storage-stats', dashboardController.getStorageStats);
+router.post('/storage-stats/update', dashboardController.updateStorageStats);
+
+// Patient data routes
+router.get('/patient-data', dashboardController.getPatientData);
+router.post('/patient-data', dashboardController.addPatientData);
+
 module.exports = router; 
