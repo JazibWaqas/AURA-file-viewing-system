@@ -1,6 +1,6 @@
-/* --- Dashboard Compact Layout --- */
+/* ===================== DASHBOARD PAGE LAYOUT ===================== */
 .dashboard-page {
-  background: linear-gradient(135deg, #1A237E 0%, #263238 100%);
+  /* background: linear-gradient(135deg, #1A237E 0%, #263238 100%); */
   min-height: 100vh;
   padding: 0 0 1.2rem 0;
   color: #f5f7fa;
@@ -8,13 +8,15 @@
 }
 
 .dashboard-intro-row {
-  width: 100%;
+  margin-left: 1.25%;
+  margin-right: 1%;
+  /* width: 100%; */
   padding: 1.2rem 1rem 0.8rem 1rem;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(90deg, #232b4d 0%, #3380be 100%);
-  border-radius: 0 0 18px 18px;
+  background: linear-gradient(90deg, #3c4776 0%, #19394f 100%);
+  border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 16px rgba(60, 80, 120, 0.10);
   margin-bottom: 1.2rem;
 }
@@ -112,6 +114,7 @@
   color: #fff;
 }
 
+/* ===================== DASHBOARD METRICS CARDS ===================== */
 .dashboard-metrics-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -146,6 +149,7 @@
   color: #e0e7ef;
 }
 
+/* ===================== DASHBOARD MAIN GRAPHS ===================== */
 .dashboard-main-graphs {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
@@ -183,6 +187,7 @@
   margin-bottom: 0.4rem;
 }
 
+/* ===================== DASHBOARD ACTIVITY & STORAGE ===================== */
 .dashboard-activity-storage {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -273,6 +278,7 @@
     color: #fff;
   }
   
+/* ===================== DASHBOARD SPONSORS ===================== */
 .dashboard-sponsors-row {
   max-width: 1200px;
   margin: 0 auto 1.2rem auto;
@@ -320,6 +326,7 @@
   display: block;
 }
 
+/* ===================== RESPONSIVE BREAKPOINTS ===================== */
 @media (max-width: 1200px) {
   .dashboard-metrics-row, .dashboard-main-graphs, .dashboard-activity-storage, .dashboard-sponsors-row {
     max-width: 98vw;
@@ -394,12 +401,24 @@
     height: 12px;
   }
 }
+@media (max-width: 768px) {
+  .dashboard-main-graphs {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .dashboard-expenses-graph,
+  .dashboard-donations-graph {
+    width: 100%;
+    min-width: 0;
+  }
+}
 
 footer, .dashboard-footer, .footer {
   display: none !important;
 }
 
-/* --- Modal Overlay for Dashboard --- */
+/* ===================== MODAL OVERLAY & FORMS ===================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -495,3 +514,57 @@ footer, .dashboard-footer, .footer {
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* === DashboardPage.jsx Inline Style Refactor Additions === */
+
+.chart-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pie-legend-label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.activity-link.update-link {
+  font-size: 0.95rem;
+  margin-top: 0.3rem;
+  cursor: pointer;
+}
+
+.metric-value.surplus {
+  color: #16a34a;
+}
+.metric-value.deficit {
+  color: #dc2626;
+}
+
+.recent-file-link {
+  cursor: pointer;
+  color: #3380be;
+  font-size: 1.3em;
+}
+
+.storage-update-time {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+/* === Pie Chart Color Variables === */
+:root {
+  --pie-color-1: #3F51B5; /* Indigo */
+  --pie-color-2: #C2185B; /* Deep Crimson */
+  --pie-color-3: #1A237E; /* Dark Navy Blue */
+  --pie-color-4: #673AB7; /* Deep Purple */
+  --pie-color-5: #263238; /* Charcoal Black */
+}
+
+.pie-color-0 { fill: var(--pie-color-1); color: var(--pie-color-1); }
+.pie-color-1 { fill: var(--pie-color-2); color: var(--pie-color-2); }
+.pie-color-2 { fill: var(--pie-color-3); color: var(--pie-color-3); }
+.pie-color-3 { fill: var(--pie-color-4); color: var(--pie-color-4); }
+.pie-color-4 { fill: var(--pie-color-5); color: var(--pie-color-5); }

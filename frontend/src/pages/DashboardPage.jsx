@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header.jsx';
 import { useAuth } from '../App';
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, 
-  PieChart, Pie, Cell, Label, Legend, 
-  LineChart, Line 
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
+  PieChart, Pie, Cell, Label, Legend,
+  LineChart, Line
 } from 'recharts';
 import '../styles/dashboard.css';
-import auraLogo from '../assets/aura-logo.png';
 import { useInView } from '../hooks/useInView';
 import parcoLogo from '../assets/Parco.png';
 import icareLogo from '../assets/Icare.png';
@@ -19,28 +18,11 @@ import soortyLogo from '../assets/Soorty.jpg';
 import ngoLogo from '../assets/ngo.jpg';
 import bvaLogo from '../assets/Bva.jpg';
 
-// const PIE_COLORS = [
-//   '#FFB300', // Donations - dark amber
-//   '#fE35B1', // Zakat - deep purple
-//   '#388E3C', // Sponsorship - dark green
-//   '#1976D2', // Fees - strong blue
-//   '#F4511E', // Other - deep orange
-// ];
+// ===================== Utility Functions =====================
 
-const PIE_COLORS = [
-  '#3F51B5', // Indigo – elegant, readable, and professional
-  '#C2185B', // Deep Crimson – rich and dramatic, not too loud
-  '#1A237E', // Dark Navy Blue – subtle but visible
-  '#673AB7', // Deep Purple – luxurious and modern
-  '#263238', // Charcoal Black – moody and grounded
-];
-
-  
-
-
-
-
-
+/**
+ * Format numbers for compact display (e.g., 1.2K, 3.4M)
+ */
 function formatNumber(num) {
   if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
   if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -48,12 +30,15 @@ function formatNumber(num) {
   return num ? num.toLocaleString('en-US') : '0';
 }
 
-// Replace formatNumber for metrics with a full comma format
+/**
+ * Format numbers for metrics with full comma format (e.g., 1,234,567)
+ */
 function formatNumberFull(num) {
   return num ? num.toLocaleString('en-PK') : '0';
 }
 
-const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
+// ===================== Custom Tooltip for Charts =====================
+const CustomTooltip = ({ active, payload, label, title }) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
@@ -65,6 +50,11 @@ const CustomTooltip = ({ active, payload, label, title, dataKey }) => {
   return null;
 };
 
+// ===================== Modal Components =====================
+
+/**
+ * Modal for adding yearly income & expense data
+ */
 function AddBarDataModal({ open, onClose, onSubmit }) {
   const [year, setYear] = useState('');
   const [income, setIncome] = useState('');
@@ -116,6 +106,9 @@ function AddBarDataModal({ open, onClose, onSubmit }) {
   );
 }
 
+/**
+ * Modal for adding funding sources (pie chart) data
+ */
 function AddPieDataModal({ open, onClose, onSubmit }) {
   const [year, setYear] = useState('');
   const [donations, setDonations] = useState('');
@@ -186,6 +179,9 @@ function AddPieDataModal({ open, onClose, onSubmit }) {
   );
 }
 
+/**
+ * Modal for adding patient data
+ */
 function AddPatientDataModal({ open, onClose, onSubmit }) {
   const [year, setYear] = useState('');
   const [patients, setPatients] = useState('');
@@ -233,6 +229,11 @@ function AddPatientDataModal({ open, onClose, onSubmit }) {
   );
 }
 
+// ===================== Chart Components =====================
+
+/**
+ * Line chart for annual expenses
+ */
 function CombinedExpenseLineChart({ data, onAddData }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
   return (
@@ -240,7 +241,7 @@ function CombinedExpenseLineChart({ data, onAddData }) {
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="chart-header-row">
         <h4>Annual Expenses</h4>
         {onAddData && (
           <button className="add-data-btn" onClick={onAddData}>Add Data</button>
@@ -269,6 +270,10 @@ function CombinedExpenseLineChart({ data, onAddData }) {
   );
 }
 
+/**
+ * Pie chart for donations breakdown
+ * Uses CSS variables for colors for scalability and theming
+ */
 function DonationsChart({ data, year, onAddData }) {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const pieData = [
@@ -283,8 +288,8 @@ function DonationsChart({ data, year, onAddData }) {
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h4 className="donations-title">Donations Breakdown ({year})</h4>
+      <div className="chart-header-row">
+        <h4 className="donations-title">Donations Breakdown ({year})</h4>
         {onAddData && (
           <button className="add-data-btn" onClick={onAddData}>Add Data</button>
         )}
@@ -303,7 +308,7 @@ function DonationsChart({ data, year, onAddData }) {
             paddingAngle={0}
           >
             {pieData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+              <Cell key={`cell-${index}`} className={`pie-color-${index % 5}`} />
             ))}
             <Label
               value="Total"
@@ -322,7 +327,9 @@ function DonationsChart({ data, year, onAddData }) {
             formatter={(value, entry, index) => {
               const d = pieData.find(d => d.name === value);
               return (
-                <span style={{ color: PIE_COLORS[index % PIE_COLORS.length], fontWeight: 500, fontSize: '0.95rem' }}>
+                <span
+                  className={`pie-legend-label pie-color-${index % 5}`}
+                >
                   {value}: {formatNumber(d ? d.value : 0)}
                 </span>
               );
@@ -334,6 +341,7 @@ function DonationsChart({ data, year, onAddData }) {
   );
 }
 
+// ===================== Sponsor Logos =====================
 const sponsorLogos = [
   { src: parcoLogo, alt: 'PARCO' },
   { src: icareLogo, alt: 'iCARE' },
@@ -346,6 +354,12 @@ const sponsorLogos = [
   { src: bvaLogo, alt: 'BVA' },
 ];
 
+// ===================== Main Dashboard Page =====================
+
+/**
+ * Main dashboard home component
+ * Handles data fetching, state, and layout
+ */
 const Home = () => {
   const { user, loading: authLoading } = useAuth();
   const [yearlyData, setYearlyData] = useState([]);
@@ -410,21 +424,18 @@ const Home = () => {
   const deficitYear = mostRecentYearData?.year || '----';
   const revenueYear = mostRecentYearData?.year || '----';
 
+  // Fetch all dashboard data (yearly, funding, storage, recent files)
   useEffect(() => {
-    // Don't fetch data until authentication is ready
-    if (authLoading) {
-      return;
-    }
-
+    if (authLoading) return;
     async function fetchData() {
       setLoading(true);
       try {
-        // Fetch yearly summary for bar chart
+        // Yearly summary for bar/line chart
         const yearlyRes = await fetch('/api/dashboard/yearly-summary');
         const yearly = await yearlyRes.json();
         setYearlyData(yearly);
-        
-        // Fetch all funding sources and pick the latest year for pie chart
+
+        // Funding sources for pie chart
         const fundingRes = await fetch('/api/dashboard/funding-sources');
         const fundingArr = await fundingRes.json();
         if (fundingArr.length > 0) {
@@ -435,41 +446,25 @@ const Home = () => {
           setFundingData({});
           setLatestYear('');
         }
-        
-        // Fetch storage statistics
-        console.log('Fetching storage stats...');
+
+        // Storage statistics
         const storageRes = await fetch('/api/dashboard/storage-stats');
-        console.log('Storage response status:', storageRes.status);
-        if (!storageRes.ok) {
-          throw new Error(`Storage API failed: ${storageRes.status}`);
-        }
+        if (!storageRes.ok) throw new Error(`Storage API failed: ${storageRes.status}`);
         const storage = await storageRes.json();
-        console.log('Storage data received:', storage);
         setStorageStats(storage);
-        
-        // Fetch recently viewed files
-        console.log('Fetching recently viewed files...');
-        console.log('User object:', user);
-        console.log('User firebaseUser:', user?.firebaseUser);
-        console.log('User UID:', user?.firebaseUser?.uid);
-        
+
+        // Recently viewed files
         if (user?.firebaseUser?.uid) {
           const recentRes = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=5`);
           if (recentRes.ok) {
-            const recentFiles = await recentRes.json();
-            console.log('Recently viewed files:', recentFiles);
-            setRecentlyViewedFiles(recentFiles);
+            setRecentlyViewedFiles(await recentRes.json());
           } else {
-            console.warn('Could not fetch recently viewed files');
             setRecentlyViewedFiles([]);
           }
         } else {
-          console.log('No authenticated user, skipping recently viewed files');
           setRecentlyViewedFiles([]);
         }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        // Set fallback data for storage if API fails
         setStorageStats({ totalFiles: 271, totalSize: 45.79, sizeUnit: 'MB' });
       } finally {
         setLoading(false);
@@ -478,6 +473,7 @@ const Home = () => {
     fetchData();
   }, [authLoading, user]);
 
+  // Add handler for submitting bar data
   const handleAddBarData = async (formData) => {
     const res = await fetch('/api/dashboard/yearly-summary', {
       method: 'POST',
@@ -507,7 +503,6 @@ const Home = () => {
     const allFundingRes = await fetch('/api/dashboard/funding-sources');
     const allFundingArr = await allFundingRes.json();
     if (allFundingArr.length > 0) {
-      // Find the entry with the highest year
       const latest = allFundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));
       setFundingData(latest);
       setLatestYear(Number(latest.year));
@@ -517,13 +512,16 @@ const Home = () => {
     }
   };
 
+  // ===================== Render =====================
   return (
     <div className="dashboard-page">
+      {/* Intro Section */}
       <div className="dashboard-intro-row">
-          <div className="dashboard-intro-flex">
-            {/* Remove the Aura logo here */}
+        <div className="dashboard-intro-flex">
           <div className="dashboard-intro-content">
-            <h2 className="dashboard-intro-title">Welcome to <span className="aura-highlight">AURA</span>'s File Management System</h2>
+            <h2 className="dashboard-intro-title">
+              Welcome to <span className="aura-highlight">AURA</span>'s File Management System
+            </h2>
             <p className="dashboard-intro-desc">
               At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, and trust. This platform is designed to give you open access to our files and records, from reports and policies to activity updates. So you can stay informed about our work and impact. All files are publicly available for your convenience and confidence, reflecting our ongoing commitment to accountability and community engagement.
             </p>
@@ -535,6 +533,7 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Metrics Row */}
       <div className="dashboard-metrics-row">
         <div className="metric-card metric-revenue">
           <h4>Amount Raised (Current Yr)</h4>
@@ -545,11 +544,16 @@ const Home = () => {
           <h4>Patients Served</h4>
           <div className="metric-value">{loadingPatients ? '[ Loading... ]' : patientsValue.toLocaleString('en-PK')}</div>
           <div className="metric-desc">This Year: {patientsYear}</div>
-          <a className="activity-link" style={{ fontSize: '0.95rem', marginTop: '0.3rem', cursor: 'pointer' }} onClick={() => setShowPatientModal(true)}>update</a>
+          <a
+            className="activity-link update-link"
+            onClick={() => setShowPatientModal(true)}
+          >update</a>
         </div>
         <div className="metric-card metric-deficit">
           <h4>{deficitLabel} for the Year</h4>
-          <div className="metric-value" style={{ color: loading ? undefined : (deficitValue >= 0 ? '#16a34a' : '#dc2626') }}>
+          <div
+            className={`metric-value ${!loading ? (deficitValue >= 0 ? 'surplus' : 'deficit') : ''}`}
+          >
             {loading ? '[ Loading... ]' : `PKR ${formatNumberFull(deficitDisplay)}`}
           </div>
           <div className="metric-desc">As of {deficitYear}</div>
@@ -557,6 +561,7 @@ const Home = () => {
       </div>
       <AddPatientDataModal open={showPatientModal} onClose={() => setShowPatientModal(false)} onSubmit={handleAddPatientData} />
 
+      {/* Main Graphs Section */}
       <div className="dashboard-main-graphs">
         <div className="dashboard-expenses-graph">
           <h3 className="graph-title">Annual Expenses</h3>
@@ -569,13 +574,13 @@ const Home = () => {
           <div className="graph-desc">Distribution of sources</div>
           <DonationsChart data={fundingData} year={latestYear} onAddData={() => setShowPieModal(true)} />
           <AddPieDataModal open={showPieModal} onClose={() => setShowPieModal(false)} onSubmit={handleAddPieData} />
-          </div>
         </div>
+      </div>
 
+      {/* Activity & Storage Section */}
       <div className="dashboard-activity-storage">
         <div className="dashboard-activity-card">
           <h4>Recent Activity</h4>
-          <p>Recently viewed files</p>
           {loading ? (
             <ul>
               <li><span>Loading...</span><small>Fetching recent activity</small></li>
@@ -584,17 +589,17 @@ const Home = () => {
             <ul>
               {recentlyViewedFiles.map((file) => (
                 <li key={file._id}>
-                  <span 
-                    style={{ cursor: 'pointer', color: '#3380be' }}
+                  <span
+                    className="recent-file-link"
                     onClick={() => window.open(`/file-viewer/${file._id}`, '_blank')}
                     title="Click to view file"
                   >
                     {file.originalName || file.filename}
                   </span>
                   <small>
-                    {file.lastViewedAt ? 
-                      new Date(file.lastViewedAt).toLocaleDateString() + ' ' + 
-                      new Date(file.lastViewedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    {file.lastViewedAt ?
+                      new Date(file.lastViewedAt).toLocaleDateString() + ' ' +
+                      new Date(file.lastViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                       : 'Recently viewed'
                     }
                   </small>
@@ -621,7 +626,7 @@ const Home = () => {
               <div className="storage-desc">
                 {storageStats.totalFiles} files stored
                 {storageStats.cached && storageStats.lastUpdated && (
-                  <span style={{ fontSize: '0.8rem', color: '#a0aec0', display: 'block', marginTop: '0.2rem' }}>
+                  <span className="storage-update-time">
                     Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}
                   </span>
                 )}
@@ -635,6 +640,7 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Sponsors Section */}
       <div className="dashboard-sponsors-row">
         <h4 className="sponsors-title">Our Valued Sponsors</h4>
         <div className="sponsors-logos-row">
@@ -648,6 +654,8 @@ const Home = () => {
     </div>
   );
 };
+
+// ===================== Dashboard Page Export =====================
 
 export default function DashboardPage() {
   return (
