@@ -1,3 +1,4 @@
+import FileCard from '../components/FileCard.jsx';
 import React, { useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
 import { AuthContext } from '../App';
 import '../styles/FileIndex.css';
@@ -210,6 +211,14 @@ export default function FileIndexPage() {
           </div>
         </main>
       </div>
+                    FileCard ? (
+                      <FileCard
+                        key={file._id}
+                        file={file}
+                        onView={handleViewFile}
+                        onDownload={handleDownload}
+                      />
+                    ) : (
     );
   }
   return (
@@ -227,6 +236,7 @@ export default function FileIndexPage() {
             <div className="page-header">
               <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
+                    )
                 <span>Filters</span>
               </button>
               <h1>File Management</h1>
@@ -314,6 +324,14 @@ export default function FileIndexPage() {
                   </div>
                 ) : (
                   recentFiles.map((file) => (
+                      FileCard ? (
+                        <FileCard
+                          key={file._id}
+                          file={file}
+                          onView={handleViewFile}
+                          onDownload={handleDownload}
+                        />
+                      ) : (
                     <div key={file._id} className="file-card">
                       <div className="file-info">
                         <h3 className="file-name">
@@ -331,6 +349,7 @@ export default function FileIndexPage() {
                       <div className="file-actions">
                         <button className="file-view-btn" onClick={() => handleViewFile(file._id)}><FiEye /></button>
                         <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /></button>
+                      )
                       </div>
                     </div>
                   ))
