@@ -5,7 +5,7 @@ import ShinyText from '../components/ShinyText';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu, FiLock } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu } from 'react-icons/fi';
 
 export default function FileIndexPage() {
   const auth = useContext(AuthContext);
@@ -320,7 +320,6 @@ export default function FileIndexPage() {
                         <span className="file-name-inner">
   <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
   <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-  {file.requiresAuth && <FiLock title="Private file" style={{ marginLeft: '0.5em', color: '#b91c1c', verticalAlign: 'middle' }} />}
 </span>
 
                         </h3>
@@ -361,7 +360,6 @@ export default function FileIndexPage() {
                           <span className="file-name-inner">
   <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
   <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-  {file.requiresAuth && <FiLock title="Private file" style={{ marginLeft: '0.5em', color: '#b91c1c', verticalAlign: 'middle' }} />}
 </span>
 
                           </h3>

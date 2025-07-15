@@ -978,6 +978,46 @@ html {
   .docx-preview {
     padding: 1rem 0.5rem;
   }
+  .file-viewer-scroll-card.file-card {
+    min-width: 180px;
+    max-width: 92vw;
+    width: 92vw;
+    min-height: 160px;
+    padding: 0.7rem 0.5rem;
+    border-radius: 14px;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+  .file-viewer-scroll-card .file-actions {
+    flex-direction: row;
+    gap: 0.3rem;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: center;
+  }
+  .file-viewer-scroll-card .file-view-btn,
+  .file-viewer-scroll-card .file-download-btn {
+    width: 44px;
+    min-width: 0;
+    max-width: 48px;
+    font-size: 1.1rem;
+    padding: 6px 0;
+    margin: 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .file-viewer-scroll-card .file-name {
+    font-size: 1.05rem;
+    word-break: break-word;
+    white-space: normal;
+  }
+  .file-viewer-scroll-card .file-info p {
+    font-size: 0.92rem;
+    word-break: break-word;
+  }
 }
 
 /* Hide scrollbars for custom scroll */
