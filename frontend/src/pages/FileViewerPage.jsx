@@ -9,6 +9,7 @@ import { HotTable } from '@handsontable/react';
 import 'handsontable/dist/handsontable.full.min.css';
 import '../styles/FileIndex.css';
 import { useAuth } from '../App';
+import FileCard from '../components/FileCard.jsx';
 
 const FileViewer = () => {
   const { id } = useParams();
@@ -466,16 +467,6 @@ const FileViewer = () => {
   };
 
   // Render logic
-  if (loading) {
-    return (
-      <div className="app-root">
-        <Header />
-        <main className="main-content">
-          <div className="loading-container"><FiLoader className="spinner-icon" /><p>Loading content...</p></div>
-        </main>
-      </div>
-    );
-  }
   if (error) {
     return (
       <div className="app-root">
@@ -529,21 +520,14 @@ const FileViewer = () => {
           <div className="file-scroll-inner" ref={scrollRef}>
             {scrollBoxFiles.length > 0 ? (
               scrollBoxFiles.map(f => (
-                <div
+                <FileCard
                   key={f._id}
-                  className={`file-card file-viewer-scroll-card${f._id === selectedFileId ? ' selected' : ''}`}
-                  onClick={() => navigate(`/file-viewer/${f._id}`)}
-                >
-                  <div className="file-info">
-                    <h4>{f.originalName || f.filename || f.name || 'Untitled'}</h4>
-                    <p>Category: {f.category || 'Uncategorized'}</p>
-                    <p>Year: {f.year || 'N/A'}</p>
-                  </div>
-                  <div className="file-actions">
-                    <button className="file-view-btn" onClick={e => { e.stopPropagation(); navigate(`/file-viewer/${f._id}`); }}><FiEye /></button>
-                    <button className="file-download-btn" onClick={e => { e.stopPropagation(); handleDownload(f._id, f.originalName || f.filename || f.name); }}><FiDownload /></button>
-                  </div>
-                </div>
+                  file={f}
+                  onView={id => setSelectedFileId(id)}
+                  onDownload={handleDownload}
+                  selected={f._id === selectedFileId}
+                  className="file-viewer-scroll-card"
+                />
               ))
             ) : (
               <div className="empty-state">
@@ -574,7 +558,9 @@ const FileViewer = () => {
               </div>
             )}
             {/* Preview content */}
-            {file ? (
+            {loading ? (
+              <div className="loading-container"><FiLoader className="spinner-icon" /><p>Loading file...</p></div>
+            ) : file ? (
               <>
                 {file?.fileType === 'pdf' && file?.url && (
                   <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
