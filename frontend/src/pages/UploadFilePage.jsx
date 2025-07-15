@@ -75,6 +75,7 @@ export default function UploadFilePage() {
   const [error, setError] = useState(null);
   const [isGoogleDriveInitialized, setIsGoogleDriveInitialized] = useState(false);
   const [subCategory, setSubCategory] = useState('');
+  const [requiresAuth, setRequiresAuth] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const isMobile = useIsMobileScreen();
@@ -198,6 +199,7 @@ export default function UploadFilePage() {
       formData.append('category', category);
       formData.append('subCategory', subCategory);
       formData.append('year', year);
+      formData.append('requiresAuth', requiresAuth ? 'true' : 'false');
       const res = await fetch('/api/files/upload', {
         method: 'POST',
         body: formData
@@ -209,6 +211,7 @@ export default function UploadFilePage() {
       setCategory('');
       setSubCategory('');
       setYear('');
+      setRequiresAuth(false);
       navigate('/file-index');
     } catch (error) {
       setError(error.message);
@@ -217,13 +220,38 @@ export default function UploadFilePage() {
     }
   };
 
-  const handleViewFile = (fileId) => {
+  const handleViewFile = async (fileId) => {
+    // Find the file object from recentUploads
+    const fileObj = recentUploads.find(f => f._id === fileId);
+    let headers = {};
+    if (fileObj && fileObj.requiresAuth) {
+      if (user && user.getIdToken) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+    // Pass token via query or localStorage for file-viewer page to use
+    if (headers['Authorization']) {
+      localStorage.setItem('fileAuthToken', headers['Authorization']);
+    } else {
+      localStorage.removeItem('fileAuthToken');
+    }
     navigate(`/file-viewer/${fileId}`);
   };
 
   const handleDownload = async (fileId, fileName) => {
     try {
-      const response = await fetch(`/api/files/${fileId}`);
+      // Find the file object from recentUploads
+      const fileObj = recentUploads.find(f => f._id === fileId);
+      let headers = {};
+      // If file requires authentication and user is logged in, send token
+      if (fileObj && fileObj.requiresAuth) {
+        if (user && user.getIdToken) {
+          const token = await user.getIdToken();
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+      const response = await fetch(`/api/files/${fileId}`, { headers });
       if (!response.ok) {
         throw new Error('Failed to download file');
       }
@@ -397,6 +425,21 @@ export default function UploadFilePage() {
                       ))}
                     </select>
                   </div>
+                  <div className="dropdown-wrapper">
+                    <label htmlFor="requiresAuth" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
+                      <input
+                        type="checkbox"
+                        id="requiresAuth"
+                        checked={requiresAuth}
+                        onChange={e => setRequiresAuth(e.target.checked)}
+                        style={{ marginRight: '0.5rem' }}
+                      />
+                      Requires Authentication (Private File)
+                    </label>
+                    <span style={{ fontSize: '0.95rem', color: '#888', marginLeft: '1.7rem' }}>
+                      Only logged-in users can view this file if checked.
+                    </span>
+                  </div>
                   <div className="form-actions">
                     <button
                       className="cancel-button"
@@ -407,6 +450,7 @@ export default function UploadFilePage() {
                         setCategory('');
                         setYear('');
                         setSubCategory('');
+                        setRequiresAuth(false);
                       }}
                     >
                       Cancel

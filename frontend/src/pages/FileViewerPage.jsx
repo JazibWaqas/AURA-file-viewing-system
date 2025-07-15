@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/FileViewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch, FiChevronLeft, FiChevronRight, FiLock } from 'react-icons/fi';
 import mammoth from 'mammoth/mammoth.browser';
 import * as XLSX from 'xlsx';
 import { HotTable } from '@handsontable/react';
@@ -178,19 +178,59 @@ const FileViewer = () => {
         if (!detailsRes.ok) throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
         const fileDetails = await detailsRes.json();
         setFile(fileDetails);
-        
+
         // Add to recently viewed
         addToRecentlyViewed(fileDetails);
-        
+
+        // Always fetch and set the latest token if user is logged in and file is private
+        let authToken = null;
+        if (fileDetails.requiresAuth) {
+          // Try to get token from firebaseUser if available
+          if (user && user.firebaseUser && user.firebaseUser.getIdToken) {
+            const token = await user.firebaseUser.getIdToken(true); // force refresh
+            authToken = `Bearer ${token}`;
+            localStorage.setItem('fileAuthToken', authToken);
+          } else if (user && user.getIdToken) {
+            // fallback for other user object
+            const token = await user.getIdToken(true);
+            authToken = `Bearer ${token}`;
+            localStorage.setItem('fileAuthToken', authToken);
+          } else {
+            localStorage.removeItem('fileAuthToken');
+          }
+        } else {
+          localStorage.removeItem('fileAuthToken');
+        }
+        const headers = authToken ? { Authorization: authToken } : {};
+
+        // If file is private and user is not logged in, show message and skip preview
+        if (fileDetails.requiresAuth && !authToken) {
+          setPreviewError('Private file, Log in to view');
+          setLoading(false);
+          return;
+        }
+
+        // Helper to handle 401
+        const handle401 = (response) => {
+          if (response.status === 401) {
+            setPreviewError('Private file, Log in to view');
+            setLoading(false);
+            return true;
+          }
+          return false;
+        };
+
         if (fileDetails.fileType === 'pdf') {
-          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
+          if (handle401(viewResponse)) return;
           if (viewResponse.ok) {
             const blob = await viewResponse.blob();
             fileDetails.url = URL.createObjectURL(blob);
             setFile(fileDetails);
           }
         } else if (fileDetails.fileType === 'csv') {
-          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`);
+          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`, { headers });
+          if (handle401(previewResponse)) return;
           if (previewResponse.ok) {
             const previewData = await previewResponse.json();
             setPreviewData(previewData);
@@ -205,7 +245,8 @@ const FileViewer = () => {
             setPreviewData(null);
             setPreviewError(null);
             setLoading(true);
-            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
+            if (handle401(viewResponse)) return;
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
               const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -228,7 +269,8 @@ const FileViewer = () => {
           try {
             setPreviewData(null);
             setPreviewError(null);
-            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
+            if (handle401(viewResponse)) return;
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
               const result = await mammoth.convertToHtml({ arrayBuffer });
@@ -562,6 +604,7 @@ const FileViewer = () => {
               <div className="file-viewer-preview-overlay">
                 <div className="file-viewer-preview-title">
                   {file?.originalName || file?.filename || file?.name || 'Untitled'}
+                  {file?.requiresAuth && <FiLock title="Private file" style={{ marginLeft: '0.5em', color: '#b91c1c', verticalAlign: 'middle' }} />}
                 </div>
                 <div className="file-viewer-preview-actions">
                   <button className="download-btn small" onClick={() => handleDownload(file?._id, file?.originalName || file?.filename || file?.name)} title="Download File">

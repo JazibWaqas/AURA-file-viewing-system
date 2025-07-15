@@ -57,7 +57,8 @@ class FileService {
                 isArchived: fileData.isArchived || false,
                 archiveDate: fileData.archiveDate,
                 createdAt: convertToTimestamp(now),
-                updatedAt: convertToTimestamp(now)
+                updatedAt: convertToTimestamp(now),
+                requiresAuth: fileData.requiresAuth === true // ensure boolean
             };
 
             await this.db.collection(this.collection).doc(fileId).set(fileRecord);

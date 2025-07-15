@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
+import { AuthContext } from '../App';
 import '../styles/FileIndex.css';
 import ShinyText from '../components/ShinyText';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu } from 'react-icons/fi';
+import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu, FiLock } from 'react-icons/fi';
 
 export default function FileIndexPage() {
+  const auth = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [recentFiles, setRecentFiles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -107,6 +109,18 @@ export default function FileIndexPage() {
     fetchRecentFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedSubCategory, selectedYear]);
+
+  // Listen for auth state changes and refetch files
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = auth.onAuthStateChanged?.(() => {
+      fetchFiles(true);
+      fetchRecentFiles();
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [auth, selectedCategory, selectedSubCategory, selectedYear, searchTerm]);
 
   // Effect for handling search term changes with debounce
   useEffect(() => {
@@ -306,6 +320,7 @@ export default function FileIndexPage() {
                         <span className="file-name-inner">
   <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
   <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+  {file.requiresAuth && <FiLock title="Private file" style={{ marginLeft: '0.5em', color: '#b91c1c', verticalAlign: 'middle' }} />}
 </span>
 
                         </h3>
@@ -346,6 +361,7 @@ export default function FileIndexPage() {
                           <span className="file-name-inner">
   <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
   <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
+  {file.requiresAuth && <FiLock title="Private file" style={{ marginLeft: '0.5em', color: '#b91c1c', verticalAlign: 'middle' }} />}
 </span>
 
                           </h3>

@@ -69,7 +69,7 @@ app.post('/api/files/upload', upload.array('files'), async (req, res) => {
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const { description, category, subCategory, year, month } = req.body;
+    const { description, category, subCategory, year, month, requiresAuth } = req.body;
     const uploadedFiles = [];
     for (const file of req.files) {
       const blob = bucket.file(file.originalname);
@@ -97,7 +97,8 @@ app.post('/api/files/upload', upload.array('files'), async (req, res) => {
         fileType: file.mimetype.includes('pdf') ? 'pdf' :
                  (file.mimetype.includes('wordprocessingml') || file.mimetype.includes('msword')) ? 'docx' :
                  (file.mimetype.includes('excel') || file.mimetype.includes('spreadsheet')) ? 'excel' :
-                 file.mimetype.includes('csv') ? 'csv' : 'other'
+                 file.mimetype.includes('csv') ? 'csv' : 'other',
+        requiresAuth: requiresAuth === 'true' // <-- store as boolean
       };
       const docRef = await db.collection('uploads').add(fileMetadata);
       uploadedFiles.push({ _id: docRef.id, ...fileMetadata });
