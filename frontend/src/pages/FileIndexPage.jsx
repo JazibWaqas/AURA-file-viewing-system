@@ -1,15 +1,13 @@
-import FileCard from '../components/FileCard.jsx';
-import React, { useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
-import { AuthContext } from '../App';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../styles/FileIndex.css';
 import ShinyText from '../components/ShinyText';
 import Header from '../components/Header.jsx';
 import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu } from 'react-icons/fi';
+import FileCard from '../components/FileCard.jsx';
 
 export default function FileIndexPage() {
-  const auth = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
   const [recentFiles, setRecentFiles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -111,18 +109,6 @@ export default function FileIndexPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedSubCategory, selectedYear]);
 
-  // Listen for auth state changes and refetch files
-  useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = auth.onAuthStateChanged?.(() => {
-      fetchFiles(true);
-      fetchRecentFiles();
-    });
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [auth, selectedCategory, selectedSubCategory, selectedYear, searchTerm]);
-
   // Effect for handling search term changes with debounce
   useEffect(() => {
     if (debounceTimeout.current) {
@@ -211,14 +197,6 @@ export default function FileIndexPage() {
           </div>
         </main>
       </div>
-                    FileCard ? (
-                      <FileCard
-                        key={file._id}
-                        file={file}
-                        onView={handleViewFile}
-                        onDownload={handleDownload}
-                      />
-                    ) : (
     );
   }
   return (
@@ -236,7 +214,6 @@ export default function FileIndexPage() {
             <div className="page-header">
               <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
-                    )
                 <span>Filters</span>
               </button>
               <h1>File Management</h1>
@@ -324,34 +301,12 @@ export default function FileIndexPage() {
                   </div>
                 ) : (
                   recentFiles.map((file) => (
-                      FileCard ? (
-                        <FileCard
-                          key={file._id}
-                          file={file}
-                          onView={handleViewFile}
-                          onDownload={handleDownload}
-                        />
-                      ) : (
-                    <div key={file._id} className="file-card">
-                      <div className="file-info">
-                        <h3 className="file-name">
-                        <span className="file-name-inner">
-  <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-  <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-</span>
-
-                        </h3>
-
-
-                        <p>Category: {file.category || 'Uncategorized'}</p>
-                        <p>Year: {file.year || 'N/A'}</p>
-                      </div>
-                      <div className="file-actions">
-                        <button className="file-view-btn" onClick={() => handleViewFile(file._id)}><FiEye /></button>
-                        <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /></button>
-                      )
-                      </div>
-                    </div>
+                    <FileCard
+                      key={file._id}
+                      file={file}
+                      onView={handleViewFile}
+                      onDownload={handleDownload}
+                    />
                   ))
                 )}
               </div>
@@ -373,24 +328,12 @@ export default function FileIndexPage() {
                 ) : (
                   <>
                     {allFiles.map((file) => (
-                      <div key={file._id} className="file-card">
-                        <div className="file-info">
-                          <h3 className="file-name">
-                          <span className="file-name-inner">
-  <span className="file-name-single">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-  <span className="file-name-duplicate">{file.originalName || file.filename || file.name || 'Untitled'}</span>
-</span>
-
-                          </h3>
-
-                          <p>Category: {file.category || 'Uncategorized'}</p>
-                          <p>Year: {file.year || 'N/A'}</p>
-                        </div>
-                        <div className="file-actions">
-                          <button className="file-view-btn" onClick={() => handleViewFile(file._id)}><FiEye /></button>
-                          <button className="file-download-btn" onClick={() => handleDownload(file._id, file.originalName || file.filename || file.name)}><FiDownload /></button>
-                        </div>
-                      </div>
+                      <FileCard
+                        key={file._id}
+                        file={file}
+                        onView={handleViewFile}
+                        onDownload={handleDownload}
+                      />
                     ))}
                     {hasMoreFiles && (
                       <div className="load-more-container">

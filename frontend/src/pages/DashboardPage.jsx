@@ -241,12 +241,16 @@ function CombinedExpenseLineChart({ data, onAddData }) {
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <div className="chart-header-row">
-        <h4>Annual Expenses</h4>
-        {onAddData && (
-          <button className="add-data-btn" onClick={onAddData}>Add Data</button>
-        )}
-      </div>
+      {/* Removed duplicate <h4>Annual Expenses</h4> */}
+      {/* Only keep Add Data button if needed, but not in a header row */}
+      {false && (
+        <div className="chart-header-row">
+          <h4>Annual Expenses</h4>
+          {onAddData && (
+            <button className="add-data-btn" onClick={onAddData}>Add Data</button>
+          )}
+        </div>
+      )}
       <p>Annual trend of expenses</p>
       <ResponsiveContainer width="100%" height={340}>
         <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -283,20 +287,42 @@ function DonationsChart({ data, year, onAddData }) {
     { name: 'Fees', value: data.fees || 0 },
     { name: 'Other', value: data.other || 0 },
   ];
+
+  // Custom legend renderer using CSS classes only
+  function renderCustomLegend({ payload }) {
+    return (
+      <div className="pie-legend-row">
+        {payload.map((entry, index) => (
+          <span
+            key={entry.value}
+            className={`pie-legend-item pie-color-${index % 5}`}
+          >
+            <span className={`pie-legend-dot pie-color-${index % 5}`}></span>
+            {entry.value}: {formatNumber(entry.payload.value)}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={ref}
       className={`chart-card graph-fade-in${inView ? ' visible' : ''}`}
     >
-      <div className="chart-header-row">
-        <h4 className="donations-title">Donations Breakdown ({year})</h4>
-        {onAddData && (
-          <button className="add-data-btn" onClick={onAddData}>Add Data</button>
-        )}
-      </div>
+      {/* Removed duplicate <h4 className="donations-title">Donations Breakdown ({year})</h4> */}
+      {/* Only keep Add Data button if needed, but not in a header row */}
+      {false && (
+        <div className="chart-header-row">
+          <h4 className="donations-title">Donations Breakdown ({year})</h4>
+          {onAddData && (
+            <button className="add-data-btn" onClick={onAddData}>Add Data</button>
+          )}
+        </div>
+      )}
       <p className="donations-desc">Distribution of donation sources</p>
-      <ResponsiveContainer width="100%" height={340}>
-        <PieChart margin={{ top: 16, right: 16, left: 16, bottom: 16 }}>
+      <ResponsiveContainer width="100%" height={360}>
+        <PieChart margin={{ top: 17, right: 16, left: 16, bottom: 16 }}>
           <Pie
             data={pieData}
             dataKey="value"
@@ -323,17 +349,7 @@ function DonationsChart({ data, year, onAddData }) {
           <Legend
             verticalAlign="bottom"
             align="center"
-            iconType="circle"
-            formatter={(value, entry, index) => {
-              const d = pieData.find(d => d.name === value);
-              return (
-                <span
-                  className={`pie-legend-label pie-color-${index % 5}`}
-                >
-                  {value}: {formatNumber(d ? d.value : 0)}
-                </span>
-              );
-            }}
+            content={renderCustomLegend}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -512,50 +528,59 @@ const Home = () => {
     }
   };
 
+  // Animation hooks for scroll-triggered effects (only for activity, storage, sponsors)
+  const [activityRef, activityInView] = useInView({ threshold: 0.2 });
+  const [storageRef, storageInView] = useInView({ threshold: 0.2 });
+  const [sponsorsRef, sponsorsInView] = useInView({ threshold: 0.2 });
+
+  // Track if animation has already played for each section
+  const [activityAnimated, setActivityAnimated] = useState(false);
+  const [storageAnimated, setStorageAnimated] = useState(false);
+  const [sponsorsAnimated, setSponsorsAnimated] = useState(false);
+
+  useEffect(() => {
+    if (activityInView && !activityAnimated) setActivityAnimated(true);
+  }, [activityInView, activityAnimated]);
+  useEffect(() => {
+    if (storageInView && !storageAnimated) setStorageAnimated(true);
+  }, [storageInView, storageAnimated]);
+  useEffect(() => {
+    if (sponsorsInView && !sponsorsAnimated) setSponsorsAnimated(true);
+  }, [sponsorsInView, sponsorsAnimated]);
+
   // ===================== Render =====================
   return (
     <div className="dashboard-page">
-      {/* Intro Section */}
-      <div className="dashboard-intro-row">
+      {/* Intro Section - animate only once at load */}
+      <div className="dashboard-intro-row dashboard-animate-slide-in-left-initial">
         <div className="dashboard-intro-flex">
           <div className="dashboard-intro-content">
-            <h2 className="dashboard-intro-title">
-              Welcome to <span className="aura-highlight">AURA</span>'s File Management System
-            </h2>
-            <p className="dashboard-intro-desc">
-              At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, and trust. This platform is designed to give you open access to our files and records, from reports and policies to activity updates. So you can stay informed about our work and impact. All files are publicly available for your convenience and confidence, reflecting our ongoing commitment to accountability and community engagement.
-            </p>
+            <h2 className="dashboard-intro-title">Welcome to <span className="aura-highlight">AURA</span>'s File Management System</h2>
+            <p className="dashboard-intro-desc">At <span className="aura-highlight">AURA</span> (Al-Umeed Rehabilitation Association), we believe in transparency, accessibility, and trust. This platform is designed to give you open access to our files and records, from reports and policies to activity updates. So you can stay informed about our work and impact. All files are publicly available for your convenience and confidence, reflecting our ongoing commitment to accountability and community engagement.</p>
           </div>
           <div className="dashboard-intro-actions">
-            <a href="https://aura.org.pk/about" className="intro-action-btn larger-btn" target="_blank" rel="noopener noreferrer">Learn More About Us</a>
-            <a href="https://aura.org.pk/donate" className="intro-action-btn primary larger-btn" target="_blank" rel="noopener noreferrer">Donate Now</a>
+            <a href="https://alumeed.org/about-aura/" className="intro-action-btn larger-btn" target="_blank" rel="noopener noreferrer">Learn More About Us</a>
+            <a href="https://alumeed.org/donation-form/" className="intro-action-btn primary larger-btn" target="_blank" rel="noopener noreferrer">Donate Now</a>
           </div>
         </div>
       </div>
 
-      {/* Metrics Row */}
+      {/* Metrics Row - pop-in wave only at load */}
       <div className="dashboard-metrics-row">
-        <div className="metric-card metric-revenue">
+        <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-1 metric-revenue">
           <h4>Amount Raised (Current Yr)</h4>
           <div className="metric-value">{loading ? '[ Loading... ]' : `PKR ${formatNumberFull(revenueValue)}`}</div>
           <div className="metric-desc">Generated in {revenueYear}</div>
         </div>
-        <div className="metric-card metric-patients">
+        <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-2 metric-patients">
           <h4>Patients Served</h4>
           <div className="metric-value">{loadingPatients ? '[ Loading... ]' : patientsValue.toLocaleString('en-PK')}</div>
           <div className="metric-desc">This Year: {patientsYear}</div>
-          <a
-            className="activity-link update-link"
-            onClick={() => setShowPatientModal(true)}
-          >update</a>
+          <a className="activity-link update-link" onClick={() => setShowPatientModal(true)}>update</a>
         </div>
-        <div className="metric-card metric-deficit">
+        <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-3 metric-deficit">
           <h4>{deficitLabel} for the Year</h4>
-          <div
-            className={`metric-value ${!loading ? (deficitValue >= 0 ? 'surplus' : 'deficit') : ''}`}
-          >
-            {loading ? '[ Loading... ]' : `PKR ${formatNumberFull(deficitDisplay)}`}
-          </div>
+          <div className={`metric-value ${!loading ? (deficitValue >= 0 ? 'surplus' : 'deficit') : ''}`}>{loading ? '[ Loading... ]' : `PKR ${formatNumberFull(deficitDisplay)}`}</div>
           <div className="metric-desc">As of {deficitYear}</div>
         </div>
       </div>
@@ -564,22 +589,31 @@ const Home = () => {
       {/* Main Graphs Section */}
       <div className="dashboard-main-graphs">
         <div className="dashboard-expenses-graph">
-          <h3 className="graph-title">Annual Expenses</h3>
+          <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
+            <h3 className="graph-title" style={{ margin: 0 }}>Annual Expenses</h3>
+            <button className="add-data-btn" onClick={() => setShowBarModal(true)}>Add Data</button>
+          </div>
           <div className="graph-desc">Expenses incurred over the years (2015-{latestYear || '----'})</div>
-          <CombinedExpenseLineChart data={yearlyData} onAddData={() => setShowBarModal(true)} />
+          <CombinedExpenseLineChart data={yearlyData} />
           <AddBarDataModal open={showBarModal} onClose={() => setShowBarModal(false)} onSubmit={handleAddBarData} />
         </div>
         <div className="dashboard-donations-graph">
-          <h3 className="graph-title">Donations Breakdown</h3>
+          <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
+            <h3 className="graph-title" style={{ margin: 0 }}>Donations Breakdown ({latestYear || '----'})</h3>
+            <button className="add-data-btn" onClick={() => setShowPieModal(true)}>Add Data</button>
+          </div>
           <div className="graph-desc">Distribution of sources</div>
-          <DonationsChart data={fundingData} year={latestYear} onAddData={() => setShowPieModal(true)} />
+          <DonationsChart data={fundingData} year={latestYear} />
           <AddPieDataModal open={showPieModal} onClose={() => setShowPieModal(false)} onSubmit={handleAddPieData} />
         </div>
       </div>
 
-      {/* Activity & Storage Section */}
+      {/* Activity & Storage Section (animate only first time in view) */}
       <div className="dashboard-activity-storage">
-        <div className="dashboard-activity-card">
+        <div
+          ref={activityRef}
+          className={`dashboard-activity-card${activityAnimated ? ' dashboard-animate-slide-in-left dashboard-animate-delay-1' : ''}`}
+        >
           <h4>Recent Activity</h4>
           {loading ? (
             <ul>
@@ -589,20 +623,8 @@ const Home = () => {
             <ul>
               {recentlyViewedFiles.map((file) => (
                 <li key={file._id}>
-                  <span
-                    className="recent-file-link"
-                    onClick={() => window.open(`/file-viewer/${file._id}`, '_blank')}
-                    title="Click to view file"
-                  >
-                    {file.originalName || file.filename}
-                  </span>
-                  <small>
-                    {file.lastViewedAt ?
-                      new Date(file.lastViewedAt).toLocaleDateString() + ' ' +
-                      new Date(file.lastViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      : 'Recently viewed'
-                    }
-                  </small>
+                  <span className="recent-file-link" onClick={() => window.open(`/file-viewer/${file._id}`, '_blank')} title="Click to view file">{file.originalName || file.filename}</span>
+                  <small>{file.lastViewedAt ? new Date(file.lastViewedAt).toLocaleDateString() + ' ' + new Date(file.lastViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently viewed'}</small>
                 </li>
               ))}
             </ul>
@@ -613,7 +635,10 @@ const Home = () => {
           )}
           <a className="activity-link" href="/file-index">View All Files</a>
         </div>
-        <div className="dashboard-storage-card">
+        <div
+          ref={storageRef}
+          className={`dashboard-storage-card${storageAnimated ? ' dashboard-animate-pop-slow dashboard-animate-delay-2' : ''}`}
+        >
           <h4>Storage Used</h4>
           {loading ? (
             <>
@@ -623,14 +648,7 @@ const Home = () => {
           ) : (
             <>
               <div className="storage-value">{storageStats.totalSize} {storageStats.sizeUnit}</div>
-              <div className="storage-desc">
-                {storageStats.totalFiles} files stored
-                {storageStats.cached && storageStats.lastUpdated && (
-                  <span className="storage-update-time">
-                    Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}
-                  </span>
-                )}
-              </div>
+              <div className="storage-desc">{storageStats.totalFiles} files stored{storageStats.cached && storageStats.lastUpdated && (<span className="storage-update-time">Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}</span>)}</div>
             </>
           )}
           <div className="storage-actions">
@@ -640,12 +658,18 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Sponsors Section */}
-      <div className="dashboard-sponsors-row">
+      {/* Sponsors Section (animate only first time in view) */}
+      <div
+        ref={sponsorsRef}
+        className="dashboard-sponsors-row"
+      >
         <h4 className="sponsors-title">Our Valued Sponsors</h4>
         <div className="sponsors-logos-row">
           {sponsorLogos.map((logo, idx) => (
-            <div key={idx} className="sponsor-logo-circle sponsor-logo-anim">
+            <div
+              key={idx}
+              className={`sponsor-logo-circle sponsor-logo-anim${sponsorsAnimated ? ' dashboard-animate-pop-slow dashboard-animate-delay-' + ((idx % 8) + 1) : ''}`}
+            >
               <img src={logo.src} alt={logo.alt} className="sponsor-logo-img" />
             </div>
           ))}
