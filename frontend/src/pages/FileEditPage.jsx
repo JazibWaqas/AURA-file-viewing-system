@@ -3,6 +3,7 @@ import Header from '../components/Header.jsx';
 import { FiSave, FiArrowLeft, FiFile, FiLoader, FiTrash2, FiEdit } from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/FileEdit.css';
+import ShinyText from '../components/ShinyText';
 
 const defaultCategories = [
     {
@@ -212,13 +213,15 @@ export default function FileEditPage() {
       <main className="main-content file-edit-main-content">
         <div className="edit-card large">
           <div className="edit-header">
-            <button className="back-button" onClick={handleCancel}>
-              <FiArrowLeft /> Back
-            </button>
-            <h2 className="edit-title">Edit File Metadata</h2>
-            <p className="edit-subtitle">
-              Update the metadata for your file to keep it properly organized.
-            </p>
+            <div className="edit-header-row">
+              <button className="back-button" onClick={handleCancel}>
+                <FiArrowLeft /> Back
+              </button>
+              <h2 className="edit-title">
+                <ShinyText text="Edit File Metadata" />
+              </h2>
+            </div>
+            
           </div>
           <div className="edit-content-layout">
             {/* Left Column - File Information Display */}
@@ -230,14 +233,12 @@ export default function FileEditPage() {
                 <div className="file-details">
                   <h3>{file.originalName || file.filename || file.name || 'Untitled'}</h3>
                   <p><strong>Size:</strong> {file.size ? `${(file.size / 1024).toFixed(2)} KB` : 'Unknown'}</p>
-                  <p><strong>Uploaded By:</strong> {file.uploadedBy || 'Anonymous'}</p>
+                  <p><strong>Category:</strong> {file.category || 'Anonymous'}</p>
                   <p><strong>File Type:</strong> {file.fileType || 'Unknown'}</p>
                 </div>
               </div>
               <div className="actions-section">
-                <button className="edit-button" title="Edit file metadata" disabled>
-                  <FiEdit /> Edit File Metadata
-                </button>
+                
                 <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}>
                   <FiTrash2 /> Delete File
                 </button>

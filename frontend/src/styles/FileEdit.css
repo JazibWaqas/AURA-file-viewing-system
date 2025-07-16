@@ -8,8 +8,8 @@
 .file-edit-main-content {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 32px;
+  align-items: center;
+  padding-top: 250px;
   background: #f0f2f5;
   box-sizing: border-box;
   width: 100%;
@@ -17,10 +17,11 @@
 
 /* The single, unified container for all page content */
 .edit-card {
-  background: #fff;
+  background: #085078;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   padding: 2.5rem 3rem;
+  margin-top: 1.75rem;
   width: 100%;
   max-width: 1100px; /* Responsive max-width */
   display: flex;
@@ -60,14 +61,17 @@
   align-items: center;
   gap: 20px;
   padding: 1.5rem;
+  
   border: 1px solid #e9ecef;
   border-radius: 12px;
-  background-color: #f8f9fa; /* Subtle background, but no "card" effect */
+  background: #f8f9fa; /* Light background for contrast */
+  border-radius: 12px;
+  padding: 1.5rem;
   margin-bottom: 1.5rem; /* Space before action buttons */
 }
 
 .file-icon-background {
-  background: #6c63ff;
+  background: #1b12c4;
   border-radius: 12px;
   width: 60px;
   height: 60px;
@@ -83,10 +87,11 @@
 }
 
 .file-details h3 {
+  color: #000000 !important; /* Ensure header is dark and visible */
+  font-size: 1.25rem;
+  font-weight: 700;
   margin: 0 0 8px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #111;
+  background: none !important;
 }
 
 .file-details p {
@@ -109,7 +114,7 @@
 .file-details-form label {
   font-weight: 500;
   margin-bottom: 2px;
-  color: #111;
+  color: #fff;
 }
 
 .file-details-form input,
@@ -156,10 +161,6 @@
   gap: 12px;
 }
 
-.edit-button,
-.delete-button {
-  width: 100%; /* Make buttons full-width of the column */
-}
 
 /* Form action buttons (Cancel, Save) */
 .form-actions {
@@ -298,39 +299,16 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 .edit-content-layout {
   gap: 3rem;
 }
-.file-info-display {
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-}
+
 
 /* Remove any duplicate or conflicting styles with globals.css */
 
 .main-content.file-edit-main-content {
-  background: #f0f2f5;
+  background: linear-gradient(90deg, #85d8ce 0%, #085078,#2f3132 100%); 
   box-sizing: border-box;
 }
 
-.edit-button {
-  background: #f3f3f3;
-  color: #111;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 22px;
-  font-size: 1rem;
-  cursor: not-allowed;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s;
-  margin-bottom: 8px;
-}
 
-.edit-button:disabled {
-  background: #e0e0e0;
-  color: #888;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
 
 /* =============================
    File Edit Card & Form
@@ -343,3 +321,24 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
 /* =============================
    Responsive Styles
    ============================= */ 
+
+.edit-header-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+
+.edit-header-row .back-button {
+  margin: 0;
+  padding: 6px 14px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.edit-header-row .edit-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+} 

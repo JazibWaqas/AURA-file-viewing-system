@@ -10,6 +10,7 @@ import 'handsontable/dist/handsontable.full.min.css';
 import '../styles/FileIndex.css';
 import { useAuth } from '../App';
 import FileCard from '../components/FileCard.jsx';
+import { getIdToken } from 'firebase/auth';
 
 const FileViewer = () => {
   const { id } = useParams();
@@ -32,44 +33,23 @@ const FileViewer = () => {
   const [isSearching, setIsSearching] = useState(false);
   const scrollRef = useRef(null);
 
-  // Debug: Log user object on every render
-  console.log('FileViewer render - user object:', user);
-  console.log('FileViewer render - authLoading:', authLoading);
-  console.log('FileViewer render - user?.userData?.uid:', user?.userData?.uid);
-  console.log('FileViewer render - user?.firebaseUser?.uid:', user?.firebaseUser?.uid);
-  console.log('FileViewer render - user?.userData:', user?.userData);
-  console.log('FileViewer render - user?.firebaseUser:', user?.firebaseUser);
-
   // Load recently viewed files from database
   useEffect(() => {
-    console.log('useEffect for recently viewed files triggered with user UID:', user?.firebaseUser?.uid);
-    
     const fetchRecentlyViewed = async () => {
-      console.log('Complete user object:', user);
-      console.log('User firebaseUser:', user?.firebaseUser);
-      console.log('User userData:', user?.userData);
-      console.log('Fetching recently viewed files for user:', user?.firebaseUser?.uid);
-      
       if (!user?.firebaseUser?.uid) {
-        console.log('No user UID found, setting empty array');
         setRecentlyViewedFiles([]);
         return;
       }
       
       try {
-        console.log('Making API call to fetch recently viewed files...');
         const res = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
-        console.log('API response status:', res.status);
         
         if (res.ok) {
           const data = await res.json();
-          console.log('API response data:', data);
           setRecentlyViewedFiles(data);
-          console.log('Loaded recently viewed files from database:', data);
         } else {
           const errorText = await res.text();
           console.error('Failed to fetch recently viewed files. Status:', res.status, 'Error:', errorText);
-          setRecentlyViewedFiles([]);
         }
       } catch (err) {
         console.error('Error fetching recently viewed files:', err);
@@ -82,15 +62,12 @@ const FileViewer = () => {
 
   // Add file to recently viewed in database
   const addToRecentlyViewed = async (fileData) => {
-    console.log('Adding file to recently viewed:', fileData?._id, 'for user:', user?.firebaseUser?.uid);
     
     if (!fileData || !user?.firebaseUser?.uid) {
-      console.log('Missing fileData or user UID, skipping add to recently viewed');
       return;
     }
     
     try {
-      console.log('Making API call to add to recently viewed...');
       const res = await fetch('/api/files/recently-viewed', {
         method: 'POST',
         headers: {
@@ -102,19 +79,13 @@ const FileViewer = () => {
         })
       });
       
-      console.log('Add to recently viewed API response status:', res.status);
-      
       if (res.ok) {
-        console.log('Successfully added to recently viewed, refreshing list...');
         // Refresh the recently viewed files list
         const refreshRes = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
-        console.log('Refresh API response status:', refreshRes.status);
         
         if (refreshRes.ok) {
           const data = await refreshRes.json();
-          console.log('Refresh API response data:', data);
           setRecentlyViewedFiles(data);
-          console.log('Updated recently viewed files:', data);
         } else {
           const errorText = await refreshRes.text();
           console.error('Failed to refresh recently viewed files. Status:', refreshRes.status, 'Error:', errorText);
@@ -169,6 +140,11 @@ const FileViewer = () => {
       setLoading(false); // Stop loading if no file is selected
       return;
     }
+    // Wait for authLoading to be false before attempting fetch
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
     const fetchFile = async () => {
       setLoading(true);
       setError(null);
@@ -179,19 +155,39 @@ const FileViewer = () => {
         if (!detailsRes.ok) throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
         const fileDetails = await detailsRes.json();
         setFile(fileDetails);
-        
         // Add to recently viewed
         addToRecentlyViewed(fileDetails);
-        
+        // If file is private and user is not logged in, show message and do not fetch preview
+        if (fileDetails.requiresAuth && !user) {
+          setError('\🔒\ This is a private file. Only logged-in users can preview its contents. Please sign in to continue.');
+          setLoading(false);
+          return;
+        }
+        // Prepare headers for private files
+        let headers = {};
+        if (fileDetails.requiresAuth && user && user.firebaseUser) {
+          const token = await getIdToken(user.firebaseUser);
+          headers['Authorization'] = `Bearer ${token}`;
+        }
         if (fileDetails.fileType === 'pdf') {
-          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
+          if (viewResponse.status === 401) {
+            setError('Sign in required.');
+            setLoading(false);
+            return;
+          }
           if (viewResponse.ok) {
             const blob = await viewResponse.blob();
             fileDetails.url = URL.createObjectURL(blob);
             setFile(fileDetails);
           }
         } else if (fileDetails.fileType === 'csv') {
-          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`);
+          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`, { headers });
+          if (previewResponse.status === 401) {
+            setError('Sign in required.');
+            setLoading(false);
+            return;
+          }
           if (previewResponse.ok) {
             const previewData = await previewResponse.json();
             setPreviewData(previewData);
@@ -254,7 +250,7 @@ const FileViewer = () => {
     return () => {
       if (file?.url) URL.revokeObjectURL(file.url);
     };
-  }, [selectedFileId]);
+  }, [selectedFileId, user, authLoading]);
 
   // Filter files for scroll box based on search or show recently viewed
   const getScrollBoxFiles = () => {
@@ -267,18 +263,13 @@ const FileViewer = () => {
         );
         return matchesSearch;
       });
-      console.log('Search results:', searchResults);
       return searchResults;
     }
     
     // Show recently viewed files when not searching
-    console.log('Recently viewed files for display:', recentlyViewedFiles);
-    console.log('User authentication status:', !!user?.firebaseUser?.uid);
-    
     // If no recently viewed files, show the 4 most recent files from allFiles
     if (recentlyViewedFiles.length === 0 && allFiles.length > 0) {
       const fallbackFiles = allFiles.slice(0, 4);
-      console.log('Using fallback files (no recently viewed or user not authenticated):', fallbackFiles);
       return fallbackFiles;
     }
     
@@ -290,7 +281,6 @@ const FileViewer = () => {
         .slice(0, 4 - recentlyViewedFiles.length);
       
       const paddedFiles = [...recentlyViewedFiles, ...additionalFiles];
-      console.log('Padded recently viewed files to 4:', paddedFiles);
       return paddedFiles;
     }
     
@@ -322,6 +312,10 @@ const FileViewer = () => {
   const handleDownload = async (fileId, fileName) => {
     try {
       const response = await fetch(`/api/files/${fileId}`);
+      if (response.status === 401) {
+        setActionError('Sign in required.');
+        return;
+      }
       if (!response.ok) throw new Error('Failed to download file');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -333,14 +327,14 @@ const FileViewer = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      alert('Failed to download file. Please try again.');
+      setActionError('Failed to download file. Please try again.');
     }
   };
   const handleEditClick = () => {
     if (user?.userData?.status === 'approved') {
       navigate(`/file-edit/${file._id}`);
     } else {
-      setActionError('Only approved users may have edit access.');
+      setActionError('Only approved users can edit files.');
     }
   };
   const handleDelete = async () => {
@@ -361,7 +355,7 @@ const FileViewer = () => {
     if (user?.userData?.status === 'approved') {
       handleDelete();
     } else {
-      setActionError('Only approved users may have edit access.');
+      setActionError('Only approved users can delete files.');
     }
   };
   const handleToggleFullscreen = () => {
@@ -467,20 +461,6 @@ const FileViewer = () => {
   };
 
   // Render logic
-  if (error) {
-    return (
-      <div className="app-root">
-        <Header />
-        <main className="main-content">
-          <div className="error-container">
-            <h2>Error Loading File</h2>
-            <p>{error}</p>
-            <button onClick={() => window.location.reload()} className="retry-button">Retry</button>
-          </div>
-        </main>
-      </div>
-    );
-  }
   return (
     <div className="app-root">
       <Header />
@@ -560,6 +540,8 @@ const FileViewer = () => {
             {/* Preview content */}
             {loading ? (
               <div className="loading-container"><FiLoader className="spinner-icon" /><p>Loading file...</p></div>
+            ) : error ? (
+              <div className="empty-state file-preview-error">{error}</div>
             ) : file ? (
               <>
                 {file?.fileType === 'pdf' && file?.url && (

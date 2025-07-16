@@ -66,7 +66,26 @@ const upload = multer({
     }
 });
 
+// Firebase token verification middleware
+const { admin } = require('../config/firebase');
+
+const verifyFirebaseToken = async (req, res, next) => {
+    const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Sign in required.' });
+    }
+    const idToken = authHeader.split(' ')[1];
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        req.user = decodedToken;
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: 'Invalid or expired token.' });
+    }
+};
+
 module.exports = {
     upload,
-    handleMulterError
+    handleMulterError,
+    verifyFirebaseToken
 };

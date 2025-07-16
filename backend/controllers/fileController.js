@@ -4,6 +4,7 @@ const XLSX = require('xlsx');
 const { parse } = require('csv-parse/sync');
 const FileService = require('../services/fileService');
 const fileService = FileService;
+const { verifyFirebaseToken } = require('../middleware/upload');
 
 const isExcelMimeType = (mimetype) => {
     const excelTypes = [
@@ -30,6 +31,25 @@ const isCsvMimeType = (mimetype) => {
 const isDocxMimeType = (mimetype) => {
     return mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || mimetype === 'application/msword';
 };
+
+// Helper to check auth for private files
+async function requireAuthIfPrivate(req, res, file) {
+    if (file.requiresAuth) {
+        // Try to verify token
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: 'Sign in required.' });
+        }
+        const idToken = authHeader.split(' ')[1];
+        try {
+            const { admin } = require('../config/firebase');
+            await admin.auth().verifyIdToken(idToken);
+        } catch (error) {
+            return res.status(401).json({ message: 'Invalid or expired token.' });
+        }
+    }
+    return null;
+}
 
 // Upload multiple files (bulk upload)
 exports.uploadBulkFiles = async (req, res) => {
@@ -63,7 +83,8 @@ exports.uploadFile = async (req, res) => {
                 description: req.body.description || '',
                 uploadedBy: req.body.uploadedBy || 'anonymous',
                 status: 'Draft',
-                url: fileMeta.url
+                url: fileMeta.url,
+                requiresAuth: req.body.requiresAuth === 'true' // <-- Store as boolean
             };
 
             const savedFile = await fileService.createFile(fileData);
@@ -112,6 +133,9 @@ exports.getFile = async (req, res) => {
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
+        // Check auth if private
+        const authResult = await requireAuthIfPrivate(req, res, file);
+        if (authResult) return;
 
         let filePath = file.path;
         if (!filePath && file.filename) {
@@ -145,6 +169,9 @@ exports.viewFile = async (req, res) => {
         if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
+        // Check auth if private
+        const authResult = await requireAuthIfPrivate(req, res, file);
+        if (authResult) return;
 
         let filePath = file.path;
         if (!filePath && file.filename) {
@@ -254,6 +281,9 @@ exports.deleteFile = async (req, res) => {
 exports.getFilePreview = async (req, res) => {
     try {
         const file = await fileService.getFileById(req.params.id);
+        // Check auth if private
+        const authResult = await requireAuthIfPrivate(req, res, file);
+        if (authResult) return;
 
         let filePath = file?.path;
         if (!filePath && file?.filename) {
