@@ -17,6 +17,8 @@ import psoLogo from '../assets/Pso.jpg';
 import soortyLogo from '../assets/Soorty.jpg';
 import ngoLogo from '../assets/ngo.jpg';
 import bvaLogo from '../assets/Bva.jpg';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // ===================== Utility Functions =====================
 
@@ -528,6 +530,39 @@ const Home = () => {
     }
   };
 
+  // Helper to check if user is approved
+  const isApproved = user && user.userData && user.userData.status === 'approved';
+
+  // Toast for unauthorized actions
+  const showAuthToast = (message) => {
+    toast.info(message);
+  };
+
+  // For Add Data (Bar)
+  const handleShowBarModal = () => {
+    if (!isApproved) {
+      showAuthToast('Only approved users can add or update data. Please log in and get approved.');
+      return;
+    }
+    setShowBarModal(true);
+  };
+  // For Add Data (Pie)
+  const handleShowPieModal = () => {
+    if (!isApproved) {
+      showAuthToast('Only approved users can add or update data. Please log in and get approved.');
+      return;
+    }
+    setShowPieModal(true);
+  };
+  // For Update Patients
+  const handleShowPatientModal = () => {
+    if (!isApproved) {
+      showAuthToast('Only approved users can update patient data. Please log in and get approved.');
+      return;
+    }
+    setShowPatientModal(true);
+  };
+
   // Animation hooks for scroll-triggered effects (only for activity, storage, sponsors)
   const [activityRef, activityInView] = useInView({ threshold: 0.2 });
   const [storageRef, storageInView] = useInView({ threshold: 0.2 });
@@ -576,7 +611,7 @@ const Home = () => {
           <h4>Patients Served</h4>
           <div className="metric-value">{loadingPatients ? '[ Loading... ]' : patientsValue.toLocaleString('en-PK')}</div>
           <div className="metric-desc">This Year: {patientsYear}</div>
-          <a className="activity-link update-link" onClick={() => setShowPatientModal(true)}>update</a>
+          <a className="activity-link update-link" onClick={handleShowPatientModal}>update</a>
         </div>
         <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-3 metric-deficit">
           <h4>{deficitLabel} for the Year</h4>
@@ -591,7 +626,7 @@ const Home = () => {
         <div className="dashboard-expenses-graph">
           <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
             <h3 className="graph-title" style={{ margin: 0 }}>Annual Expenses</h3>
-            <button className="add-data-btn" onClick={() => setShowBarModal(true)}>Add Data</button>
+            <button className="add-data-btn" onClick={handleShowBarModal}>Add Data</button>
           </div>
           <div className="graph-desc">Expenses incurred over the years (2015-{latestYear || '----'})</div>
           <CombinedExpenseLineChart data={yearlyData} />
@@ -600,7 +635,7 @@ const Home = () => {
         <div className="dashboard-donations-graph">
           <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
             <h3 className="graph-title" style={{ margin: 0 }}>Donations Breakdown ({latestYear || '----'})</h3>
-            <button className="add-data-btn" onClick={() => setShowPieModal(true)}>Add Data</button>
+            <button className="add-data-btn" onClick={handleShowPieModal}>Add Data</button>
           </div>
           <div className="graph-desc">Distribution of sources</div>
           <DonationsChart data={fundingData} year={latestYear} />
@@ -653,7 +688,11 @@ const Home = () => {
           )}
           <div className="storage-actions">
             <a className="storage-action-btn" href="/file-index">Manage Files</a>
-            <a className="storage-action-btn primary" href="https://console.firebase.google.com/project/auraxkhidmat-f4c73/usage" target="_blank" rel="noopener noreferrer">Upgrade Storage</a>
+            {isApproved ? (
+              <a className="storage-action-btn primary" href="https://console.firebase.google.com/project/auraxkhidmat-f4c73/usage" target="_blank" rel="noopener noreferrer">Upgrade Storage</a>
+            ) : (
+              <button className="storage-action-btn primary" onClick={() => showAuthToast('Only approved users can upgrade storage. Please log in and get approved.')}>Upgrade Storage</button>
+            )}
           </div>
         </div>
       </div>
@@ -675,6 +714,18 @@ const Home = () => {
           ))}
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

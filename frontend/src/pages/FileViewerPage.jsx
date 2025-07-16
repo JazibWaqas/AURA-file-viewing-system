@@ -11,6 +11,9 @@ import '../styles/FileIndex.css';
 import { useAuth } from '../App';
 import FileCard from '../components/FileCard.jsx';
 import { getIdToken } from 'firebase/auth';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 const FileViewer = () => {
   const { id } = useParams();
@@ -32,6 +35,8 @@ const FileViewer = () => {
   const [selectedFileId, setSelectedFileId] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const scrollRef = useRef(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Load recently viewed files from database
   useEffect(() => {
@@ -308,12 +313,19 @@ const FileViewer = () => {
     setIsSearching(false);
   };
 
+  // Helper: is user approved
+  const isApproved = user?.userData?.status === 'approved';
+
   // Handlers
   const handleDownload = async (fileId, fileName) => {
+    if (!isApproved) {
+      toast.info('Only approved users can download files. Please log in and get approved.');
+      return;
+    }
     try {
       const response = await fetch(`/api/files/${fileId}`);
       if (response.status === 401) {
-        setActionError('Sign in required.');
+        toast.info('Sign in required.');
         return;
       }
       if (!response.ok) throw new Error('Failed to download file');
@@ -327,35 +339,37 @@ const FileViewer = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      setActionError('Failed to download file. Please try again.');
+      toast.error('Failed to download file. Please try again.');
     }
   };
   const handleEditClick = () => {
-    if (user?.userData?.status === 'approved') {
+    if (isApproved) {
       navigate(`/file-edit/${file._id}`);
     } else {
-      setActionError('Only approved users can edit files.');
+      toast.info('Only approved users can edit files. Please log in and get approved.');
     }
   };
   const handleDelete = async () => {
+    setShowConfirm(true);
+  };
+  const confirmDelete = async () => {
     if (!file || !file._id) return;
-    if (window.confirm(`Are you sure you want to delete "${file.originalName || file.filename || file.name}"?`)) {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
-        navigate('/file-index', { state: { message: 'File deleted successfully!' } });
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
+      toast.success('File deleted successfully!');
+      navigate('/file-index');
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete file.');
+      setDeleting(false);
     }
   };
   const handleDeleteClick = () => {
-    if (user?.userData?.status === 'approved') {
+    if (isApproved) {
       handleDelete();
     } else {
-      setActionError('Only approved users can delete files.');
+      toast.info('Only approved users can delete files. Please log in and get approved.');
     }
   };
   const handleToggleFullscreen = () => {
@@ -589,11 +603,32 @@ const FileViewer = () => {
             {file.description && <div className="description-section"><h3>Description</h3><p>{file.description}</p></div>}
             <div className="actions-section">
               <button className="edit-button" title="Edit file metadata" onClick={handleEditClick}><FiEdit /> Edit File Metadata</button>
-              <button className="delete-button" title="Delete this file permanently" onClick={handleDeleteClick}><FiTrash2 /> Delete File</button>
-              {actionError && <div className="error-message">{actionError}</div>}
+              <button className="delete-button" title="Delete this file permanently" onClick={handleDeleteClick} disabled={deleting}><FiTrash2 /> Delete File</button>
             </div>
           </div>
         )}
+        <ConfirmModal
+          open={showConfirm}
+          title="Delete File?"
+          message={`Are you sure you want to delete \"${file?.originalName || file?.filename || file?.name}\"? This action cannot be undone.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirm(false)}
+          loading={deleting}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </main>
     </div>
   );

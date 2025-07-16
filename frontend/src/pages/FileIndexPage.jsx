@@ -6,6 +6,8 @@ import CategorySidebar from '../components/CategorySidebar.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalendar, FiPlus, FiMenu } from 'react-icons/fi';
 import FileCard from '../components/FileCard.jsx';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FileIndexPage() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
@@ -149,7 +151,10 @@ export default function FileIndexPage() {
   const handleDownload = useCallback(async (fileId, fileName) => {
     try {
       const response = await fetch(`/api/files/${fileId}`);
-      if (!response.ok) throw new Error('Failed to download file');
+      if (!response.ok) {
+        toast.error('Failed to download file. Please try again.');
+        return;
+      }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -160,7 +165,7 @@ export default function FileIndexPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      alert('Failed to download file. Please try again.');
+      toast.error('Failed to download file. Please try again.');
     }
   }, []);
   const handleSearchChange = (e) => {
@@ -349,6 +354,18 @@ export default function FileIndexPage() {
             </section>
           </div>
         </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </main>
     </div>
   );

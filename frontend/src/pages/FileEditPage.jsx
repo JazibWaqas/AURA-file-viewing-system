@@ -4,6 +4,9 @@ import { FiSave, FiArrowLeft, FiFile, FiLoader, FiTrash2, FiEdit } from 'react-i
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/FileEdit.css';
 import ShinyText from '../components/ShinyText';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 const defaultCategories = [
     {
@@ -76,6 +79,8 @@ export default function FileEditPage() {
   const [category, setCategory] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [year, setYear] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchFile = async () => {
@@ -161,18 +166,19 @@ export default function FileEditPage() {
   };
 
   const handleDelete = async () => {
+    setShowConfirm(true);
+  };
+  const confirmDelete = async () => {
     if (!file || !file._id) return;
-    if (window.confirm(`Are you sure you want to delete "${file.originalName || file.filename || file.name}"?`)) {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
-        alert('File deleted successfully!');
-        navigate('/file-index');
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
+      toast.success('File deleted successfully!');
+      navigate('/file-index');
+    } catch (error) {
+      setError(error.message);
+      setDeleting(false);
     }
   };
 
@@ -239,7 +245,7 @@ export default function FileEditPage() {
               </div>
               <div className="actions-section">
                 
-                <button className="delete-button" title="Delete this file permanently" onClick={handleDelete}>
+                <button className="delete-button" title="Delete this file permanently" onClick={handleDelete} disabled={deleting}>
                   <FiTrash2 /> Delete File
                 </button>
               </div>
@@ -331,6 +337,28 @@ export default function FileEditPage() {
           </div>
           {error && <div className="error-message">{error}</div>}
         </div>
+        <ConfirmModal
+          open={showConfirm}
+          title="Delete File?"
+          message={`Are you sure you want to delete "${file?.originalName || file?.filename || file?.name}"? This action cannot be undone.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirm(false)}
+          loading={deleting}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </main>
     </div>
   );

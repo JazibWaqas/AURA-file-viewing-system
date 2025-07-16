@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
   import { useAuth } from '../App';
   import { useIsMobileScreen } from '../services/deviceUtils';
   import { FaExclamationTriangle } from 'react-icons/fa';
+  import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
   
   const defaultCategories = [
       {
@@ -253,7 +255,8 @@ import React, { useState, useEffect } from 'react';
         }
         const response = await fetch(`/api/files/${fileId}`, { headers });
         if (!response.ok) {
-          throw new Error('Failed to download file');
+          toast.error('Failed to download file. Please try again.');
+          return;
         }
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -265,7 +268,7 @@ import React, { useState, useEffect } from 'react';
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } catch (error) {
-        alert('Failed to download file. Please try again.');
+        toast.error('Failed to download file. Please try again.');
       }
     };
   
@@ -276,10 +279,18 @@ import React, { useState, useEffect } from 'react';
   
     if (isMobile) {
       return (
-        <>
+        <div style={{
+          minHeight: '100vh',
+          width: '100vw',
+          background: 'linear-gradient(90deg, #85d8ce 0%, #085078,#2f3132 100%)',
+          margin: 0,
+          padding: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
           <Header />
           <div style={{
-            minHeight: '60vh',
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -289,11 +300,12 @@ import React, { useState, useEffect } from 'react';
             fontSize: '1.35rem',
             textAlign: 'center',
             gap: '1.2rem',
+            width: '100%',
           }}>
             <FaExclamationTriangle size={48} style={{ color: '#d32f2f' }} />
             <span>For full access, please log in from a computer as a registered user.</span>
           </div>
-        </>
+        </div>
       );
     }
   
@@ -501,6 +513,18 @@ import React, { useState, useEffect } from 'react';
               </div>
             </div>
           </div>
+          <ToastContainer
+            position="top-right"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
         </main>
       </div>
     );

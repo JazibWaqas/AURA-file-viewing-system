@@ -869,7 +869,7 @@ footer, .dashboard-footer, .footer {
   animation: fade-in-slow 1.3s cubic-bezier(0.4,0.2,0.2,1) both;
 }
 .dashboard-animate-pop-slow {
-  animation: pop-in-slow 1.1s cubic-bezier(0.4,0.2,0.2,1) both;
+  animation: pop-in-slow 2.1s cubic-bezier(0.4,0.2,0.2,1) both;
 }
 
 /* === Adjusted for Welcome to Aura card (slower slide-in-left) === */
@@ -879,7 +879,7 @@ footer, .dashboard-footer, .footer {
 
 /* === Pop-in wave for metric cards (initial only) === */
 .dashboard-animate-pop-wave {
-  animation: pop-in-slow 1.3s cubic-bezier(0.4,0.2,0.2,1) both;
+  animation: pop-in-slow 2.3s cubic-bezier(0.4,0.2,0.2,1) both;
 }
 
 /* Staggered delays for slow animations */

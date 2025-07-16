@@ -57,8 +57,7 @@ class FileService {
                 isArchived: fileData.isArchived || false,
                 archiveDate: fileData.archiveDate,
                 createdAt: convertToTimestamp(now),
-                updatedAt: convertToTimestamp(now),
-                requiresAuth: typeof fileData.requiresAuth === 'boolean' ? fileData.requiresAuth : false
+                updatedAt: convertToTimestamp(now)
             };
 
             await this.db.collection(this.collection).doc(fileId).set(fileRecord);
@@ -180,15 +179,31 @@ class FileService {
             // Delete from Firestore
             await this.db.collection(this.collection).doc(fileId).delete();
 
-            // Delete from Firebase Storage if path exists
+            // Try to delete from Firebase Storage
+            let deletedFromBucket = false;
             if (file.path) {
                 try {
                     const fileRef = this.bucket.file(file.path);
                     await fileRef.delete();
+                    deletedFromBucket = true;
+                    console.log(`[deleteFile] Deleted from bucket by path: ${file.path}`);
                 } catch (storageError) {
-                    console.warn('Could not delete file from storage:', storageError);
-                    // Don't throw error if storage deletion fails
+                    console.warn(`[deleteFile] Could not delete from storage by path: ${file.path}`, storageError);
                 }
+            }
+            // Fallback: try by filename if path is missing or failed
+            if (!deletedFromBucket && file.filename) {
+                try {
+                    const fileRef = this.bucket.file(file.filename);
+                    await fileRef.delete();
+                    deletedFromBucket = true;
+                    console.log(`[deleteFile] Deleted from bucket by filename: ${file.filename}`);
+                } catch (storageError) {
+                    console.warn(`[deleteFile] Could not delete from storage by filename: ${file.filename}`, storageError);
+                }
+            }
+            if (!deletedFromBucket) {
+                console.warn('[deleteFile] File was not deleted from bucket. File info:', file);
             }
 
             return { message: 'File deleted successfully' };
