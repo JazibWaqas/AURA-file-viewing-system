@@ -63,8 +63,7 @@ exports.uploadFile = async (req, res) => {
                 description: req.body.description || '',
                 uploadedBy: req.body.uploadedBy || 'anonymous',
                 status: 'Draft',
-                url: fileMeta.url,
-                requiresAuth: req.body.requiresAuth === 'true' || req.body.requiresAuth === true // store as boolean
+                url: fileMeta.url
             };
 
             const savedFile = await fileService.createFile(fileData);
@@ -116,12 +115,6 @@ exports.getFile = async (req, res) => {
 
         let filePath = file.path;
         if (!filePath && file.filename) {
-        // If file requires authentication, check user
-        if (file.requiresAuth) {
-            if (!req.user) {
-                return res.status(401).json({ message: 'Authentication required to view this file.' });
-            }
-        }
             filePath = file.filename;
         }
 
@@ -164,12 +157,6 @@ exports.viewFile = async (req, res) => {
 
         const fileRef = fileService.bucket.file(filePath);
         const [exists] = await fileRef.exists();
-        // If file requires authentication, check user
-        if (file.requiresAuth) {
-            if (!req.user) {
-                return res.status(401).json({ message: 'Authentication required to view this file.' });
-            }
-        }
         if (!exists) {
             return res.status(404).json({ message: 'File not found in storage' });
         }

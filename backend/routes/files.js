@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fileController = require('../controllers/fileController');
 const { upload, handleMulterError } = require('../middleware/upload');
-const authMiddleware = require('../middleware/auth');
 
 // File retrieval routes
 router.get('/', fileController.getAllFiles);
@@ -16,11 +15,10 @@ router.delete('/recently-viewed/:userId', fileController.clearRecentlyViewedFile
 
 // File operations (these come after recently-viewed routes)
 router.get('/:id/debug', fileController.debugFile);
-router.get('/:id/view', authMiddleware, fileController.viewFile);
+router.get('/:id/view', fileController.viewFile);
 router.get('/:id/preview', fileController.getFilePreview);
 router.get('/:id/details', fileController.getFileDetails);
-// Protect file download if requiresAuth is true
-router.get('/:id', authMiddleware, fileController.getFile);
+router.get('/:id', fileController.getFile);
 router.put('/:id', upload.single('file'), fileController.updateFile);
 router.delete('/:id', fileController.deleteFile);
 
