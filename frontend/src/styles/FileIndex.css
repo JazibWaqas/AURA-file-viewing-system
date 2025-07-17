@@ -82,7 +82,7 @@
     margin-bottom: 2rem;
     flex-wrap: wrap;
     align-items: center;
-    width: 100%;
+    width: 105%;
     box-sizing: border-box;
     color: #384959;
   }
@@ -95,7 +95,6 @@
   }
   
   .search-icon {
-    /* Search icon in input */
     position: absolute;
     left: 1rem;
     top: 50%;
@@ -382,28 +381,51 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
   }
   
   /* =============================
        File Card Buttons
        ============================= */
-  .file-view-btn,
+  .file-view-btn{
+      /* Buttons in file card */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 45%;
+      min-width: 77px;
+      max-width: 87%;
+      
+      background: #5a9bdc !important;
+      color: #000000 !important;
+      border: none;
+      border-radius: 6px;
+      font-weight: 550;
+      gap: 5px;
+      font-size: 0.93rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin: 2px 0;
+  }
+
+
   .file-download-btn {
     /* Buttons in file card */
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1 1 45%;
-    min-width: 80px;
-    max-width: 100%;
+    min-width: 105px;
+    max-width: 110%;
     padding: 8px 0;
+    gap: 5px;
+    
     background: #5a9bdc !important;
     color: #000000 !important;
     border: none;
     border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.98rem;
+    font-weight: 550;
+    font-size: 0.93rem;
     cursor: pointer;
     transition: background 0.2s;
     margin: 2px 0;
@@ -411,8 +433,8 @@
   
   .file-view-btn:hover,
   .file-download-btn:hover {
-    background: #1e18d8 !important;
-    color: #1e1b4b !important;
+    background: #296897 !important;
+    color: #090633 !important;
   }
   
   /* =============================
@@ -626,21 +648,47 @@
   }
   
   @media (max-width: 600px) {
-  
+
+    .search-icon{align-items: left;}
+
     .files-scroll-grid,
     .all-files-scroll-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr) !important;
       gap: 0.7rem;
     }
   
-    .files-scroll-grid>.file-card,
-    .all-files-scroll-grid>.file-card {
-      max-width: 100%;
-      min-height: 80px;
-      padding: 0.5rem 0.2rem;
+    .file-card {
+      max-width: 100% !important;
+      min-height: 120px !important;
+      padding: 0.7rem !important;
+    }
+  
+    .file-info h4 {
+      font-size: 0.9rem !important;
+    }
+  
+    .file-info p {
+      font-size: 0.7rem !important;
+      line-height: 1.2;
+    }
+  
+    .file-actions {
+      width: 100% !important;
+      gap: 0.4rem;
+    }
+  
+    .file-view-btn,
+    .file-download-btn {
+      flex: 1 1 45% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      font-size: 0.6rem !important;
+      padding: 5px 4px !important;
     }
   }
   
+  
+
   @media (max-width: 768px) {
     .sidebar-container {
       position: fixed;
@@ -659,12 +707,28 @@
   
     .file-index-layout.sidebar-open .sidebar-container {
       left: 0;
+      
     }
+    
+      .file-index-layout.sidebar-open .main-content,
+      .file-index-layout.sidebar-open .search-filter-bar {
+        opacity: 0;
+        pointer-events: none;
+      }
+    
   
     .sidebar-toggle-btn {
       display: flex;
+      background-color: #05253e;
       /* Show the button on mobile */
       align-items: center;
+      color: #fff;
+      font-size: large;
+      font-weight: bold;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      padding-top: 5px;
+      padding-right: 5px;
       gap: 0.5rem;
     }
   
@@ -685,12 +749,10 @@
     }
   
     /* Remove any z-index or position from .search-filter-bar */
-    .search-filter-bar,
-    .search-filter-bar * {
+    .search-filter-bar {
       position: static !important;
       z-index: auto !important;
-      background: none !important;
-      box-shadow: none !important;
+      
     }
   }
   
@@ -738,9 +800,7 @@
     box-sizing: border-box;
   }
   
-  .sidebar-toggle-btn {
-    display: none !important;
-  }
+  
   
   @media (max-width: 768px) {
     .sidebar-toggle-btn {
@@ -749,3 +809,15 @@
       gap: 0.5rem;
     }
   }
+
+.sidebar-toggle-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .sidebar-toggle-btn {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}

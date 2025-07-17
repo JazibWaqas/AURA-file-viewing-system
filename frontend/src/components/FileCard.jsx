@@ -23,13 +23,13 @@ export default function FileCard({ file, onView, onDownload, selected, className
           className="file-view-btn"
           onClick={e => { e.stopPropagation(); onView && onView(file._id); }}
         >
-          <FiEye />
+          <FiEye /> View 
         </button>
         <button
           className="file-download-btn"
           onClick={e => { e.stopPropagation(); onDownload && onDownload(file._id, file.originalName || file.filename || file.name); }}
         >
-          <FiDownload />
+          <FiDownload /> Download 
         </button>
       </div>
     </div>

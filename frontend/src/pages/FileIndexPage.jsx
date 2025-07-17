@@ -10,7 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function FileIndexPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 900);
+  
   const [recentFiles, setRecentFiles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [allFiles, setAllFiles] = useState([]);
@@ -131,7 +131,7 @@ export default function FileIndexPage() {
 
   // Responsive sidebar
   useEffect(() => {
-    const handleResize = () => setSidebarOpen(window.innerWidth >= 900);
+    const handleResize = () => setIsSidebarOpen(window.innerWidth >= 900);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -171,9 +171,10 @@ export default function FileIndexPage() {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
-  const handleCategorySelect = useCallback((cat, sub) => {
+  const handleCategorySelect = useCallback((cat, sub, isSubCategory) => {
     setSelectedCategory(cat);
     setSelectedSubCategory(sub);
+    if (isSubCategory) setIsSidebarOpen(false); // Only close sidebar if a subcategory is selected
   }, []);
   const getUniqueYears = useMemo(() => {
     const years = Array.from(new Set(allFiles.map(file => file.year))).filter(Boolean);
@@ -209,9 +210,13 @@ export default function FileIndexPage() {
       <Header />
       <main className="main-content">
         <div className={`file-index-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-          <div className="sidebar-container">
-            <CategorySidebar onSelect={handleCategorySelect} />
-          </div>
+        <div
+  className="sidebar-container"
+  onClick={(e) => e.stopPropagation()} // ✅ this is the fix
+>
+  <CategorySidebar onSelect={handleCategorySelect} />
+</div>
+
 
           {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
 
@@ -219,9 +224,9 @@ export default function FileIndexPage() {
             <div className="page-header">
               <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
-                <span>Filters</span>
+                <span>Categories</span>
               </button>
-              <h1>File Management</h1>
+              
 
             </div>
 

@@ -40,7 +40,7 @@ export default function CategorySidebar({ onSelect }) {
                     <button
                       type="button"
                       className="subcategory-btn"
-                      onClick={() => onSelect(cat.name, sub)}
+                      onClick={() => onSelect(cat.name, sub,true)}
                     >
                       {sub}
                     </button>
