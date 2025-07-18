@@ -15,6 +15,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmModal from '../components/ConfirmModal';
 
+const isMobileDevice = () => {
+  if (typeof navigator === 'undefined') return false;
+  return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+};
+
 const FileViewer = () => {
   const { id } = useParams();
   const [file, setFile] = useState(null);
@@ -140,6 +145,7 @@ const FileViewer = () => {
 
   // When selectedFileId changes, fetch and show that file
   useEffect(() => {
+    let pdfObjectUrl = null; // Track PDF object URL for cleanup
     if (!selectedFileId) {
       setFile(null);
       setLoading(false); // Stop loading if no file is selected
@@ -165,7 +171,6 @@ const FileViewer = () => {
         // If file is private and user is not logged in, show message and do not fetch preview
         if (fileDetails.requiresAuth && !user) {
           setError('\🔒\ This is a private file. Only logged-in users can preview its contents. Please sign in to continue.');
-          setLoading(false);
           return;
         }
         // Prepare headers for private files
@@ -174,23 +179,27 @@ const FileViewer = () => {
           const token = await getIdToken(user.firebaseUser);
           headers['Authorization'] = `Bearer ${token}`;
         }
+        // PDF preview
         if (fileDetails.fileType === 'pdf') {
           const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
           if (viewResponse.status === 401) {
             setError('Sign in required.');
-            setLoading(false);
             return;
           }
           if (viewResponse.ok) {
             const blob = await viewResponse.blob();
-            fileDetails.url = URL.createObjectURL(blob);
+            pdfObjectUrl = URL.createObjectURL(blob);
+            fileDetails.url = pdfObjectUrl;
             setFile(fileDetails);
           }
-        } else if (fileDetails.fileType === 'csv') {
+        } else if (
+          fileDetails.fileType === 'csv'
+        ) {
+          // CSV preview
+          setLoading(true);
           const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`, { headers });
           if (previewResponse.status === 401) {
             setError('Sign in required.');
-            setLoading(false);
             return;
           }
           if (previewResponse.ok) {
@@ -202,7 +211,12 @@ const FileViewer = () => {
           } else {
             setPreviewError('Failed to load preview data.');
           }
-        } else if (fileDetails.fileType === 'excel' || fileDetails.fileType === 'xlsx') {
+        } else if (
+          fileDetails.fileType === 'excel' ||
+          fileDetails.fileType === 'xlsx' ||
+          fileDetails.fileType === 'xls'
+        ) {
+          // Excel preview (xlsx, xls)
           try {
             setPreviewData(null);
             setPreviewError(null);
@@ -223,13 +237,16 @@ const FileViewer = () => {
             }
           } catch (err) {
             setPreviewError('Error processing Excel file.');
-          } finally {
-            setLoading(false);
           }
-        } else if (fileDetails.fileType === 'docx' || fileDetails.fileType === 'doc') {
+        } else if (
+          fileDetails.fileType === 'docx' ||
+          fileDetails.fileType === 'doc'
+        ) {
+          // Word preview (docx, doc)
           try {
             setPreviewData(null);
             setPreviewError(null);
+            setLoading(true);
             const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
@@ -240,8 +257,6 @@ const FileViewer = () => {
             }
           } catch (err) {
             setPreviewError('Error loading document preview.');
-          } finally {
-            setLoading(false);
           }
         }
       } catch (err) {
@@ -251,9 +266,9 @@ const FileViewer = () => {
       }
     };
     fetchFile();
-    // Clean up object URLs
+    // Clean up object URLs for PDF (and future blob previews)
     return () => {
-      if (file?.url) URL.revokeObjectURL(file.url);
+      if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
     };
   }, [selectedFileId, user, authLoading]);
 
@@ -420,10 +435,10 @@ const FileViewer = () => {
             data={tableData}
             colHeaders={headers}
             rowHeaders={true}
-            width="100%"
-            height="70vh"
-            colWidths={160}
+            style={isFullscreen ? { width: '100vw', height: '100vh' } : { width: '100%', height: '100%' }}
             autoColumnSize={true}
+            colWidths={Array.isArray(headers) ? Array(headers.length).fill(200) : undefined}
+            stretchH="all"
             licenseKey="non-commercial-and-evaluation"
             contextMenu={true}
             filters={true}
@@ -559,7 +574,21 @@ const FileViewer = () => {
             ) : file ? (
               <>
                 {file?.fileType === 'pdf' && file?.url && (
-                  <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
+                  isMobileDevice() ? (
+                    <div className="pdf-mobile-message">
+                      <p>PDF preview is not supported on mobile.<br/>Tap below to open the PDF in your browser or download it.</p>
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="pdf-mobile-open-btn"
+                      >
+                        Open PDF
+                      </a>
+                    </div>
+                  ) : (
+                    <iframe src={file.url} title="PDF Preview" className="pdf-preview-frame" frameBorder="0" />
+                  )
                 )}
                 {(file?.fileType === 'csv' || file?.fileType === 'excel' || file?.fileType === 'xlsx') && (
                   <div
