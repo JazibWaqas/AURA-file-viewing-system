@@ -194,8 +194,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: #ede9fe !important;
-    color: #3b2f7f !important;
+    background: #2e5d8c !important;
+    color: #fff !important;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -203,8 +203,8 @@
   }
   
   .clear-filters-button:hover {
-    background: #a78bfa !important;
-    color: #1e1b4b !important;
+    background: #2e5d8c !important;
+    color: #fff !important;
   }
   
   /* =============================
@@ -445,14 +445,14 @@
   /* =============================
        Miscellaneous States
        ============================= */
-  .loading-indicator,
-  .empty-state {
-    /* Loading or empty state display */
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 120px;
     grid-column: 1 / -1;
-    text-align: center;
-    padding: 2rem 0;
-    background: #f8f9fa;
-    border-radius: 8px;
   }
   
   /* =============================
@@ -488,8 +488,8 @@
   
   .load-more-button {
     /* Load more button */
-    background: #ede9fe !important;
-    color: #3b2f7f !important;
+    background: #3d77ae !important;
+    color: #fff !important;
     border: none;
     border-radius: 8px;
     padding: 0.75rem 1.5rem;
@@ -499,14 +499,16 @@
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
+    font-weight: 500;
     gap: 0.5rem;
     box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
   }
   
   .load-more-button:hover {
-    background: #a78bfa !important;
-    color: #1e1b4b !important;
+    background: #2e5d8c !important;
+    color: #fff !important;
     transform: translateY(-1px);
+    font-weight: 550;
     box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
   }
   
@@ -718,13 +720,22 @@
       gap: 0.4rem;
     }
   
-    .file-view-btn,
-    .file-download-btn {
+    .file-view-btn {
+    
       flex: 1 1 45% !important;
       min-width: 0 !important;
       max-width: 100% !important;
       font-size: 0.6rem !important;
-      padding: 5px 4px !important;
+      align-items: left;
+      padding: 6px 2px   !important;
+    }
+    .file-download-btn {
+    
+      flex: 1 1 45% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      font-size: 0.6rem !important;
+      padding: 6px 2px   !important;
     }
   }
   

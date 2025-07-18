@@ -191,7 +191,7 @@
   }
   
   .header-login-btn:hover {
-    background: #9b3a42;
+    background: #220e50;
     color: #fff;
   }
   
@@ -321,15 +321,4 @@
     overflow-x: hidden;
   }
   
-  /* =============================
-     Sidebar (Category Sidebar Only, if any)
-     ============================= */
-  
-  /* =============================
-     Layout Components
-     ============================= */
-  
-  /* =============================
-     Responsive Styles
-     ============================= */
   

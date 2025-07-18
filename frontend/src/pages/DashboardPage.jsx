@@ -361,15 +361,15 @@ function DonationsChart({ data, year, onAddData }) {
 
 // ===================== Sponsor Logos =====================
 const sponsorLogos = [
-  { src: parcoLogo, alt: 'PARCO' },
-  { src: icareLogo, alt: 'iCARE' },
-  { src: habibMetroLogo, alt: 'HabibMetro' },
-  { src: infaqLogo, alt: 'INFAQ' },
-  { src: toyotaLogo, alt: 'TOYOTA' },
-  { src: psoLogo, alt: 'PSO' },
-  { src: soortyLogo, alt: 'Soorty' },
-  { src: ngoLogo, alt: 'NGO' },
-  { src: bvaLogo, alt: 'BVA' },
+  { src: parcoLogo, alt: 'PARCO' ,link: 'https://www.parco.com.pk/' },
+  { src: icareLogo, alt: 'iCARE' ,link: 'https://i-care-foundation.org/'},
+  { src: habibMetroLogo, alt: 'HabibMetro' ,link: 'https://www.habibmetro.com/'},
+  { src: infaqLogo, alt: 'INFAQ' ,link: 'https://infaq.org.pk/'},
+  { src: toyotaLogo, alt: 'TOYOTA' ,link: 'https://toyota-indus.com/'},
+  { src: psoLogo, alt: 'PSO',link: 'https://psopk.com/' },
+  { src: soortyLogo, alt: 'Soorty',link: 'https://soorty.com/' },
+  { src: ngoLogo, alt: 'ZVMG Rangoonwala' ,link: 'https://rangoonwalatrust.org/about-us/'},
+  { src: bvaLogo, alt: 'BVA',link: 'https://bva.edu.pk/' },
 ];
 
 // ===================== Main Dashboard Page =====================
@@ -704,14 +704,18 @@ const Home = () => {
       >
         <h4 className="sponsors-title">Our Valued Sponsors</h4>
         <div className="sponsors-logos-row">
-          {sponsorLogos.map((logo, idx) => (
-            <div
-              key={idx}
-              className={`sponsor-logo-circle sponsor-logo-anim${sponsorsAnimated ? ' dashboard-animate-pop-slow dashboard-animate-delay-' + ((idx % 8) + 1) : ''}`}
-            >
-              <img src={logo.src} alt={logo.alt} className="sponsor-logo-img" />
-            </div>
-          ))}
+        {sponsorLogos.map((logo, idx) => (
+  <a
+    key={idx}
+    href={logo.link}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`sponsor-logo-circle sponsor-logo-anim${sponsorsAnimated ? ' dashboard-animate-pop-slow dashboard-animate-delay-' + ((idx % 8) + 1) : ''}`}
+    title={logo.alt}
+  >
+    <img src={logo.src} alt={logo.alt} className="sponsor-logo-img" />
+  </a>
+))}
         </div>
       </div>
       <ToastContainer

@@ -970,3 +970,15 @@ footer, .dashboard-footer, .footer {
 .pie-color-2 { color: var(--pie-color-3); }
 .pie-color-3 { color: var(--pie-color-4); }
 .pie-color-4 { color: var(--pie-color-5); }
+
+.sponsor-logo-circle {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sponsor-logo-circle:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 24px rgba(44, 83, 100, 0.22);
+  z-index: 2;
+  border: 2px solid #07243c; /* or your brand color */
+  background: #fff;
+  filter: brightness(1.1);
+}

@@ -294,7 +294,7 @@ export default function FileIndexPage() {
 
               <div className="files-scroll-grid">
                 {isLoadingFiles ? (
-                  <div className="loading-indicator">
+                  <div className="loading-indicator" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', minHeight: '120px' }}>
                     <FiLoader className="spinner-icon" />
                     <p>Loading files...</p>
                   </div>
@@ -320,7 +320,7 @@ export default function FileIndexPage() {
               <ShinyText text="All Files" className="all-files-title" />
               <div className="all-files-scroll-grid">
                 {isLoadingFiles && allFiles.length === 0 ? (
-                  <div className="loading-indicator">
+                  <div className="loading-indicator" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', minHeight: '120px' }}>
                     <FiLoader className="spinner-icon" />
                     <p>Loading files...</p>
                   </div>
