@@ -8,6 +8,8 @@ import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiSearch, FiFilter, FiCalenda
 import FileCard from '../components/FileCard.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../App';
+import { getIdToken } from 'firebase/auth';
 
 export default function FileIndexPage() {
   
@@ -32,6 +34,7 @@ export default function FileIndexPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const debounceTimeout = useRef(null);
+  const { user, loading: authLoading } = useAuth();
 
   // Fetch categories and initial files
   useEffect(() => {
@@ -151,8 +154,34 @@ export default function FileIndexPage() {
 
   const handleViewFile = useCallback((fileId) => navigate(`/file-viewer/${fileId}`), [navigate]);
   const handleDownload = useCallback(async (fileId, fileName) => {
+    // Find the file object from allFiles or recentFiles
+    const fileObj = allFiles.find(f => f._id === fileId) || recentFiles.find(f => f._id === fileId);
+    // If file requires authentication
+    if (fileObj && fileObj.requiresAuth) {
+      if (authLoading) {
+        toast.info('Checking authentication...');
+        return;
+      }
+      if (!user) {
+        toast.info('You must be signed in to download this file.');
+        return;
+      }
+      if (user.userData?.status !== 'approved') {
+        toast.info('Only approved users can download this file.');
+        return;
+      }
+    }
     try {
-      const response = await fetch(`/api/files/${fileId}`);
+      let headers = {};
+      if (fileObj && fileObj.requiresAuth && user && user.firebaseUser) {
+        const token = await getIdToken(user.firebaseUser);
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`/api/files/${fileId}`, { headers });
+      if (response.status === 401) {
+        toast.info('Sign in required.');
+        return;
+      }
       if (!response.ok) {
         toast.error('Failed to download file. Please try again.');
         return;
@@ -169,7 +198,7 @@ export default function FileIndexPage() {
     } catch (error) {
       toast.error('Failed to download file. Please try again.');
     }
-  }, []);
+  }, [allFiles, recentFiles, user, authLoading]);
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
