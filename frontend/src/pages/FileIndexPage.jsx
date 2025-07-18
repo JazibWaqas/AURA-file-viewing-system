@@ -17,6 +17,8 @@ export default function FileIndexPage() {
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
@@ -247,18 +249,7 @@ export default function FileIndexPage() {
                   onChange={handleSearchChange}
                 />
               </div>
-              <div className="filter-container">
-                <button
-                  className={`filter-button ${selectedCategory ? 'active' : ''}`}
-                  onClick={() => {
-                    setSelectedCategory('');
-                    setSelectedSubCategory('');
-                  }}
-                >
-                  <FiFilter />
-                  {selectedCategory ? `Category (${selectedCategory})` : 'Category'}
-                </button>
-              </div>
+              
               <div className="filter-container">
                 <button
                   className={`filter-button ${selectedYear ? 'active' : ''}`}
@@ -270,14 +261,17 @@ export default function FileIndexPage() {
                 {showYearFilter && (
                   <div className="filter-dropdown">
                     {getUniqueYears.map(year => (
-                      <button
-                        key={year}
-                        className={`filter-option ${selectedYear === year ? 'selected' : ''}`}
-                        onClick={() => setSelectedYear(year)}
-                      >
-                        {year}
-                      </button>
-                    ))}
+  <button
+    key={year}
+    className={`filter-option ${selectedYear === year ? 'selected' : ''}`}
+    onClick={() => {
+      setSelectedYear(year);
+      setShowYearFilter(false); // <-- Close dropdown after selection
+    }}
+  >
+    {year}
+  </button>
+))}
                   </div>
                 )}
               </div>

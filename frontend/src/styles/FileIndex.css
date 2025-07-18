@@ -134,19 +134,21 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: #ede9fe !important;
-    color: #3b2f7f !important;
+    background: #3d77ae !important;
+    color: #d0e2ed !important;
     border: none;
     border-radius: 6px;
     font-size: 0.9rem;
     cursor: pointer;
+    font-weight: 500;
     transition: all 0.2s ease;
   }
   
   .filter-button:hover,
   .filter-button.active {
-    background: #a78bfa !important;
-    color: #1e1b4b !important;
+    background: #2e5d8c !important;
+    color: #fefdff !important;
+    font-weight: bolder;
     border-color: #4a90e2;
   }
   
@@ -254,7 +256,8 @@
        ============================= */
   .file-card {
     /* The actual file card */
-    background: linear-gradient(135deg, #f9f9f9 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%);
+
     border-radius: 12px;
     padding: 1.2rem 1rem;
     display: flex;
@@ -396,8 +399,8 @@
       min-width: 77px;
       max-width: 87%;
       
-      background: #5a9bdc !important;
-      color: #000000 !important;
+      background: #4fa7dd !important;
+      color: #1b0651 !important;
       border: none;
       border-radius: 6px;
       font-weight: 550;
@@ -420,8 +423,8 @@
     padding: 8px 0;
     gap: 5px;
     
-    background: #5a9bdc !important;
-    color: #000000 !important;
+    background: #1c5287 !important;
+    color: #deeefb !important;
     border: none;
     border-radius: 6px;
     font-weight: 550;
@@ -431,12 +434,14 @@
     margin: 2px 0;
   }
   
-  .file-view-btn:hover,
-  .file-download-btn:hover {
-    background: #296897 !important;
-    color: #090633 !important;
+  .file-view-btn:hover {
+    background: #3b85b2 !important;
+    color: #000 !important;
   }
-  
+  .file-download-btn:hover {
+    background: #163f66 !important;
+    color: #fff !important;
+  }
   /* =============================
        Miscellaneous States
        ============================= */
@@ -735,7 +740,7 @@
       height: 100vh;
       z-index: 2000;
       transition: left 0.3s ease-in-out;
-      background: #fff;
+      background: transparent;
       box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
       border-top-right-radius: 1.5rem;
       border-bottom-right-radius: 1.5rem;
