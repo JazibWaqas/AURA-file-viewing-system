@@ -15,6 +15,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmModal from '../components/ConfirmModal';
 
+
 const isMobileDevice = () => {
   if (typeof navigator === 'undefined') return false;
   return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
@@ -496,8 +497,7 @@ const FileViewer = () => {
       <main className="main-content file-viewer-main-redesign">
         <div className="file-viewer-header file-viewer-page">
           <div className="file-viewer-header-left">
-            <button className="back-button" onClick={() => navigate('/file-index')}><FiArrowLeft /> Back</button>
-            <h1>{file?.originalName || file?.filename || file?.name || 'Untitled'}</h1>
+            {/* Removed back button and file name */}
           </div>
         </div>
         
@@ -598,10 +598,8 @@ const FileViewer = () => {
                   </div>
                 )}
                 {(file?.fileType === 'docx' || file?.fileType === 'doc') && (
-                  <div
-                    className={`docx-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`}
-                  >
-                    {renderDocx()}
+                  <div className={`docx-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`} style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+                    <div className="docx-preview" style={{flex: 1, width: '100%', overflow: 'auto'}} dangerouslySetInnerHTML={{ __html: previewData }} />
                   </div>
                 )}
                 {!['pdf', 'csv', 'excel', 'xlsx', 'docx', 'doc'].includes(file?.fileType) && (
@@ -612,7 +610,9 @@ const FileViewer = () => {
                 )}
               </>
             ) : (
-              <div className="empty-state">No file selected.</div>
+              <div className="file-preview-empty-state">
+                Your file will open here.
+              </div>
             )}
           </div>
         </div>
