@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-
 import { createContext, useContext, useEffect, useState, Suspense, lazy } from "react";
 import { auth } from "./services/firebase";
 import PageLoader from "./components/PageLoader";
+import './styles/pending-approval-popup.css';
 
 // Lazy load the page components
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -19,6 +20,7 @@ export function useAuth() {
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showPendingPopup, setShowPendingPopup] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -27,11 +29,18 @@ function AuthProvider({ children }) {
             const response = await fetch(`/api/users/status/${firebaseUser.uid}`);
             const userData = await response.json();
             setUser({ firebaseUser, userData: userData || { status: 'pending' } });
+            if (userData && userData.status === 'pending') {
+              setShowPendingPopup(true);
+            } else {
+              setShowPendingPopup(false);
+            }
         } catch (error) {
             setUser({ firebaseUser, userData: { status: 'pending' } });
+            setShowPendingPopup(true);
         }
       } else {
         setUser(null);
+        setShowPendingPopup(false);
       }
       setLoading(false);
     });
@@ -39,7 +48,20 @@ function AuthProvider({ children }) {
   }, []);
   
   const value = { user, setUser, loading };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {showPendingPopup && (
+        <div className="pending-approval-popup">
+          <div className="pending-approval-popup-content">
+            <h2>Approval Pending</h2>
+            <p>Your account is awaiting administrator approval. You will be notified by email once approved.</p>
+            <button onClick={() => setShowPendingPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 function PrivateRoute() {
@@ -79,10 +101,11 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/file-index" element={<FileIndexPage />} />
             <Route path="/file-viewer/:id?" element={<FileViewerPage />} />
-            <Route path="/upload-file" element={<UploadFilePage />} />
+            
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
+            <Route path="/upload-file" element={<UploadFilePage />} />
               <Route path="/file-edit/:id" element={<FileEditPage />} />
             </Route>
 

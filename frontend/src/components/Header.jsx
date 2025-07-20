@@ -5,6 +5,7 @@ import { FaHome, FaFolderOpen, FaEye, FaUpload, FaPlus } from 'react-icons/fa';
 import { auth, signInWithGoogle, signOutUser } from '../services/firebase';
 import auraLogo from '../assets/aura-logo.png';
 import { useIsMobileScreen } from '../services/deviceUtils';
+import { useAuth } from '../App';
 
 const navLinks = [
   { to: '/', label: 'Dashboard', shortLabel: 'Home', icon: <FaHome /> },
@@ -13,19 +14,9 @@ const navLinks = [
   { to: '/upload-file', label: 'Upload File', shortLabel: 'Upload', icon: <FaUpload /> },
 ];
 
-// Simple auth state hook
-function useAuth() {
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    return unsubscribe;
-  }, []);
-  return user;
-}
-
 const Header = () => {
   const location = useLocation();
-  const user = useAuth();
+  const { user } = useAuth(); // Use global auth context
   const isMobile = useIsMobileScreen();
   return (
     <header className="header">
@@ -53,7 +44,9 @@ const Header = () => {
         </nav>
         {!isMobile && (user ? (
           <div className="header-user-info">
-            <span className="header-user-name">{user.displayName || user.email}</span>
+            {user.userData && user.userData.status === 'approved' && (
+              <span className="header-user-name">{user.firebaseUser.displayName || user.firebaseUser.email}</span>
+            )}
             <button className="header-login-btn" onClick={signOutUser}>Log Out</button>
           </div>
         ) : (
