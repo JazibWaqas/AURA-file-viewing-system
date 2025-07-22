@@ -5,6 +5,7 @@
 /* =============================
    Layout & Structure
    ============================= */
+
 .file-viewer-flex-root {
   width: 100%;
   min-height: calc(100vh - 128px); /* Adjusted for header heights */
