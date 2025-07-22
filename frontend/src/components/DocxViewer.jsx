@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { FiLoader } from 'react-icons/fi';
+import API_BASE_URL from '../config/api';
 
 const MammothViewer = ({ fileId }) => {
     const [html, setHtml] = useState('');
@@ -14,7 +15,7 @@ const MammothViewer = ({ fileId }) => {
                 // Dynamically import mammoth
                 const mammoth = await import('mammoth/mammoth.browser.js');
 
-                const response = await fetch(`/api/files/${fileId}/view`);
+                const response = await fetch(`${API_BASE_URL}/api/files/${fileId}/view`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch document for preview.');
                 }

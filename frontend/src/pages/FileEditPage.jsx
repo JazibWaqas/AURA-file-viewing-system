@@ -7,6 +7,7 @@ import ShinyText from '../components/ShinyText';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmModal from '../components/ConfirmModal';
+import API_BASE_URL from '../config/api';
 
 const defaultCategories = [
     {
@@ -88,7 +89,7 @@ export default function FileEditPage() {
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`/api/files/${id}/details`);
+        const response = await fetch(`${API_BASE_URL}/files/${id}/details`);
         if (!response.ok) {
           throw new Error(response.status === 404 ? 'File not found' : 'Failed to fetch file details');
         }
@@ -132,7 +133,7 @@ export default function FileEditPage() {
       setSaving(true);
       setError(null);
 
-      const response = await fetch(`/api/files/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/files/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ export default function FileEditPage() {
     if (!file || !file._id) return;
     setDeleting(true);
     try {
-      const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/files/${file._id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
       toast.success('File deleted successfully!');
       navigate('/file-index');

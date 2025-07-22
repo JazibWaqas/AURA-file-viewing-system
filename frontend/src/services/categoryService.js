@@ -1,10 +1,10 @@
-const API_BASE_URL = '/api';
+import API_BASE_URL from '../config/api';
 
 export const categoryService = {
     // Get all categories
     async getAllCategories() {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories`);
+            const response = await fetch(`${API_BASE_URL}/api/categories`);
             if (!response.ok) {
                 throw new Error('Failed to fetch categories');
             }
@@ -18,7 +18,7 @@ export const categoryService = {
     // Get categories for dropdown (simplified format)
     async getCategoriesForDropdown() {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/dropdown`);
+            const response = await fetch(`${API_BASE_URL}/api/categories/dropdown`);
             if (!response.ok) {
                 throw new Error('Failed to fetch categories for dropdown');
             }
@@ -32,7 +32,7 @@ export const categoryService = {
     // Get a single category
     async getCategory(id) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${id}`);
+            const response = await fetch(`${API_BASE_URL}/api/categories/${id}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch category');
             }
@@ -46,7 +46,7 @@ export const categoryService = {
     // Create a new category
     async createCategory(categoryData) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export const categoryService = {
     // Update a category
     async updateCategory(id, categoryData) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const categoryService = {
     // Delete a category
     async deleteCategory(id) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -102,7 +102,7 @@ export const categoryService = {
     // Add subcategory to a category
     async addSubCategory(categoryId, subCategoryData) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/subcategories`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/${categoryId}/subcategories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export const categoryService = {
     // Update subcategory
     async updateSubCategory(categoryId, subCategoryId, subCategoryData) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/subcategories/${subCategoryId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/${categoryId}/subcategories/${subCategoryId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export const categoryService = {
     // Delete subcategory
     async deleteSubCategory(categoryId, subCategoryId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/subcategories/${subCategoryId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/${categoryId}/subcategories/${subCategoryId}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -158,7 +158,7 @@ export const categoryService = {
     // Initialize default categories
     async initializeDefaultCategories() {
         try {
-            const response = await fetch(`${API_BASE_URL}/categories/initialize`, {
+            const response = await fetch(`${API_BASE_URL}/api/categories/initialize`, {
                 method: 'POST',
             });
             if (!response.ok) {

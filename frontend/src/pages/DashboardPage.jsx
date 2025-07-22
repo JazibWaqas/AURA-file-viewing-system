@@ -19,6 +19,7 @@ import ngoLogo from '../assets/ngo.jpg';
 import bvaLogo from '../assets/Bva.jpg';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_BASE_URL from '../config/api';
 
 // ===================== Utility Functions =====================
 
@@ -397,7 +398,7 @@ const Home = () => {
     async function fetchPatients() {
       setLoadingPatients(true);
       try {
-        const res = await fetch('/api/dashboard/patient-data');
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/patient-data`);
         const data = await res.json();
         setPatientData(data);
       } catch (err) {
@@ -418,14 +419,14 @@ const Home = () => {
 
   // Add handler for submitting patient data
   const handleAddPatientData = async ({ year, patients }) => {
-    const res = await fetch('/api/dashboard/patient-data', {
+    const res = await fetch(`${API_BASE_URL}/api/dashboard/patient-data`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ year, patients })
     });
     if (!res.ok) throw new Error('Failed to add patient data');
     // Refresh patient data
-    const updated = await fetch('/api/dashboard/patient-data');
+    const updated = await fetch(`${API_BASE_URL}/api/dashboard/patient-data`);
     setPatientData(await updated.json());
   };
 
@@ -449,12 +450,12 @@ const Home = () => {
       setLoading(true);
       try {
         // Yearly summary for bar/line chart
-        const yearlyRes = await fetch('/api/dashboard/yearly-summary');
+        const yearlyRes = await fetch(`${API_BASE_URL}/api/dashboard/yearly-summary`);
         const yearly = await yearlyRes.json();
         setYearlyData(yearly);
 
         // Funding sources for pie chart
-        const fundingRes = await fetch('/api/dashboard/funding-sources');
+        const fundingRes = await fetch(`${API_BASE_URL}/api/dashboard/funding-sources`);
         const fundingArr = await fundingRes.json();
         if (fundingArr.length > 0) {
           const latest = fundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));
@@ -466,14 +467,14 @@ const Home = () => {
         }
 
         // Storage statistics
-        const storageRes = await fetch('/api/dashboard/storage-stats');
+        const storageRes = await fetch(`${API_BASE_URL}/api/dashboard/storage-stats`);
         if (!storageRes.ok) throw new Error(`Storage API failed: ${storageRes.status}`);
         const storage = await storageRes.json();
         setStorageStats(storage);
 
         // Recently viewed files
         if (user?.firebaseUser?.uid) {
-          const recentRes = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=5`);
+          const recentRes = await fetch(`${API_BASE_URL}/api/files/recently-viewed/${user.firebaseUser.uid}?limit=5`);
           if (recentRes.ok) {
             setRecentlyViewedFiles(await recentRes.json());
           } else {
@@ -493,14 +494,14 @@ const Home = () => {
 
   // Add handler for submitting bar data
   const handleAddBarData = async (formData) => {
-    const res = await fetch('/api/dashboard/yearly-summary', {
+    const res = await fetch(`${API_BASE_URL}/api/dashboard/yearly-summary`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
     if (!res.ok) throw new Error('Failed to add data');
     // Refresh data
-    const yearlyRes = await fetch('/api/dashboard/yearly-summary');
+    const yearlyRes = await fetch(`${API_BASE_URL}/api/dashboard/yearly-summary`);
     const yearly = await yearlyRes.json();
     setYearlyData(yearly);
     // Update latest year if needed
@@ -511,14 +512,14 @@ const Home = () => {
 
   // Add handler for submitting pie data
   const handleAddPieData = async (formData) => {
-    const res = await fetch('/api/dashboard/funding-sources', {
+    const res = await fetch(`${API_BASE_URL}/api/dashboard/funding-sources`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
     if (!res.ok) throw new Error('Failed to add data');
     // Always fetch all funding sources and pick the latest year
-    const allFundingRes = await fetch('/api/dashboard/funding-sources');
+    const allFundingRes = await fetch(`${API_BASE_URL}/api/dashboard/funding-sources`);
     const allFundingArr = await allFundingRes.json();
     if (allFundingArr.length > 0) {
       const latest = allFundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));

@@ -14,6 +14,7 @@ import { getIdToken } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmModal from '../components/ConfirmModal';
+import API_BASE_URL from '../config/api';
 
 
 const isMobileDevice = () => {
@@ -53,7 +54,7 @@ const FileViewer = () => {
       }
       
       try {
-        const res = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
+        const res = await fetch(`${API_BASE_URL}/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
         
         if (res.ok) {
           const data = await res.json();
@@ -79,7 +80,7 @@ const FileViewer = () => {
     }
     
     try {
-      const res = await fetch('/api/files/recently-viewed', {
+      const res = await fetch(`${API_BASE_URL}/files/recently-viewed`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ const FileViewer = () => {
       
       if (res.ok) {
         // Refresh the recently viewed files list
-        const refreshRes = await fetch(`/api/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
+        const refreshRes = await fetch(`${API_BASE_URL}/files/recently-viewed/${user.firebaseUser.uid}?limit=4`);
         
         if (refreshRes.ok) {
           const data = await refreshRes.json();
@@ -113,7 +114,7 @@ const FileViewer = () => {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const res = await fetch('/api/files');
+        const res = await fetch(`${API_BASE_URL}/files`);
         if (!res.ok) throw new Error('Failed to fetch files');
         const data = await res.json();
         setAllFiles(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -163,7 +164,7 @@ const FileViewer = () => {
       setPreviewError(null);
       setPreviewData(null);
       try {
-        const detailsRes = await fetch(`/api/files/${selectedFileId}/details`);
+        const detailsRes = await fetch(`${API_BASE_URL}/files/${selectedFileId}/details`);
         if (!detailsRes.ok) throw new Error(detailsRes.status === 404 ? 'File not found' : 'Error fetching file details');
         const fileDetails = await detailsRes.json();
         setFile(fileDetails);
@@ -182,7 +183,7 @@ const FileViewer = () => {
         }
         // PDF preview
         if (fileDetails.fileType === 'pdf') {
-          const viewResponse = await fetch(`/api/files/${selectedFileId}/view`, { headers });
+          const viewResponse = await fetch(`${API_BASE_URL}/files/${selectedFileId}/view`, { headers });
           if (viewResponse.status === 401) {
             setError('Sign in required.');
             return;
@@ -198,7 +199,7 @@ const FileViewer = () => {
         ) {
           // CSV preview
           setLoading(true);
-          const previewResponse = await fetch(`/api/files/${selectedFileId}/preview`, { headers });
+          const previewResponse = await fetch(`${API_BASE_URL}/files/${selectedFileId}/preview`, { headers });
           if (previewResponse.status === 401) {
             setError('Sign in required.');
             return;
@@ -222,7 +223,7 @@ const FileViewer = () => {
             setPreviewData(null);
             setPreviewError(null);
             setLoading(true);
-            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            const viewResponse = await fetch(`${API_BASE_URL}/files/${selectedFileId}/view`);
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
               const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -248,7 +249,7 @@ const FileViewer = () => {
             setPreviewData(null);
             setPreviewError(null);
             setLoading(true);
-            const viewResponse = await fetch(`/api/files/${selectedFileId}/view`);
+            const viewResponse = await fetch(`${API_BASE_URL}/files/${selectedFileId}/view`);
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
               const result = await mammoth.convertToHtml({ arrayBuffer });
@@ -339,7 +340,7 @@ const FileViewer = () => {
       return;
     }
     try {
-      const response = await fetch(`/api/files/${fileId}`);
+      const response = await fetch(`${API_BASE_URL}/files/${fileId}`);
       if (response.status === 401) {
         toast.info('Sign in required.');
         return;
@@ -372,7 +373,7 @@ const FileViewer = () => {
     if (!file || !file._id) return;
     setDeleting(true);
     try {
-      const response = await fetch(`/api/files/${file._id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/files/${file._id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error((await response.json()).message || 'Failed to delete file');
       toast.success('File deleted successfully!');
       navigate('/file-index');

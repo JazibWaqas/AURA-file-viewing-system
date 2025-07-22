@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, Suspense, lazy } from "
 import { auth } from "./services/firebase";
 import PageLoader from "./components/PageLoader";
 import './styles/pending-approval-popup.css';
+import API_BASE_URL from './config/api';
 
 // Lazy load the page components
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -26,7 +27,7 @@ function AuthProvider({ children }) {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         try {
-            const response = await fetch(`/api/users/status/${firebaseUser.uid}`);
+            const response = await fetch(`${API_BASE_URL}/api/users/status/${firebaseUser.uid}`);
             const userData = await response.json();
             setUser({ firebaseUser, userData: userData || { status: 'pending' } });
             if (userData && userData.status === 'pending') {

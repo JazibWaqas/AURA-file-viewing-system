@@ -10,6 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../App';
 import { getIdToken } from 'firebase/auth';
+import API_BASE_URL from '../config/api';
 
 export default function FileIndexPage() {
   
@@ -41,7 +42,7 @@ export default function FileIndexPage() {
     const fetchCategories = async () => {
       setIsLoadingCategories(true);
       try {
-        const res = await fetch('/api/categories');
+        const res = await fetch(`${API_BASE_URL}/api/categories`);
         if (!res.ok) throw new Error('Failed to fetch categories');
         const categoriesData = await res.json();
         const financialStatements = categoriesData.filter(cat => cat === 'Financial Statements');
@@ -76,7 +77,7 @@ export default function FileIndexPage() {
         limit: 16,
         ...(lastVisible && !reset ? { startAfter: lastVisible } : {})
       });
-      const res = await fetch(`/api/files/paginated?${params}`);
+      const res = await fetch(`${API_BASE_URL}/api/files/paginated?${params}`);
       if (!res.ok) throw new Error('Failed to fetch files');
       const { files, lastVisible: newLastVisible, hasNextPage } = await res.json();
       setAllFiles(prev => reset ? files : [...prev, ...files]);
@@ -100,7 +101,7 @@ export default function FileIndexPage() {
         search: search,
         limit: 4
       });
-      const res = await fetch(`/api/files/paginated?${params}`);
+      const res = await fetch(`${API_BASE_URL}/api/files/paginated?${params}`);
       if (!res.ok) throw new Error('Failed to fetch recent files');
       const { files } = await res.json();
       setRecentFiles(files);
@@ -177,7 +178,7 @@ export default function FileIndexPage() {
         const token = await getIdToken(user.firebaseUser);
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const response = await fetch(`/api/files/${fileId}`, { headers });
+      const response = await fetch(`${API_BASE_URL}/api/files/${fileId}`, { headers });
       if (response.status === 401) {
         toast.info('Sign in required.');
         return;

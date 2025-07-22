@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { FiLoader } from 'react-icons/fi';
+import API_BASE_URL from '../config/api';
 
 // Lazy load HotTable
 const HotTable = lazy(() =>
@@ -21,7 +22,7 @@ const SpreadsheetViewer = ({ fileId, fileType }) => {
                 const XLSX = await import('xlsx');
                 await import('handsontable/dist/handsontable.full.min.css');
 
-                const response = await fetch(`/api/files/${fileId}/view`);
+                const response = await fetch(`${API_BASE_URL}/files/${fileId}/view`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch spreadsheet for preview.');
                 }
@@ -53,7 +54,7 @@ const SpreadsheetViewer = ({ fileId, fileType }) => {
             setLoading(true);
             setError('');
              try {
-                const previewResponse = await fetch(`/api/files/${fileId}/preview`);
+                const previewResponse = await fetch(`${API_BASE_URL}/files/${fileId}/preview`);
                 if (!previewResponse.ok) {
                     throw new Error('Failed to load CSV preview data.');
                 }

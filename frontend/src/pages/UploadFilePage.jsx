@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
   import { FaExclamationTriangle } from 'react-icons/fa';
   import { ToastContainer, toast } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
+  import API_BASE_URL from '../config/api';
   
   const defaultCategories = [
       {
@@ -105,7 +106,7 @@ import React, { useState, useEffect } from 'react';
     useEffect(() => {
       const fetchFiles = async () => {
         try {
-          const res = await fetch('/api/files');
+          const res = await fetch(`${API_BASE_URL}/files`);
           if (!res.ok) throw new Error('Failed to fetch files');
           const data = await res.json();
           const recentFiles = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
@@ -202,7 +203,7 @@ import React, { useState, useEffect } from 'react';
         formData.append('subCategory', subCategory);
         formData.append('year', year);
         formData.append('requiresAuth', requiresAuth ? 'true' : 'false');
-        const res = await fetch('/api/files/upload', {
+        const res = await fetch(`${API_BASE_URL}/files/upload`, {
           method: 'POST',
           body: formData
         });
@@ -253,7 +254,7 @@ import React, { useState, useEffect } from 'react';
             headers['Authorization'] = `Bearer ${token}`;
           }
         }
-        const response = await fetch(`/api/files/${fileId}`, { headers });
+        const response = await fetch(`${API_BASE_URL}/files/${fileId}`, { headers });
         if (!response.ok) {
           toast.error('Failed to download file. Please try again.');
           return;

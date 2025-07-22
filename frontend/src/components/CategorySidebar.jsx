@@ -1,6 +1,7 @@
 // ... existing imports ...
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/CategorySidebar.css';
+import API_BASE_URL from '../config/api';
 
 export default function CategorySidebar({ onSelect }) {
   const [categories, setCategories] = useState([]);
@@ -8,7 +9,7 @@ export default function CategorySidebar({ onSelect }) {
 
   useEffect(() => {
     // Fetch categories from backend
-    fetch('/api/categories')
+    fetch(`${API_BASE_URL}/api/categories`)
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => {

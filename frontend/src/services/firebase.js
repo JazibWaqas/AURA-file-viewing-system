@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import API_BASE_URL from '../config/api';
 
 const firebaseConfig= {
 apiKey: "AIzaSyDP-0zAhfsiBsYSYTZ2yis0ZzOXHd6kf7Q",
@@ -23,7 +24,7 @@ export const signInWithGoogle = async () => {
     const { user } = result;
 
     // After successful sign-in, notify our backend
-    const response = await fetch('/api/users/login', {
+    const response = await fetch(`${API_BASE_URL}/api/users/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
