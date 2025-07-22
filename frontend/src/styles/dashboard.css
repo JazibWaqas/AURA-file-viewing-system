@@ -61,6 +61,7 @@
   margin-bottom: 0.3rem;
   line-height: 1.7;
   font-weight: 400;
+  margin-left: 1rem;
 }
 .dashboard-intro-actions {
   flex: 1;
@@ -620,7 +621,7 @@ footer, .dashboard-footer, .footer {
   --pie-color-2: #00e6b8;   /* Bright Teal */
   --pie-color-3: #f7bf47;   /* Gold/Yellow */
   --pie-color-4: #e94fbe;   /* Magenta Pink */
-  --pie-color-5: #16e05d;   /* Bright Green */
+  --pie-color-5: #e74b36;   /* Desert Sand */
 }
 
 /* Pie chart color classes for each slice */
