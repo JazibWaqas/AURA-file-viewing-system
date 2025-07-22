@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../styles/FileViewer.css';
+import '../styles/fileviewer.css';
 import Header from '../components/Header.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiFile, FiEye, FiDownload, FiLoader, FiX, FiArrowLeft, FiInfo, FiCalendar, FiUser, FiFolder, FiTrash2, FiEdit, FiMaximize, FiMinimize, FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
