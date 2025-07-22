@@ -599,9 +599,30 @@ const FileViewer = () => {
                   </div>
                 )}
                 {(file?.fileType === 'docx' || file?.fileType === 'doc') && (
-                  <div className={`docx-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`} style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-                    <div className="docx-preview" style={{flex: 1, width: '100%', overflow: 'auto'}} dangerouslySetInnerHTML={{ __html: previewData }} />
-                  </div>
+                  isMobileDevice() ? (
+                    <div style={{
+                      overflowX: 'auto',
+                      WebkitOverflowScrolling: 'touch',
+                      width: '100%',
+                      maxWidth: '100vw',
+                      boxSizing: 'border-box',
+                      border: '1px solid #e0e0e0',
+                      background: '#fff',
+                      borderRadius: '8px',
+                      padding: '0.5rem 0.25rem',
+                      minHeight: '70vh',
+                    }}>
+                      <div
+                        className="docx-preview"
+                        style={{ overflowY: 'auto', minHeight: '65vh' }}
+                        dangerouslySetInnerHTML={{ __html: previewData }}
+                      />
+                    </div>
+                  ) : (
+                    <div className={`docx-preview-wrapper${isFullscreen ? ' fullscreen' : ''}`} style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+                      <div className="docx-preview" style={{flex: 1, width: '100%', overflow: 'auto'}} dangerouslySetInnerHTML={{ __html: previewData }} />
+                    </div>
+                  )
                 )}
                 {!['pdf', 'csv', 'excel', 'xlsx', 'docx', 'doc'].includes(file?.fileType) && (
                   <div className="unsupported-preview">
