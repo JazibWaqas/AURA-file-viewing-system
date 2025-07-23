@@ -68,6 +68,28 @@ exports.getFundingSources = async (req, res) => {
   }
 };
 
+// Delete yearly summary for a year
+exports.deleteYearlySummary = async (req, res) => {
+  try {
+    const { year } = req.params;
+    await db.collection('dashboardYearlySummary').doc(String(year)).delete();
+    res.json({ message: 'Yearly summary deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete funding sources for a year
+exports.deleteFundingSources = async (req, res) => {
+  try {
+    const { year } = req.params;
+    await db.collection('dashboardFundingSources').doc(String(year)).delete();
+    res.json({ message: 'Funding sources deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get storage statistics (file count and total size) - INSTANT LOAD VERSION
 exports.getStorageStats = async (req, res) => {
   try {

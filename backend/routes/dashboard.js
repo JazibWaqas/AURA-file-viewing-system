@@ -18,4 +18,9 @@ router.post('/storage-stats/update', dashboardController.updateStorageStats);
 router.get('/patient-data', dashboardController.getPatientData);
 router.post('/patient-data', dashboardController.addPatientData);
 
+//Delete Data
+
+router.delete('/yearly-summary/:year', dashboardController.deleteYearlySummary);
+router.delete('/funding-sources/:year', dashboardController.deleteFundingSources);
+
 module.exports = router; 

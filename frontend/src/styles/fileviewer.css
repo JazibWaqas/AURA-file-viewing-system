@@ -1374,8 +1374,8 @@ html {
    ============================= */
 .file-preview-empty-state {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center !important;
+  justify-content: center !important;
   height: 100%;
   width: 100%;
   text-align: center;

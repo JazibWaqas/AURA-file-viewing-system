@@ -5,6 +5,7 @@
   padding: 0 0 1.2rem 0;
   color: #f5f7fa;
   font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  width: 100%;
 }
 
 .dashboard-intro-row {
@@ -15,7 +16,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(90deg, #3c4776 0%, #19394f 100%);
+  background: linear-gradient(90deg, #224760 0%, #051925 100%);
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 16px rgba(60, 80, 120, 0.10);
   margin-bottom: 1.2rem;
@@ -69,14 +70,14 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
-  margin-left: 1.2rem;
+  margin-left: 1.0rem;
   margin-top: 0.2rem;
 }
 
 /* Font size for the action buttons in the intro section ("Learn More About Us", "Donate Now") */
 .intro-action-btn {
   display: inline-block;
-  padding: 0.5rem 1.2rem;
+  
   border-radius: 6px;
   background: #263238;
   color: #f7bf47;
@@ -203,6 +204,10 @@
   margin-bottom: 0.4rem;
 }
 
+.recharts-wrapper .recharts-cartesian-axis-tick text {
+  fill: #e7f7f6 !important;
+  font-weight: 550;
+} 
 /* ===================== DASHBOARD ACTIVITY & STORAGE ===================== */
 .dashboard-activity-storage {
   display: grid;
@@ -796,11 +801,11 @@ footer, .dashboard-footer, .footer {
 .dashboard-main-graphs,
 .dashboard-activity-storage,
 .dashboard-sponsors-row {
-  width: 100% !important;
+  width: 100.5% !important;
   max-width: none !important;
   margin: 0 0 1.2rem 0 !important;
   padding-left: 2vw !important;
-  padding-right: 2vw !important;
+  padding-right: 0.25vw !important;
   box-sizing: border-box !important;
 }
 
@@ -982,4 +987,19 @@ footer, .dashboard-footer, .footer {
   border: 2px solid #07243c; /* or your brand color */
   background: #fff;
   filter: brightness(1.1);
+}
+
+/* Add styles for delete input and button in graph modals */
+.dashboard-main-graphs input[type="number"] {
+  padding: 0.3em;
+  margin-right: 0.3em;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 7em;
+  font-size: 1rem;
+}
+.dashboard-main-graphs .add-data-btn[style*='background: #dc2626'] {
+  background: #dc2626 !important;
+  color: #fff !important;
+  margin-right: 0.5em;
 }

@@ -258,8 +258,8 @@ function CombinedExpenseLineChart({ data, onAddData }) {
       <ResponsiveContainer width="100%" height={340}>
         <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="year" />
-          <YAxis tickFormatter={formatNumber} />
+          <XAxis dataKey="year" tick={{ className: 'recharts-axis-tick-white' }} />
+          <YAxis tickFormatter={formatNumber} tick={{ className: 'recharts-axis-tick-white' }} />
           <Tooltip formatter={formatNumber} />
           <Legend verticalAlign="top" align="right" />
           <Line
@@ -392,6 +392,9 @@ const Home = () => {
   const [patientData, setPatientData] = useState([]);
   const [showPatientModal, setShowPatientModal] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(true);
+  const [deleteYear, setDeleteYear] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteType, setDeleteType] = useState(''); // 'yearly' or 'funding'
 
   // Fetch patient data
   useEffect(() => {
@@ -531,6 +534,41 @@ const Home = () => {
     }
   };
 
+  // Delete handler
+  const handleDelete = async () => {
+    let url = '';
+    if (deleteType === 'yearly') {
+      url = `${API_BASE_URL}/api/dashboard/yearly-summary/${deleteYear}`;
+    } else if (deleteType === 'funding') {
+      url = `${API_BASE_URL}/api/dashboard/funding-sources/${deleteYear}`;
+    }
+    const res = await fetch(url, { method: 'DELETE' });
+    if (res.ok) {
+      toast.success(`Deleted data for year ${deleteYear}`);
+      // Refresh data
+      if (deleteType === 'yearly') {
+        const yearlyRes = await fetch(`${API_BASE_URL}/api/dashboard/yearly-summary`);
+        setYearlyData(await yearlyRes.json());
+      } else if (deleteType === 'funding') {
+        const allFundingRes = await fetch(`${API_BASE_URL}/api/dashboard/funding-sources`);
+        const allFundingArr = await allFundingRes.json();
+        if (allFundingArr.length > 0) {
+          const latest = allFundingArr.reduce((a, b) => (Number(a.year) > Number(b.year) ? a : b));
+          setFundingData(latest);
+          setLatestYear(Number(latest.year));
+        } else {
+          setFundingData({});
+          setLatestYear('');
+        }
+      }
+    } else {
+      toast.error('Failed to delete data.');
+    }
+    setShowDeleteConfirm(false);
+    setDeleteYear('');
+    setDeleteType('');
+  };
+
   // Helper to check if user is approved
   const isApproved = user && user.userData && user.userData.status === 'approved';
 
@@ -627,7 +665,24 @@ const Home = () => {
         <div className="dashboard-expenses-graph">
           <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
             <h3 className="graph-title" style={{ margin: 0 }}>Annual Expenses</h3>
-            <button className="add-data-btn" onClick={handleShowBarModal}>Add Data</button>
+            <div>
+              <input
+                type="number"
+                placeholder="Year to delete"
+                value={deleteYear}
+                onChange={e => setDeleteYear(e.target.value)}
+                style={{ padding: '0.3em', marginRight: '0.3em', borderRadius: '4px', border: '1px solid #ccc', width: '7em' }}
+              />
+              <button
+                className="add-data-btn"
+                style={{ background: '#dc2626', color: '#fff', marginRight: '0.5em' }}
+                onClick={() => { setDeleteType('yearly'); setShowDeleteConfirm(true); }}
+                disabled={!deleteYear}
+              >
+                Delete
+              </button>
+              <button className="add-data-btn" onClick={handleShowBarModal}>Add Data</button>
+            </div>
           </div>
           <div className="graph-desc">Expenses incurred over the years (2015-{latestYear || '----'})</div>
           <CombinedExpenseLineChart data={yearlyData} />
@@ -636,13 +691,48 @@ const Home = () => {
         <div className="dashboard-donations-graph">
           <div className="chart-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
             <h3 className="graph-title" style={{ margin: 0 }}>Donations Breakdown ({latestYear || '----'})</h3>
-            <button className="add-data-btn" onClick={handleShowPieModal}>Add Data</button>
+            <div>
+              <input
+                type="number"
+                placeholder="Year to delete"
+                value={deleteYear}
+                onChange={e => setDeleteYear(e.target.value)}
+                style={{ padding: '0.3em', marginRight: '0.3em', borderRadius: '4px', border: '1px solid #ccc', width: '7em' }}
+              />
+              <button
+                className="add-data-btn"
+                style={{ background: '#dc2626', color: '#fff', marginRight: '0.5em' }}
+                onClick={() => { setDeleteType('funding'); setShowDeleteConfirm(true); }}
+                disabled={!deleteYear}
+              >
+                Delete
+              </button>
+              <button className="add-data-btn" onClick={handleShowPieModal}>Add Data</button>
+            </div>
           </div>
           <div className="graph-desc">Distribution of sources</div>
           <DonationsChart data={fundingData} year={latestYear} />
           <AddPieDataModal open={showPieModal} onClose={() => setShowPieModal(false)} onSubmit={handleAddPieData} />
         </div>
       </div>
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete data for year <b>{deleteYear}</b>?</p>
+            <div className="modal-actions">
+              <button onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button
+                style={{ background: '#dc2626', color: '#fff' }}
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Activity & Storage Section (animate only first time in view) */}
       <div className="dashboard-activity-storage">

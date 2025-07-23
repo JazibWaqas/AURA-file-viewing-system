@@ -577,7 +577,8 @@ const FileViewer = () => {
                 {file?.fileType === 'pdf' && file?.url && (
                   isMobileDevice() ? (
                     <div className="pdf-mobile-message">
-                      <p>PDF preview is not supported on mobile.<br/>Tap below to open the PDF in your browser or download it.</p>
+                      <p>To open or download the PDF file, tap below.</p>
+
                       <a
                         href={file.url}
                         target="_blank"

@@ -42,16 +42,21 @@ const Header = () => {
             ))}
           </ul>
         </nav>
-        {!isMobile && (user ? (
-          <div className="header-user-info">
-            {user.userData && user.userData.status === 'approved' && (
-              <span className="header-user-name">{user.firebaseUser.displayName || user.firebaseUser.email}</span>
-            )}
-            <button className="header-login-btn" onClick={signOutUser}>Log Out</button>
-          </div>
-        ) : (
-          <button className="header-login-btn" onClick={signInWithGoogle}>Log In</button>
-        ))}
+        {!isMobile && (
+  <div className="header-user-info">
+    {user?.firebaseUser && user?.userData?.status === 'approved' ? (
+      <>
+        <span className="header-user-name">
+          {user.firebaseUser.displayName || user.firebaseUser.email}
+        </span>
+        <button className="header-login-btn" onClick={signOutUser}>Log Out</button>
+      </>
+    ) : (
+      <button className="header-login-btn" onClick={signInWithGoogle}>Log In</button>
+    )}
+  </div>
+)}
+
       </div>
     </header>
   );
