@@ -9,14 +9,14 @@
     font-family: Arial, sans-serif;
     box-sizing: border-box;
     overflow-x: hidden; /* Prevent horizontal scroll */
-    overflow-y: auto; /* Allow vertical scroll only when needed */
+    overflow-y: hidden; /* Allow vertical scroll only when needed */
     
   }
   
   #root {
     min-height: 100vh;
     overflow-x: hidden; /* Prevent horizontal scroll */
-    overflow-y: auto;
+    
   }
   
   /* =============================
@@ -30,7 +30,7 @@
     width: 100%;
     background: #f0f2f5;
     overflow-x: hidden; /* Prevent horizontal scroll */
-    overflow-y: auto; /* Allow vertical scroll */
+     /* Allow vertical scroll */
   }
   
   .app-content-row {
@@ -40,7 +40,7 @@
     width: 100%;
     background: #f0f2f5;
     overflow-x: hidden; /* Prevent horizontal scroll */
-    overflow-y: auto; /* Allow vertical scroll */
+     /* Allow vertical scroll */
   }
   
   .main-content {
@@ -49,7 +49,7 @@
     background: linear-gradient(90deg, #85d8ce 0%, #085078,#2f3132 100%); 
     min-height: calc(100vh - 64px);
     overflow-x: hidden; /* Prevent horizontal scroll */
-    overflow-y: auto;
+    
     width: 100%;
     box-sizing: border-box;
   }
