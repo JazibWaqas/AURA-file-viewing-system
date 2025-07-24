@@ -445,10 +445,39 @@
     font-size: 0.7rem;
   }
   /* Font size for metric cards, graphs, activity, storage, sponsors, etc. on small screens is inherited unless overridden */
-  .metric-card, .dashboard-expenses-graph, .dashboard-donations-graph, .dashboard-activity-card, .dashboard-storage-card, .dashboard-sponsors-row {
+  .metric-card, .dashboard-expenses-graph, .dashboard-donations-graph, .dashboard-activity-card, .dashboard-storage-card {
     padding: 0.45rem 0.25rem 0.25rem 0.25rem;
     border-radius: 5px;
     font-size: 0.6rem;
+}
+.dashboard-sponsors-row,
+.sponsors-logos-row {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  box-sizing: border-box !important;
+}
+.dashboard-intro-row {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+  border-radius: 2.25 !important;
+  left: 0 !important;
+  
+  box-sizing: border-box !important;
+}
+.dashboard-sponsors-row {
+  align-items: stretch !important;
+}
+.sponsors-logos-row {
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.4rem !important;
 }
 .sponsor-logo-circle {
     width: 30px;
@@ -828,7 +857,7 @@ footer, .dashboard-footer, .footer {
 .dashboard-main-graphs,
 .dashboard-activity-storage,
 .dashboard-sponsors-row {
-  width: 101.39% !important;
+  width: 102.39% !important;
   max-width: 200% !important;
   margin: 0 0 1.2rem 0 !important;
   padding-left: 1.0rem !important;
