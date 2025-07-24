@@ -20,6 +20,7 @@ import bvaLogo from '../assets/Bva.jpg';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import API_BASE_URL from '../config/api';
+import { Link } from 'react-router-dom';
 
 // ===================== Utility Functions =====================
 
@@ -680,7 +681,7 @@ const Home = () => {
               <li><span>No recent activity</span><small>Files you view will appear here</small></li>
             </ul>
           )}
-          <a className="activity-link" href="/file-index">View All Files</a>
+          <Link className="activity-link" to="/file-index">View All Files</Link>
         </div>
         <div
           ref={storageRef}
@@ -699,7 +700,7 @@ const Home = () => {
             </>
           )}
           <div className="storage-actions">
-            <a className="storage-action-btn" href="/file-index">Manage Files</a>
+            <Link className="storage-action-btn" to="/file-index">Manage Files</Link>
             {isApproved ? (
               <a className="storage-action-btn primary" href="https://console.firebase.google.com/project/auraxkhidmat-f4c73/usage" target="_blank" rel="noopener noreferrer">Upgrade Storage</a>
             ) : (
