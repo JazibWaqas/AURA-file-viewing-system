@@ -312,14 +312,20 @@ exports.getFilesPaginated = async (req, res) => {
         Object.keys(filters).forEach(key => (filters[key] === '' || filters[key] === null || filters[key] === undefined) && delete filters[key]);
 
         if (search) {
-            const algoliaResult = await fileService.searchFilesWithAlgolia(search, Number(limit), Number(page));
-            res.json({
-                files: algoliaResult.files,
-                page: algoliaResult.page,
-                nbPages: algoliaResult.nbPages,
-                hasNextPage: algoliaResult.hasNextPage,
-                lastVisible: null
-            });
+            try {
+                const algoliaResult = await fileService.searchFilesWithAlgolia(search, Number(limit), Number(page));
+                res.json({
+                    files: algoliaResult.files,
+                    page: algoliaResult.page,
+                    nbPages: algoliaResult.nbPages,
+                    hasNextPage: algoliaResult.hasNextPage,
+                    lastVisible: null
+                });
+            } catch (algoliaError) {
+                console.warn('Algolia search failed, falling back to regular search:', algoliaError.message);
+                const result = await fileService.getFilesPaginated({ filters, limit, startAfter });
+                res.json(result);
+            }
         } else {
             const result = await fileService.getFilesPaginated({ filters, limit, startAfter });
             res.json(result);

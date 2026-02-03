@@ -8,17 +8,24 @@ const convertTimestamp = (ts) => ts && ts.toDate ? ts.toDate() : ts;
 const convertToTimestamp = (date) => date; // Firestore admin handles Date objects automatically
 
 async function searchFilesWithAlgolia(searchTerm, limit = 16, page = 0) {
-  const algoliaResult = await algoliaIndex.search(searchTerm, {
-    hitsPerPage: limit,
-    page: page,
-  });
-  // Return Algolia hits directly, plus pagination info
-  return {
-    files: algoliaResult.hits,
-    page: algoliaResult.page,
-    nbPages: algoliaResult.nbPages,
-    hasNextPage: algoliaResult.page < algoliaResult.nbPages - 1
-  };
+  try {
+    if (!algoliaIndex) {
+      throw new Error('Algolia index not initialized');
+    }
+    const algoliaResult = await algoliaIndex.search(searchTerm, {
+      hitsPerPage: limit,
+      page: page,
+    });
+    return {
+      files: algoliaResult.hits,
+      page: algoliaResult.page,
+      nbPages: algoliaResult.nbPages,
+      hasNextPage: algoliaResult.page < algoliaResult.nbPages - 1
+    };
+  } catch (error) {
+    console.error('Algolia search error:', error.message);
+    throw error;
+  }
 }
 
 class FileService {

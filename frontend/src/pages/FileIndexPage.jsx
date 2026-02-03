@@ -73,18 +73,23 @@ export default function FileIndexPage() {
         category: selectedCategory,
         subCategory: selectedSubCategory,
         year: selectedYear,
-        search: search,
+        search: search || '',
         limit: 16,
         ...(lastVisible && !reset ? { startAfter: lastVisible } : {})
       });
       const res = await fetch(`${API_BASE_URL}/api/files/paginated?${params}`);
-      if (!res.ok) throw new Error('Failed to fetch files');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch files: ${res.status} ${res.statusText}`);
+      }
       const { files, lastVisible: newLastVisible, hasNextPage } = await res.json();
       setAllFiles(prev => reset ? files : [...prev, ...files]);
       setLastVisible(newLastVisible);
       setHasMoreFiles(hasNextPage);
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.message || 'Failed to fetch files. Please check your connection and try again.';
+      setError(errorMessage);
+      console.error('Error fetching files:', err);
     } finally {
       setIsLoadingFiles(false);
       setIsLoadingMore(false);
@@ -98,14 +103,17 @@ export default function FileIndexPage() {
         category: selectedCategory,
         subCategory: selectedSubCategory,
         year: selectedYear,
-        search: search,
+        search: search || '',
         limit: 4
       });
       const res = await fetch(`${API_BASE_URL}/api/files/paginated?${params}`);
-      if (!res.ok) throw new Error('Failed to fetch recent files');
+      if (!res.ok) {
+        throw new Error('Failed to fetch recent files');
+      }
       const { files } = await res.json();
       setRecentFiles(files);
     } catch (err) {
+      console.error('Error fetching recent files:', err);
       setRecentFiles([]);
     }
   }, [selectedCategory, selectedSubCategory, selectedYear]);
