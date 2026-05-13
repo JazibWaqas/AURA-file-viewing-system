@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "snapshot:dashboard": "node scripts/generate-dashboard-snapshot.mjs",
+    "snapshot:files": "node scripts/generate-file-snapshot.mjs",
+    "snapshot": "npm run snapshot:dashboard && npm run snapshot:files",
     "lint": "eslint .",
     "preview": "vite preview"
   },

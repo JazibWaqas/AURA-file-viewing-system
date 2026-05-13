@@ -59,8 +59,8 @@
 
 .category-name.expanded,
 .category-name:hover {
-  background: #E3F0FB;
-  color: #000;
+  background: rgba(96, 200, 245, 0.14);
+  color: #fff;
   font-weight: 700;
 }
 
@@ -84,8 +84,8 @@
 }
 
 .subcategory-btn:hover {
-  background: #F2F4F8;
-  color: #000;
+  background: rgba(96, 200, 245, 0.10);
+  color: #fff;
   font-weight: 600;
 }
 

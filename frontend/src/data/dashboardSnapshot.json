@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-05-13T18:28:01.280Z",
+  "source": "https://aura-file-viewing-system.onrender.com",
+  "yearlyData": [
+    {
+      "year": 2015,
+      "totalRevenue": 12968861,
+      "totalExpenses": 13923715
+    },
+    {
+      "year": 2016,
+      "totalRevenue": 20096020,
+      "totalExpenses": 19671786
+    },
+    {
+      "year": 2017,
+      "totalRevenue": 18378444,
+      "totalExpenses": 19672195
+    },
+    {
+      "year": 2018,
+      "totalRevenue": 15948795,
+      "totalExpenses": 21292593
+    },
+    {
+      "year": 2019,
+      "totalRevenue": 25561445,
+      "totalExpenses": 21698873
+    },
+    {
+      "year": 2020,
+      "totalRevenue": 18887133,
+      "totalExpenses": 23857572
+    },
+    {
+      "year": 2021,
+      "totalRevenue": 14478076,
+      "totalExpenses": 18199534
+    },
+    {
+      "year": 2022,
+      "totalRevenue": 21318558,
+      "totalExpenses": 20461183
+    },
+    {
+      "year": 2023,
+      "totalRevenue": 24026879,
+      "totalExpenses": 26540307
+    },
+    {
+      "year": 2024,
+      "totalRevenue": 33063777,
+      "totalExpenses": 33247036
+    },
+    {
+      "year": "2025",
+      "totalRevenue": 37216502,
+      "totalExpenses": 35167077
+    }
+  ],
+  "fundingSources": [
+    {
+      "year": 2024,
+      "donations": 7183302,
+      "zakat": 4185445,
+      "sponsorship": 4247128,
+      "fees": 5804200,
+      "other": 11714272
+    }
+  ],
+  "patientData": [
+    {
+      "year": 2025,
+      "patients": 149
+    }
+  ],
+  "storageStats": {
+    "totalFiles": 262,
+    "totalSizeBytes": 49018153,
+    "totalSize": 46.75,
+    "sizeUnit": "MB",
+    "estimated": false,
+    "cached": true,
+    "lastUpdated": "2026-05-13T18:12:53.815Z"
+  }
+}

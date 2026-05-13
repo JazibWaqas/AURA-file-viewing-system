@@ -67,8 +67,8 @@
   text-align: justify; /* Optional: Can make blocks of text look cleaner, but ensure hyphenation is handled well if used. */
 }
 .aura-highlight {
-  color: #83f7fd; /* A slightly brighter, yet still professional blue for highlighting. Adjust to your brand's accent color. */
-  font-weight: 700; /* Bolder to stand out more */
+  color: #60C8F5;
+  font-weight: 700;
 }
 .dashboard-intro-actions {
   flex: 1;
@@ -85,7 +85,7 @@
   display: inline-block;
   
   border-radius: 6px;
-  background: #263238;
+  background: #1a2e44;
   color: #f7bf47;
   font-weight: 700;
   font-size: 0.8rem;
@@ -136,9 +136,10 @@
   margin: 0 auto 1.2rem auto;
 }
 .metric-card {
-  background: #232b4d;
+  background: #1D2545;
   border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(60, 80, 120, 0.10);
+  border-left: 3px solid rgba(247, 191, 71, 0.35);
+  box-shadow: 0 2px 16px rgba(15, 25, 65, 0.22), 0 1px 4px rgba(0,0,0,0.10);
   padding: 0.9rem 0.7rem 0.6rem 0.7rem;
   display: flex;
   flex-direction: column;
@@ -178,9 +179,9 @@
   align-items: stretch;
 }
 .dashboard-expenses-graph, .dashboard-donations-graph {
-  background: #232b4d;
+  background: #1D2545;
   border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(60, 80, 120, 0.10);
+  box-shadow: 0 2px 16px rgba(15, 25, 65, 0.22), 0 1px 4px rgba(0,0,0,0.10);
   padding: 0.9rem 0.7rem 0.6rem 0.7rem;
   display: flex;
   flex-direction: column;
@@ -223,9 +224,9 @@
   margin: 0 auto 1.2rem auto;
 }
 .dashboard-activity-card, .dashboard-storage-card {
-  background: #232b4d;
+  background: #1D2545;
   border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(60, 80, 120, 0.10);
+  box-shadow: 0 2px 16px rgba(15, 25, 65, 0.22), 0 1px 4px rgba(0,0,0,0.10);
   padding: 0.9rem 0.7rem 0.6rem 0.7rem;
   display: flex;
   flex-direction: column;
@@ -317,7 +318,7 @@
     font-size: 0.9rem;
   padding: 0.35rem 1rem;
   border-radius: 4px;
-  background: #263238;
+  background: #1a2e44;
   color: #f7bf47;
     font-weight: 700;
   font-size: 0.75rem;
@@ -337,9 +338,9 @@
 .dashboard-sponsors-row {
   max-width: 1200px;
   margin: 0 auto 1.2rem auto;
-  background: #232b4d;
+  background: #1D2545;
   border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(60, 80, 120, 0.10);
+  box-shadow: 0 2px 16px rgba(15, 25, 65, 0.22), 0 1px 4px rgba(0,0,0,0.10);
   padding: 0.9rem 0.7rem 0.6rem 0.7rem;
     display: flex;
     flex-direction: column;
@@ -356,28 +357,31 @@
 }
 /* 4. Sponsors logos: full width, distributed */
 .sponsors-logos-row {
-    display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-    align-items: center;
-      width: 100%;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  max-width: 760px;
+  gap: 0.65rem;
+  margin: 0 auto;
 }
 .sponsor-logo-circle {
-    width: 60px;
-    height: 60px;
+  width: clamp(42px, 7vw, 60px);
+  height: clamp(42px, 7vw, 60px);
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 6px rgba(60, 80, 120, 0.10);
   border: 1px solid #e0e7ef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 0;
+  box-sizing: border-box;
 }
 .sponsor-logo-img {
-  width: 50px;
-  height: 50px;
+  width: 78%;
+  height: 78%;
   object-fit: contain;
   border-radius: 20%;
   display: block;
@@ -415,16 +419,9 @@
     grid-template-columns: 1fr;
   }
   .sponsors-logos-row {
-    gap: 0.3rem;
-    justify-content: center;
-}
-.sponsor-logo-circle {
-    width: 36px;
-    height: 36px;
-  }
-  .sponsor-logo-img {
-    width: 28px;
-    height: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+    gap: 0.45rem;
+    max-width: 520px;
   }
 }
 @media (max-width: 600px) {
@@ -452,14 +449,8 @@
 }
 .dashboard-sponsors-row,
 .sponsors-logos-row {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-width: 100vw !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
   box-sizing: border-box !important;
 }
 .dashboard-intro-row {
@@ -472,21 +463,19 @@
   box-sizing: border-box !important;
 }
 .dashboard-sponsors-row {
-  align-items: stretch !important;
+  align-items: center !important;
+  padding: 0.75rem 0.5rem !important;
+  margin-bottom: 1rem !important;
 }
 .sponsors-logos-row {
-  justify-content: center !important;
-  flex-wrap: wrap !important;
+  grid-template-columns: repeat(auto-fit, minmax(34px, 1fr)) !important;
   gap: 0.4rem !important;
+  max-width: 430px !important;
 }
 .sponsor-logo-circle {
-    width: 30px;
-    height: 30px;
+  width: clamp(32px, 9vw, 42px);
+  height: clamp(32px, 9vw, 42px);
 }
-.sponsor-logo-img {
-    width: 14px;
-    height: 14px;
-  }
 }
 @media (max-width: 768px) {
   .dashboard-main-graphs {
@@ -677,11 +666,11 @@ footer, .dashboard-footer, .footer {
 
 /* === Pie Chart Color Variables: Vibrant and High-Contrast for Dark Background === */
 :root {
-  --pie-color-1: #3f8efc;   /* Vibrant Blue */
-  --pie-color-2: #00e6b8;   /* Bright Teal */
-  --pie-color-3: #f7bf47;   /* Gold/Yellow */
-  --pie-color-4: #e94fbe;   /* Magenta Pink */
-  --pie-color-5: #e74b36;   /* Desert Sand */
+  --pie-color-1: #5B9EE8;   /* Steel Blue */
+  --pie-color-2: #06C9A3;   /* Refined Teal */
+  --pie-color-3: #E8A82E;   /* Deep Gold */
+  --pie-color-4: #9B72CF;   /* Soft Violet */
+  --pie-color-5: #F4845F;   /* Warm Terracotta */
 }
 
 /* Pie chart color classes for each slice */
@@ -857,11 +846,11 @@ footer, .dashboard-footer, .footer {
 .dashboard-main-graphs,
 .dashboard-activity-storage,
 .dashboard-sponsors-row {
-  width: 102.39% !important;
-  max-width: 200% !important;
-  margin: 0 0 1.2rem 0 !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto 1.2rem auto !important;
   padding-left: 1.0rem !important;
-  padding-right: 0 !important;
+  padding-right: 1.0rem !important;
   box-sizing: border-box !important;
 }
 
@@ -965,7 +954,7 @@ footer, .dashboard-footer, .footer {
 }
 .metric-card:hover, .dashboard-activity-card:hover, .dashboard-storage-card:hover {
   transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 32px rgba(63,142,252,0.13);
+  box-shadow: 0 8px 32px rgba(63,142,252,0.20), 0 4px 12px rgba(0,0,0,0.15);
 }
 .sponsor-logo-circle:hover {
   transform: scale(1.12) rotate(-6deg);

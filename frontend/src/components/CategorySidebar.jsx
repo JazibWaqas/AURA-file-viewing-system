@@ -2,18 +2,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/CategorySidebar.css';
 import API_BASE_URL from '../config/api';
+import { staticCategories } from '../services/staticFileSnapshot';
 
 export default function CategorySidebar({ onSelect }) {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(staticCategories);
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
     // Fetch categories from backend
     fetch(`${API_BASE_URL}/api/categories`)
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+        }
+      })
       .catch(err => {
-        setCategories([]);
+        setCategories(staticCategories);
         // Optionally handle error
       });
   }, []);

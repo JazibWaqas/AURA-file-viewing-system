@@ -15,6 +15,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConfirmModal from '../components/ConfirmModal';
 import API_BASE_URL from '../config/api';
+import { findStaticFile, sortFilesByDate, staticFiles } from '../services/staticFileSnapshot';
 
 
 const isMobileDevice = () => {
@@ -25,9 +26,9 @@ const isMobileDevice = () => {
 const FileViewer = () => {
   const { id } = useParams();
   const [file, setFile] = useState(null);
-  const [allFiles, setAllFiles] = useState([]);
+  const [allFiles, setAllFiles] = useState(sortFilesByDate(staticFiles));
   const [recentlyViewedFiles, setRecentlyViewedFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(id && !findStaticFile(id)));
   const [error, setError] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [previewError, setPreviewError] = useState(null);
@@ -119,7 +120,7 @@ const FileViewer = () => {
         const data = await res.json();
         setAllFiles(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       } catch (err) {
-        setAllFiles([]);
+        setAllFiles(sortFilesByDate(staticFiles));
       } finally {
         // If no file is selected, stop loading after files are loaded
         if (!id) setLoading(false);
@@ -159,7 +160,14 @@ const FileViewer = () => {
       return;
     }
     const fetchFile = async () => {
-      setLoading(true);
+      const staticFile = findStaticFile(selectedFileId);
+      const hasStaticFile = Boolean(staticFile);
+
+      if (staticFile) {
+        setFile(staticFile);
+      }
+
+      setLoading(!hasStaticFile);
       setError(null);
       setPreviewError(null);
       setPreviewData(null);
@@ -198,7 +206,7 @@ const FileViewer = () => {
           fileDetails.fileType === 'csv'
         ) {
           // CSV preview
-          setLoading(true);
+          setLoading(!hasStaticFile);
           const previewResponse = await fetch(`${API_BASE_URL}/api/files/${selectedFileId}/preview`, { headers });
           if (previewResponse.status === 401) {
             setError('Sign in required.');
@@ -222,7 +230,7 @@ const FileViewer = () => {
           try {
             setPreviewData(null);
             setPreviewError(null);
-            setLoading(true);
+            setLoading(!hasStaticFile);
             const viewResponse = await fetch(`${API_BASE_URL}/api/files/${selectedFileId}/view`);
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
@@ -248,7 +256,7 @@ const FileViewer = () => {
           try {
             setPreviewData(null);
             setPreviewError(null);
-            setLoading(true);
+            setLoading(!hasStaticFile);
             const viewResponse = await fetch(`${API_BASE_URL}/api/files/${selectedFileId}/view`);
             if (viewResponse.ok) {
               const arrayBuffer = await viewResponse.arrayBuffer();
@@ -262,7 +270,11 @@ const FileViewer = () => {
           }
         }
       } catch (err) {
-        setError(err.message);
+        if (!hasStaticFile) {
+          setError(err.message);
+        } else {
+          setPreviewError('Preview will load when the file service is awake.');
+        }
       } finally {
         setLoading(false);
       }

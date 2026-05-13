@@ -6,7 +6,7 @@
     margin: 0;
     padding: 0;
     background: #f0f2f5;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
     box-sizing: border-box;
     overflow-x: hidden; /* Prevent horizontal scroll */
     overflow-y: hidden; /* Allow vertical scroll only when needed */
@@ -168,8 +168,8 @@
   
   .header-nav-link:hover,
   .header-nav-link.active {
-    background: #ede9fe;
-    color: #0c4453;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
   }
   
   /* Header login button styles */
@@ -191,7 +191,7 @@
   }
   
   .header-login-btn:hover {
-    background: #220e50;
+    background: #0d2e47;
     color: #fff;
   }
   

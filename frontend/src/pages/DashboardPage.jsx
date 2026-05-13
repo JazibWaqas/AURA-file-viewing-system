@@ -21,6 +21,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import API_BASE_URL from '../config/api';
 import { Link } from 'react-router-dom';
+import {
+  staticLatestFunding,
+  staticPatientData,
+  staticStorageStats,
+  staticYearlyData
+} from '../services/staticDashboardSnapshot';
 
 // ===================== Utility Functions =====================
 
@@ -374,6 +380,11 @@ const sponsorLogos = [
   { src: bvaLogo, alt: 'BVA',link: 'https://bva.edu.pk/' },
 ];
 
+const fallbackYearlyData = staticYearlyData;
+const fallbackFundingData = staticLatestFunding;
+const fallbackPatientData = staticPatientData;
+const fallbackStorageStats = staticStorageStats;
+
 // ===================== Main Dashboard Page =====================
 
 /**
@@ -382,17 +393,15 @@ const sponsorLogos = [
  */
 const Home = () => {
   const { user, loading: authLoading } = useAuth();
-  const [yearlyData, setYearlyData] = useState([]);
-  const [fundingData, setFundingData] = useState({});
-  const [latestYear, setLatestYear] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [yearlyData, setYearlyData] = useState(fallbackYearlyData);
+  const [fundingData, setFundingData] = useState(fallbackFundingData);
+  const [latestYear, setLatestYear] = useState(fallbackFundingData.year);
   const [showBarModal, setShowBarModal] = useState(false);
   const [showPieModal, setShowPieModal] = useState(false);
-  const [storageStats, setStorageStats] = useState({ totalFiles: 0, totalSize: 0, sizeUnit: 'MB' });
+  const [storageStats, setStorageStats] = useState(fallbackStorageStats);
   const [recentlyViewedFiles, setRecentlyViewedFiles] = useState([]);
-  const [patientData, setPatientData] = useState([]);
+  const [patientData, setPatientData] = useState(fallbackPatientData);
   const [showPatientModal, setShowPatientModal] = useState(false);
-  const [loadingPatients, setLoadingPatients] = useState(true);
   // Remove deleteYear, showDeleteConfirm, deleteType state
   // Remove handleDelete function
   // Remove delete input and delete button from graph headers
@@ -402,15 +411,14 @@ const Home = () => {
   // Fetch patient data
   useEffect(() => {
     async function fetchPatients() {
-      setLoadingPatients(true);
       try {
         const res = await fetch(`${API_BASE_URL}/api/dashboard/patient-data`);
         const data = await res.json();
-        setPatientData(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setPatientData(data);
+        }
       } catch (err) {
-        setPatientData([]);
-      } finally {
-        setLoadingPatients(false);
+        setPatientData(fallbackPatientData);
       }
     }
     fetchPatients();
@@ -453,12 +461,13 @@ const Home = () => {
   useEffect(() => {
     if (authLoading) return;
     async function fetchData() {
-      setLoading(true);
       try {
         // Yearly summary for bar/line chart
         const yearlyRes = await fetch(`${API_BASE_URL}/api/dashboard/yearly-summary`);
         const yearly = await yearlyRes.json();
-        setYearlyData(yearly);
+        if (Array.isArray(yearly) && yearly.length > 0) {
+          setYearlyData(yearly);
+        }
 
         // Funding sources for pie chart
         const fundingRes = await fetch(`${API_BASE_URL}/api/dashboard/funding-sources`);
@@ -468,15 +477,17 @@ const Home = () => {
           setFundingData(latest);
           setLatestYear(Number(latest.year));
         } else {
-          setFundingData({});
-          setLatestYear('');
+          setFundingData(fallbackFundingData);
+          setLatestYear(fallbackFundingData.year || '');
         }
 
         // Storage statistics
         const storageRes = await fetch(`${API_BASE_URL}/api/dashboard/storage-stats`);
         if (!storageRes.ok) throw new Error(`Storage API failed: ${storageRes.status}`);
         const storage = await storageRes.json();
-        setStorageStats(storage);
+        if (storage && typeof storage.totalFiles !== 'undefined') {
+          setStorageStats(storage);
+        }
 
         // Recently viewed files
         if (user?.firebaseUser?.uid) {
@@ -490,9 +501,7 @@ const Home = () => {
           setRecentlyViewedFiles([]);
         }
       } catch (error) {
-        setStorageStats({ totalFiles: 271, totalSize: 45.79, sizeUnit: 'MB' });
-      } finally {
-        setLoading(false);
+        setStorageStats(fallbackStorageStats);
       }
     }
     fetchData();
@@ -532,8 +541,8 @@ const Home = () => {
       setFundingData(latest);
       setLatestYear(Number(latest.year));
     } else {
-      setFundingData({});
-      setLatestYear('');
+      setFundingData(fallbackFundingData);
+      setLatestYear(fallbackFundingData.year || '');
     }
   };
 
@@ -611,18 +620,18 @@ const Home = () => {
       <div className="dashboard-metrics-row">
         <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-1 metric-revenue">
           <h4>Amount Raised (Current Yr)</h4>
-          <div className="metric-value">{loading ? '[ Loading... ]' : `PKR ${formatNumberFull(revenueValue)}`}</div>
+          <div className="metric-value">PKR {formatNumberFull(revenueValue)}</div>
           <div className="metric-desc">Generated in {revenueYear}</div>
         </div>
         <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-2 metric-patients">
           <h4>Patients Served</h4>
-          <div className="metric-value">{loadingPatients ? '[ Loading... ]' : patientsValue.toLocaleString('en-PK')}</div>
+          <div className="metric-value">{patientsValue.toLocaleString('en-PK')}</div>
           <div className="metric-desc">This Year: {patientsYear}</div>
           <a className="activity-link update-link" onClick={handleShowPatientModal}>update</a>
         </div>
         <div className="metric-card dashboard-animate-pop-wave dashboard-animate-delay-3 metric-deficit">
           <h4>{deficitLabel} for the Year</h4>
-          <div className={`metric-value ${!loading ? (deficitValue >= 0 ? 'surplus' : 'deficit') : ''}`}>{loading ? '[ Loading... ]' : `PKR ${formatNumberFull(deficitDisplay)}`}</div>
+          <div className={`metric-value ${deficitValue >= 0 ? 'surplus' : 'deficit'}`}>PKR {formatNumberFull(deficitDisplay)}</div>
           <div className="metric-desc">As of {deficitYear}</div>
         </div>
       </div>
@@ -663,11 +672,7 @@ const Home = () => {
           className={`dashboard-activity-card${activityAnimated ? ' dashboard-animate-slide-in-left dashboard-animate-delay-1' : ''}`}
         >
           <h4>Recent Activity</h4>
-          {loading ? (
-            <ul>
-              <li><span>Loading...</span><small>Fetching recent activity</small></li>
-            </ul>
-          ) : recentlyViewedFiles.length > 0 ? (
+          {recentlyViewedFiles.length > 0 ? (
             <ul>
               {recentlyViewedFiles.map((file) => (
                 <li key={file._id}>
@@ -688,17 +693,8 @@ const Home = () => {
           className={`dashboard-storage-card${storageAnimated ? ' dashboard-animate-pop-slow dashboard-animate-delay-2' : ''}`}
         >
           <h4>Storage Used</h4>
-          {loading ? (
-            <>
-              <div className="storage-value">Loading...</div>
-              <div className="storage-desc">Calculating storage usage</div>
-            </>
-          ) : (
-            <>
-              <div className="storage-value">{storageStats.totalSize} {storageStats.sizeUnit}</div>
-              <div className="storage-desc">{storageStats.totalFiles} files stored{storageStats.cached && storageStats.lastUpdated && (<span className="storage-update-time">Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}</span>)}</div>
-            </>
-          )}
+          <div className="storage-value">{storageStats.totalSize} {storageStats.sizeUnit}</div>
+          <div className="storage-desc">{storageStats.totalFiles} files stored{storageStats.cached && storageStats.lastUpdated && (<span className="storage-update-time">Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}</span>)}</div>
           <div className="storage-actions">
             <Link className="storage-action-btn" to="/file-index">Manage Files</Link>
             {isApproved ? (

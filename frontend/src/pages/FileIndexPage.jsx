@@ -11,14 +11,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../App';
 import { getIdToken } from 'firebase/auth';
 import API_BASE_URL from '../config/api';
+import { getStaticFilesPage, staticCategories } from '../services/staticFileSnapshot';
 
 export default function FileIndexPage() {
   
-  const [recentFiles, setRecentFiles] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [allFiles, setAllFiles] = useState([]);
-  const [isLoadingFiles, setIsLoadingFiles] = useState(true);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const initialFilesPage = getStaticFilesPage({}, { limit: 16 });
+  const initialRecentFilesPage = getStaticFilesPage({}, { limit: 4 });
+  const [recentFiles, setRecentFiles] = useState(initialRecentFilesPage.files);
+  const [categories, setCategories] = useState(staticCategories);
+  const [allFiles, setAllFiles] = useState(initialFilesPage.files);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -28,8 +31,8 @@ export default function FileIndexPage() {
   const [showYearFilter, setShowYearFilter] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [lastVisible, setLastVisible] = useState(null);
-  const [hasMoreFiles, setHasMoreFiles] = useState(false);
+  const [lastVisible, setLastVisible] = useState(initialFilesPage.lastVisible);
+  const [hasMoreFiles, setHasMoreFiles] = useState(initialFilesPage.hasNextPage);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
@@ -40,17 +43,15 @@ export default function FileIndexPage() {
   // Fetch categories and initial files
   useEffect(() => {
     const fetchCategories = async () => {
-      setIsLoadingCategories(true);
       try {
         const res = await fetch(`${API_BASE_URL}/api/categories`);
         if (!res.ok) throw new Error('Failed to fetch categories');
         const categoriesData = await res.json();
-        const financialStatements = categoriesData.filter(cat => cat === 'Financial Statements');
-        const other = categoriesData.filter(cat => cat === 'Other');
-        const rest = categoriesData.filter(cat => cat !== 'Financial Statements' && cat !== 'Other');
-        setCategories([...financialStatements, ...rest, ...other]);
+        if (Array.isArray(categoriesData) && categoriesData.length > 0) {
+          setCategories(categoriesData);
+        }
       } catch (err) {
-        setError(err.message);
+        setCategories(staticCategories);
       } finally {
         setIsLoadingCategories(false);
       }
@@ -60,10 +61,16 @@ export default function FileIndexPage() {
 
   // Fetch paginated files (All Files)
   const fetchFiles = useCallback(async (reset = false, search = searchTerm) => {
+    const staticPage = getStaticFilesPage(
+      { category: selectedCategory, subCategory: selectedSubCategory, year: selectedYear, search },
+      { limit: 16, startAfter: reset ? null : lastVisible }
+    );
+
     if (reset) {
-      setIsLoadingFiles(true);
-      setAllFiles([]);
-      setLastVisible(null);
+      setAllFiles(staticPage.files);
+      setLastVisible(staticPage.lastVisible);
+      setHasMoreFiles(staticPage.hasNextPage);
+      setIsLoadingFiles(false);
     } else {
       setIsLoadingMore(true);
     }
@@ -87,9 +94,12 @@ export default function FileIndexPage() {
       setLastVisible(newLastVisible);
       setHasMoreFiles(hasNextPage);
     } catch (err) {
-      const errorMessage = err.message || 'Failed to fetch files. Please check your connection and try again.';
-      setError(errorMessage);
       console.error('Error fetching files:', err);
+      if (!reset) {
+        setAllFiles(prev => [...prev, ...staticPage.files]);
+        setLastVisible(staticPage.lastVisible);
+        setHasMoreFiles(staticPage.hasNextPage);
+      }
     } finally {
       setIsLoadingFiles(false);
       setIsLoadingMore(false);
@@ -98,6 +108,12 @@ export default function FileIndexPage() {
 
   // Fetch recent files (limit 4, same filters)
   const fetchRecentFiles = useCallback(async (search = searchTerm) => {
+    const staticPage = getStaticFilesPage(
+      { category: selectedCategory, subCategory: selectedSubCategory, year: selectedYear, search },
+      { limit: 4 }
+    );
+    setRecentFiles(staticPage.files);
+
     try {
       const params = new URLSearchParams({
         category: selectedCategory,
@@ -114,7 +130,7 @@ export default function FileIndexPage() {
       setRecentFiles(files);
     } catch (err) {
       console.error('Error fetching recent files:', err);
-      setRecentFiles([]);
+      setRecentFiles(staticPage.files);
     }
   }, [selectedCategory, selectedSubCategory, selectedYear]);
 
