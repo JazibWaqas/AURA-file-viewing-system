@@ -486,6 +486,7 @@
     display: flex;
     justify-content: center;
     padding: 2rem 0;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
   }
   
   .load-more-button {

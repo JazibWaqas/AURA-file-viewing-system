@@ -314,11 +314,18 @@
       font-size: 0.9rem;
     }
   }
+
   
   .app-root, .app-content-row {
     width: 100%;
     min-width: 0;
     overflow-x: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 0;
+    }
   }
   
   
