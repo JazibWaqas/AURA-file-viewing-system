@@ -694,7 +694,7 @@ const Home = () => {
         >
           <h4>Storage Used</h4>
           <div className="storage-value">{storageStats.totalSize} {storageStats.sizeUnit}</div>
-          <div className="storage-desc">{storageStats.totalFiles} files stored{storageStats.cached && storageStats.lastUpdated && (<span className="storage-update-time">Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}</span>)}</div>
+          <div className="storage-desc">{typeof storageStats.totalFiles === 'number' ? storageStats.totalFiles.toLocaleString('en-US') : storageStats.totalFiles} files stored{storageStats.cached && storageStats.lastUpdated && (<span className="storage-update-time">Updated {new Date(storageStats.lastUpdated).toLocaleTimeString()}</span>)}</div>
           <div className="storage-actions">
             <Link className="storage-action-btn" to="/file-index">Manage Files</Link>
             {isApproved ? (
